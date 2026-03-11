@@ -63,6 +63,15 @@ async function initUserNav() {
 }
 initUserNav();
 
+// ── Logout (POST to prevent CSRF) ────────────────────
+const logoutBtn = $('logoutBtn');
+if (logoutBtn) {
+  logoutBtn.addEventListener('click', async () => {
+    try { await fetch('/api/logout', { method: 'POST' }); } catch {}
+    window.location.replace('/login');
+  });
+}
+
 // ── Person selector: preset educator faces ────────────
 async function initPersonSelector() {
   const psGrid = $('psGrid');

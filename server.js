@@ -57,14 +57,21 @@ app.use(express.json({ limit: '20mb' }));
 app.use(express.urlencoded({ extended: false }));
 
 // ─── Session ───────────────────────────────────────────────────────────────────
+if (!process.env.SESSION_SECRET) {
+  console.error('FATAL: SESSION_SECRET is not set in .env — refusing to start with an insecure default.');
+  process.exit(1);
+}
+const isProduction = process.env.NODE_ENV === 'production';
+if (isProduction) app.set('trust proxy', 1);
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'change-me-in-production',
+  secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   cookie: {
     httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000,
-    sameSite: 'lax'
+    sameSite: 'lax',
+    secure: isProduction
   }
 }));
 
@@ -78,6 +85,19 @@ const imageLimiter = rateLimit({
   handler: (req, res) => {
     res.status(429).json({
       error: `Too many requests — you can generate up to 5 images per minute. Please wait ${Math.ceil((req.rateLimit.resetTime - Date.now()) / 1000)}s and try again.`
+    });
+  }
+});
+
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => ipKeyGenerator(req.ip ?? req.socket.remoteAddress ?? 'unknown'),
+  handler: (req, res) => {
+    res.status(429).json({
+      error: `Too many login attempts — please wait ${Math.ceil((req.rateLimit.resetTime - Date.now()) / 1000)}s and try again.`
     });
   }
 });
@@ -113,7 +133,7 @@ app.get('/login', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
-app.post('/api/login', (req, res) => {
+app.post('/api/login', loginLimiter, (req, res) => {
   const { username, password } = req.body;
   const validUser = process.env.LOGIN_USER;
   const validPass = process.env.LOGIN_PASS;
@@ -129,15 +149,16 @@ app.post('/api/login', (req, res) => {
     return res.json({ success: true });
   }
 
-  activityLog('unknown', 'login-failed', { ip: req.ip, attempted: username });
+  const safeUser = String(username || '').replace(/[^\x20-\x7E]/g, '').slice(0, 64);
+  activityLog('unknown', 'login-failed', { ip: req.ip, attempted: safeUser });
   res.status(401).json({ error: 'Invalid username or password.' });
 });
 
-app.get('/logout', (req, res) => {
+app.post('/api/logout', (req, res) => {
   const user = req.session.user;
   req.session.destroy(() => {
     activityLog(user, 'logout', {});
-    res.redirect('/login');
+    res.json({ success: true });
   });
 });
 
@@ -192,6 +213,9 @@ app.post('/api/suggest-prompt', promptLimiter, async (req, res) => {
     const { topic, category, aspectRatio } = req.body;
     if (!topic && !category) {
       return res.status(400).json({ error: 'Topic or category is required.' });
+    }
+    if ((topic && topic.length > 500) || (category && category.length > 200)) {
+      return res.status(400).json({ error: 'Topic or category is too long.' });
     }
 
     const ratioLabel = aspectRatio === '9:16' ? '9:16' : '16:9';
@@ -252,7 +276,7 @@ Return ONLY 3 numbered lines:
         headers: {
           'Content-Type':  'application/json',
           'Authorization': `Bearer ${OPENROUTER_KEY}`,
-          'HTTP-Referer':  'http://localhost:3000',
+          'HTTP-Referer':  process.env.APP_URL || `http://localhost:${PORT}`,
           'X-Title':       'ThumbAI'
         },
         body: JSON.stringify({
@@ -330,6 +354,9 @@ app.post('/api/generate', imageLimiter, async (req, res) => {
     const { prompt, aspectRatio } = req.body;
     if (!prompt || !prompt.trim()) {
       return res.status(400).json({ error: 'Prompt is required.' });
+    }
+    if (prompt.length > 2000) {
+      return res.status(400).json({ error: 'Prompt exceeds maximum length of 2000 characters.' });
     }
 
     const dimPrefix = aspectRatio === '9:16'
