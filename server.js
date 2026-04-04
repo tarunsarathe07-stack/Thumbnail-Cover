@@ -558,17 +558,21 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// ─── Start ─────────────────────────────────────────────────────────────────────
-app.listen(PORT, () => {
-  console.log(`\n🚀 AI Thumbnail Generator running at http://localhost:${PORT}`);
-  if (!GEMINI_API_KEY || GEMINI_API_KEY === 'your_gemini_api_key_here') {
-    console.warn('⚠️  WARNING: GEMINI_API_KEY is not set in .env — API calls will fail.\n');
-  } else {
-    console.log('✅ Gemini API key loaded.');
-  }
-  if (!process.env.LOGIN_USER || !process.env.LOGIN_PASS) {
-    console.warn('⚠️  WARNING: LOGIN_USER and LOGIN_PASS are not set in .env — login will be broken.\n');
-  } else {
-    console.log(`✅ Login configured for user: ${process.env.LOGIN_USER}\n`);
-  }
-});
+// ─── Start (only when run directly, not when imported by Vercel) ───────────────
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`\n🚀 AI Thumbnail Generator running at http://localhost:${PORT}`);
+    if (!GEMINI_API_KEY || GEMINI_API_KEY === 'your_gemini_api_key_here') {
+      console.warn('⚠️  WARNING: GEMINI_API_KEY is not set in .env — API calls will fail.\n');
+    } else {
+      console.log('✅ Gemini API key loaded.');
+    }
+    if (!process.env.LOGIN_USER || !process.env.LOGIN_PASS) {
+      console.warn('⚠️  WARNING: LOGIN_USER and LOGIN_PASS are not set in .env — login will be broken.\n');
+    } else {
+      console.log(`✅ Login configured for user: ${process.env.LOGIN_USER}\n`);
+    }
+  });
+}
+
+module.exports = app;
