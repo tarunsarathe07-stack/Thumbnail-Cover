@@ -55,7 +55,7 @@ const userNavName      = $('userNavName');
 // ── User nav: show logged-in username ─────────────────
 async function initUserNav() {
   try {
-    const res  = await fetch('/api/me');
+    const res  = await fetch('/api/me', { credentials: 'include' });
     if (!res.ok) return;
     const data = await res.json();
     if (userNavName && data.user) userNavName.textContent = data.user;
@@ -67,7 +67,7 @@ initUserNav();
 const logoutBtn = $('logoutBtn');
 if (logoutBtn) {
   logoutBtn.addEventListener('click', async () => {
-    try { await fetch('/api/logout', { method: 'POST' }); } catch {}
+    try { await fetch('/api/logout', { method: 'POST', credentials: 'include' }); } catch {}
     window.location.replace('/login');
   });
 }
@@ -77,7 +77,7 @@ async function initPersonSelector() {
   const psGrid = $('psGrid');
   if (!psGrid) return;
   try {
-    const res  = await fetch('/api/presets');
+    const res  = await fetch('/api/presets', { credentials: 'include' });
     const data = await res.json();
     if (!data.presets?.length) {
       psGrid.innerHTML = '<span class="ps-empty">No presets yet — add images to <code>public/presets/</code></span>';
@@ -120,7 +120,7 @@ initPersonSelector();
 // ── API health check ─────────────────────────────────
 async function checkApiHealth() {
   try {
-    const res  = await fetch('/api/health');
+    const res  = await fetch('/api/health', { credentials: 'include' });
     const data = await res.json();
     const statusLabel = apiStatus.querySelector('.status-label');
     if (data.keyConfigured) {
@@ -426,8 +426,9 @@ async function generateThumbnail() {
     const ratio = getSelectedRatio();
     // Send full prompt to Gemini — text is rendered directly in the image (3D/embossed)
     const res   = await fetch('/api/generate', {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method:      'POST',
+      credentials: 'include',
+      headers:     { 'Content-Type': 'application/json' },
       body: JSON.stringify({ prompt: rawPrompt, aspectRatio: ratio })
     });
     const data = await res.json();
@@ -564,7 +565,7 @@ async function doFaceSwap() {
     formData.append('targetImage', state.targetFile);
     if (customPrompt) formData.append('prompt', customPrompt);
 
-    const res  = await fetch('/api/faceswap', { method: 'POST', body: formData });
+    const res  = await fetch('/api/faceswap', { method: 'POST', credentials: 'include', body: formData });
     const data = await res.json();
     if (!res.ok || !data.success) throw new Error(data.error || 'Face swap failed. Try different images.');
 
@@ -875,8 +876,9 @@ async function sendFabMessage() {
     }
 
     const res  = await fetch('/api/suggest-prompt', {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method:      'POST',
+      credentials: 'include',
+      headers:     { 'Content-Type': 'application/json' },
       body: JSON.stringify({ topic, aspectRatio: ratio })
     });
     const data = await res.json();
