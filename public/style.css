@@ -294,8 +294,7 @@ body::after {
   padding: 14px 16px 34px;
   resize: none;
   min-height: 110px;
-  max-height: 300px;
-  overflow-y: auto;
+  overflow-y: hidden;
   transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
   outline: none;
   backdrop-filter: blur(8px);

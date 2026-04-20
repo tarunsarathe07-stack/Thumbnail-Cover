@@ -165,7 +165,9 @@ function hideEl(el) { el.setAttribute('hidden', ''); }
 
 function autoResize(el) {
   el.style.height = 'auto';
-  el.style.height = el.scrollHeight + 'px';
+  const sh = el.scrollHeight;
+  el.style.height      = Math.min(sh, 250) + 'px';
+  el.style.overflowY   = sh > 250 ? 'auto' : 'hidden';
 }
 
 function showError(el, msg) { el.textContent = msg; showEl(el); }
