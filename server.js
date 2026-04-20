@@ -4,7 +4,7 @@ const multer   = require('multer');
 const fetch    = require('node-fetch');
 const path     = require('path');
 const fs       = require('fs');
-const session  = require('express-session');
+const session  = require('cookie-session');
 const { rateLimit, ipKeyGenerator } = require('express-rate-limit');
 const { log: activityLog }          = require('./activity-logger');
 
@@ -58,21 +58,20 @@ app.use(express.urlencoded({ extended: false }));
 
 // ─── Session ───────────────────────────────────────────────────────────────────
 if (!process.env.SESSION_SECRET) {
-  console.error('FATAL: SESSION_SECRET is not set in .env — refusing to start with an insecure default.');
+  console.error('FATAL: SESSION_SECRET is not set — refusing to start with an insecure default.');
   process.exit(1);
 }
 const isProduction = process.env.NODE_ENV === 'production';
 if (isProduction) app.set('trust proxy', 1);
+// cookie-session stores the session in a signed cookie — no server-side store
+// required, so it works correctly in Vercel's stateless serverless environment.
 app.use(session({
-  secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000,
-    sameSite: 'lax',
-    secure: isProduction
-  }
+  name:     'session',
+  keys:     [process.env.SESSION_SECRET],
+  maxAge:   24 * 60 * 60 * 1000,
+  httpOnly: true,
+  sameSite: 'lax',
+  secure:   isProduction
 }));
 
 // ─── Rate limiting ─────────────────────────────────────────────────────────────
@@ -156,10 +155,9 @@ app.post('/api/login', loginLimiter, (req, res) => {
 
 app.post('/api/logout', (req, res) => {
   const user = req.session.user;
-  req.session.destroy(() => {
-    activityLog(user, 'logout', {});
-    res.json({ success: true });
-  });
+  req.session = null; // clears the cookie-session cookie
+  activityLog(user, 'logout', {});
+  res.json({ success: true });
 });
 
 app.get('/api/health', (req, res) => {
@@ -558,17 +556,21 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// ─── Start ─────────────────────────────────────────────────────────────────────
-app.listen(PORT, () => {
-  console.log(`\n🚀 AI Thumbnail Generator running at http://localhost:${PORT}`);
-  if (!GEMINI_API_KEY || GEMINI_API_KEY === 'your_gemini_api_key_here') {
-    console.warn('⚠️  WARNING: GEMINI_API_KEY is not set in .env — API calls will fail.\n');
-  } else {
-    console.log('✅ Gemini API key loaded.');
-  }
-  if (!process.env.LOGIN_USER || !process.env.LOGIN_PASS) {
-    console.warn('⚠️  WARNING: LOGIN_USER and LOGIN_PASS are not set in .env — login will be broken.\n');
-  } else {
-    console.log(`✅ Login configured for user: ${process.env.LOGIN_USER}\n`);
-  }
-});
+// ─── Start (only when run directly, not when imported by Vercel) ───────────────
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`\n🚀 AI Thumbnail Generator running at http://localhost:${PORT}`);
+    if (!GEMINI_API_KEY || GEMINI_API_KEY === 'your_gemini_api_key_here') {
+      console.warn('⚠️  WARNING: GEMINI_API_KEY is not set in .env — API calls will fail.\n');
+    } else {
+      console.log('✅ Gemini API key loaded.');
+    }
+    if (!process.env.LOGIN_USER || !process.env.LOGIN_PASS) {
+      console.warn('⚠️  WARNING: LOGIN_USER and LOGIN_PASS are not set in .env — login will be broken.\n');
+    } else {
+      console.log(`✅ Login configured for user: ${process.env.LOGIN_USER}\n`);
+    }
+  });
+}
+
+module.exports = app;
