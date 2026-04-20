@@ -137,7 +137,7 @@ async function checkApiHealth() {
 }
 checkApiHealth();
 
-// ── Char counter ─────────────────────────────────────
+// ── Char counter + auto-resize ────────────────────────
 promptInput.addEventListener('input', () => {
   const len = promptInput.value.length;
   charCount.textContent = `${len} / 2000`;
@@ -145,6 +145,7 @@ promptInput.addEventListener('input', () => {
   else if (len > 1600) charCount.style.color = '#eab308';
   else charCount.style.color = '';
   if (len > 2000) promptInput.value = promptInput.value.slice(0, 2000);
+  autoResize(promptInput);
 });
 
 // ── Aspect ratio toggle ───────────────────────────────
@@ -161,6 +162,11 @@ document.querySelectorAll('.ratio-card').forEach(card => {
 // ── Helpers ───────────────────────────────────────────
 function showEl(el) { el.removeAttribute('hidden'); }
 function hideEl(el) { el.setAttribute('hidden', ''); }
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = el.scrollHeight + 'px';
+}
 
 function showError(el, msg) { el.textContent = msg; showEl(el); }
 function clearError(el)     { el.textContent = '';   hideEl(el); }

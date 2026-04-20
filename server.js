@@ -11,7 +11,7 @@ const { log: activityLog }          = require('./activity-logger');
 const app  = express();
 const PORT = process.env.PORT || 3000;
 const GEMINI_API_KEY      = process.env.GEMINI_API_KEY;
-const GEMINI_API_URL      = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-image-preview:generateContent';
+const GEMINI_API_URL      = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp-image-generation:generateContent';
 const GEMINI_API_URL_FB   = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp-image-generation:generateContent';
 const GEMINI_TEXT_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
 const OPENROUTER_API_URL  = 'https://openrouter.ai/api/v1/chat/completions';
@@ -366,15 +366,17 @@ app.post('/api/generate', imageLimiter, async (req, res) => {
       ? 'Create a 9:16 portrait image (1008x1792px) for Instagram Reels / YouTube Shorts.'
       : 'Create a 16:9 landscape image (1792x1008px) for YouTube thumbnails.';
 
+    const format = aspectRatio === '9:16' ? '9:16 vertical format' : '16:9 landscape format';
+
     const enhancedPrompt =
       `${dimPrefix}\n\n` +
-      `Visual Style Guidelines:\n${BRAND_KB}\n\n` +
-      `Design Request: ${prompt.trim()}\n\n` +
-      `Create a professional, eye-catching thumbnail optimized for ${aspectRatio === '9:16' ? 'Instagram Reels' : 'YouTube'}. ` +
-      `Render ALL text directly in the image as bold 3D extruded/embossed text with photorealistic depth, shadows, and lighting effects. ` +
-      `Text must look like professional YouTube thumbnail typography — thick, 3D, with strong drop shadows. No flat or plain text. ` +
-      `The scene, subjects, props, and setting must match the topic described above — do not default to generic academic/student imagery unless the topic is about education. ` +
-      `The image must be vibrant, high-contrast, and designed to maximize click-through rates. No letterboxing or borders.`;
+      `Professional YouTube thumbnail, ${format}, cinematic composition, real photographic quality, ` +
+      `dramatic lighting with strong shadows, bold graphic design typography with thick white text + ` +
+      `one accent color (yellow OR red), large subject/person in foreground cutout style, ` +
+      `contextual background scene behind subject, layered depth: foreground subject + midground props + ` +
+      `background environment, NO flat illustrations, NO cartoon style, hyper-realistic photographic render, ` +
+      `high contrast, punchy colors, style reference: Indian news channel YouTube thumbnails. ` +
+      `User description: ${prompt.trim()}`;
 
     const requestBody = {
       contents: [{ parts: [{ text: enhancedPrompt }] }],
