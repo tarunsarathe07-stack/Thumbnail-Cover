@@ -55,7 +55,12 @@ const upload  = multer({
 // ─── Body parsing ──────────────────────────────────────────────────────────────
 app.use(express.json({ limit: '20mb' }));
 app.use(express.urlencoded({ extended: false }));
-
+if (require.main === module) {
+  app.listen(PORT, () => {
+    // Whatever console.log code is already here
+  });
+}
+module.exports = app;
 // ─── Session ───────────────────────────────────────────────────────────────────
 if (!process.env.SESSION_SECRET) {
   console.error('FATAL: SESSION_SECRET is not set — refusing to start with an insecure default.');
