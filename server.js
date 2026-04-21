@@ -4,15 +4,30 @@ const multer   = require('multer');
 const fetch    = require('node-fetch');
 const path     = require('path');
 const fs       = require('fs');
+const OpenAI   = require('openai');
 const session  = require('cookie-session');
 const { rateLimit, ipKeyGenerator } = require('express-rate-limit');
 const { log: activityLog }          = require('./activity-logger');
 
+// ─── Required environment variables ───────────────────────────────────────────
+// OPENAI_API_KEY  — OpenAI key for thumbnail generation (gpt-image-1)
+// GEMINI_API_KEY  — Google Gemini key for face swap + prompt suggestions
+// SESSION_SECRET  — Secret used to sign cookie-session cookies
+// LOGIN_USER      — App login username
+// LOGIN_PASS      — App login password
+
 const app  = express();
 const PORT = process.env.PORT || 3000;
+
+// OpenAI — used by /api/generate
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+// Initialise lazily so the server starts cleanly even without the key set
+const openaiClient   = OPENAI_API_KEY ? new OpenAI({ apiKey: OPENAI_API_KEY }) : null;
+
+// Gemini — used by /api/faceswap and /api/suggest-prompt
 const GEMINI_API_KEY      = process.env.GEMINI_API_KEY;
-const GEMINI_API_URL      = 'https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-fast-generate-001:generateContent';
-const GEMINI_API_URL_FB   = 'https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-fast-generate-001:generateContent';
+const GEMINI_API_URL      = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp-image-generation:generateContent';
+const GEMINI_API_URL_FB   = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp-image-generation:generateContent';
 const GEMINI_TEXT_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
 const OPENROUTER_API_URL  = 'https://openrouter.ai/api/v1/chat/completions';
 const OPENROUTER_KEY      = process.env._0xOK;
@@ -55,12 +70,7 @@ const upload  = multer({
 // ─── Body parsing ──────────────────────────────────────────────────────────────
 app.use(express.json({ limit: '20mb' }));
 app.use(express.urlencoded({ extended: false }));
-if (require.main === module) {
-  app.listen(PORT, () => {
-    // Whatever console.log code is already here
-  });
-}
-module.exports = app;
+
 // ─── Session ───────────────────────────────────────────────────────────────────
 if (!process.env.SESSION_SECRET) {
   console.error('FATAL: SESSION_SECRET is not set — refusing to start with an insecure default.');
@@ -168,7 +178,7 @@ app.post('/api/logout', (req, res) => {
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'ok',
-    keyConfigured: !!GEMINI_API_KEY && GEMINI_API_KEY !== 'your_gemini_api_key_here',
+    keyConfigured: !!OPENAI_API_KEY,
     loggedIn: !!req.session?.loggedIn
   });
 });
@@ -347,11 +357,11 @@ Return ONLY 3 numbered lines:
   }
 });
 
-// ─── Generate thumbnail ────────────────────────────────────────────────────────
+// ─── Generate thumbnail (OpenAI gpt-image-1) ──────────────────────────────────
 app.post('/api/generate', imageLimiter, async (req, res) => {
   try {
-    if (!GEMINI_API_KEY || GEMINI_API_KEY === 'your_gemini_api_key_here') {
-      return res.status(500).json({ error: 'Gemini API key not configured. Please set GEMINI_API_KEY in your .env file.' });
+    if (!OPENAI_API_KEY) {
+      return res.status(500).json({ error: 'OpenAI API key not configured. Please set OPENAI_API_KEY in your .env file.' });
     }
 
     const { prompt, aspectRatio } = req.body;
@@ -363,8 +373,8 @@ app.post('/api/generate', imageLimiter, async (req, res) => {
     }
 
     const dimPrefix = aspectRatio === '9:16'
-      ? 'Create a 9:16 portrait image (1008x1792px) for Instagram Reels / YouTube Shorts.'
-      : 'Create a 16:9 landscape image (1792x1008px) for YouTube thumbnails.';
+      ? 'Create a 9:16 portrait image (1024x1536px) for Instagram Reels / YouTube Shorts.'
+      : 'Create a 16:9 landscape image (1536x1024px) for YouTube thumbnails.';
 
     const format = aspectRatio === '9:16' ? '9:16 vertical format' : '16:9 landscape format';
 
@@ -378,59 +388,28 @@ app.post('/api/generate', imageLimiter, async (req, res) => {
       `high contrast, punchy colors, style reference: Indian news channel YouTube thumbnails. ` +
       `User description: ${prompt.trim()}`;
 
-    const requestBody = {
-      contents: [{ parts: [{ text: enhancedPrompt }] }],
-      generationConfig: { responseModalities: ['IMAGE', 'TEXT'] }
-    };
+    const size = aspectRatio === '9:16' ? '1024x1536' : '1536x1024';
 
-    // ── Try new model first, fall back to flash-exp ────────────────────────────
-    const ctrl = new AbortController();
-    const tId  = setTimeout(() => ctrl.abort(), 60000);
-
-    let response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(requestBody),
-      signal: ctrl.signal
+    const result = await openaiClient.images.generate({ // openaiClient is non-null here (key checked above)
+      model:   'gpt-image-1',
+      prompt:  enhancedPrompt,
+      n:       1,
+      size,
+      quality: 'medium'
     });
-    clearTimeout(tId);
 
-    // If new model not available, fall back silently
-    if (response.status === 404 || response.status === 400) {
-      console.log('[Generate] gemini-3-pro-image-preview not available, falling back to flash-exp');
-      const ctrl2 = new AbortController();
-      const tId2  = setTimeout(() => ctrl2.abort(), 60000);
-      response = await fetch(`${GEMINI_API_URL_FB}?key=${GEMINI_API_KEY}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestBody),
-        signal: ctrl2.signal
-      });
-      clearTimeout(tId2);
+    const imageData = result.data?.[0]?.b64_json;
+    if (!imageData) {
+      return res.status(500).json({ error: 'No image returned by OpenAI. Try a different prompt.' });
     }
 
-    const data = await response.json();
-
-    if (!response.ok) {
-      return res.status(response.status).json({ error: data?.error?.message || 'Gemini API error' });
-    }
-
-    const candidates = data?.candidates || [];
-    for (const candidate of candidates) {
-      for (const part of candidate?.content?.parts || []) {
-        if (part.inlineData?.mimeType?.startsWith('image/')) {
-          activityLog(req.session.user, 'generate', { ratio: aspectRatio });
-          return res.json({
-            success:    true,
-            imageData:  part.inlineData.data,
-            mimeType:   part.inlineData.mimeType,
-            aspectRatio
-          });
-        }
-      }
-    }
-
-    return res.status(500).json({ error: 'No image was returned by Gemini. Try a different prompt.' });
+    activityLog(req.session.user, 'generate', { ratio: aspectRatio });
+    return res.json({
+      success:    true,
+      imageData,
+      mimeType:   'image/png',
+      aspectRatio
+    });
   } catch (err) {
     console.error('Generate error:', err);
     res.status(500).json({ error: err.message || 'Internal server error' });
@@ -567,8 +546,13 @@ app.get('*', (req, res) => {
 if (require.main === module) {
   app.listen(PORT, () => {
     console.log(`\n🚀 AI Thumbnail Generator running at http://localhost:${PORT}`);
-    if (!GEMINI_API_KEY || GEMINI_API_KEY === 'your_gemini_api_key_here') {
-      console.warn('⚠️  WARNING: GEMINI_API_KEY is not set in .env — API calls will fail.\n');
+    if (!OPENAI_API_KEY) {
+      console.warn('⚠️  WARNING: OPENAI_API_KEY is not set in .env — image generation will fail.\n');
+    } else {
+      console.log('✅ OpenAI API key loaded.');
+    }
+    if (!GEMINI_API_KEY) {
+      console.warn('⚠️  WARNING: GEMINI_API_KEY is not set in .env — face swap and prompt suggestions will fail.\n');
     } else {
       console.log('✅ Gemini API key loaded.');
     }
