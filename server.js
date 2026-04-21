@@ -10,7 +10,7 @@ const { rateLimit, ipKeyGenerator } = require('express-rate-limit');
 const { log: activityLog }          = require('./activity-logger');
 
 // ─── Required environment variables ───────────────────────────────────────────
-// OPENAI_API_KEY  — OpenAI key for thumbnail generation (gpt-image-1)
+// OPENAI_API_KEY  — OpenAI key for thumbnail generation (gpt-image-1.5)
 // GEMINI_API_KEY  — Google Gemini key for face swap + prompt suggestions
 // SESSION_SECRET  — Secret used to sign cookie-session cookies
 // LOGIN_USER      — App login username
@@ -357,7 +357,7 @@ Return ONLY 3 numbered lines:
   }
 });
 
-// ─── Generate thumbnail (OpenAI gpt-image-1) ──────────────────────────────────
+// ─── Generate thumbnail (OpenAI gpt-image-1.5) ────────────────────────────────
 app.post('/api/generate', imageLimiter, async (req, res) => {
   try {
     if (!OPENAI_API_KEY) {
@@ -391,11 +391,11 @@ app.post('/api/generate', imageLimiter, async (req, res) => {
     const size = aspectRatio === '9:16' ? '1024x1536' : '1536x1024';
 
     const result = await openaiClient.images.generate({ // openaiClient is non-null here (key checked above)
-      model:   'gpt-image-1',
+      model:   'gpt-image-1.5',
       prompt:  enhancedPrompt,
       n:       1,
       size,
-      quality: 'medium'
+      quality: 'low'
     });
 
     const imageData = result.data?.[0]?.b64_json;
