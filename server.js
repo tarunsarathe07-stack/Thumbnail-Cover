@@ -258,14 +258,14 @@ app.post('/api/suggest-prompt', promptLimiter, async (req, res) => {
   }
 });
 
-// ─── Generate thumbnail (OpenAI gpt-image-1.5) ────────────────────────────────
+// ─── Generate thumbnail (OpenAI gpt-image-2) ────────────────────────────────
 app.post('/api/generate', imageLimiter, async (req, res) => {
   try {
     if (!OPENAI_API_KEY) {
       return res.status(500).json({ error: 'OpenAI API key not configured. Please set OPENAI_API_KEY in your .env file.' });
     }
 
-    const { prompt, aspectRatio } = req.body;
+    const { prompt, aspectRatio, style, mode } = req.body;
     if (!prompt || !prompt.trim()) {
       return res.status(400).json({ error: 'Prompt is required.' });
     }
@@ -273,30 +273,55 @@ app.post('/api/generate', imageLimiter, async (req, res) => {
       return res.status(400).json({ error: 'Prompt exceeds maximum length of 2000 characters.' });
     }
 
-    const dimPrefix = aspectRatio === '9:16'
-      ? 'Create a 9:16 portrait image (1024x1536px) for Instagram Reels / YouTube Shorts.'
-      : 'Create a 16:9 landscape image (1536x1024px) for YouTube thumbnails.';
+    // FIX 1 — Aspect ratio → size
+    let size;
+    if (aspectRatio === '9:16')      size = '1024x1792';
+    else if (aspectRatio === '16:9') size = '1792x1024';
+    else                             size = '1024x1024';
 
-    const format = aspectRatio === '9:16' ? '9:16 vertical format' : '16:9 landscape format';
+    // FIX 3 — Style mode modifiers
+    const styleMap = {
+      cinematic: 'dramatic lighting, shadows, depth',
+      minimal:   'very clean background, single subject, lots of empty space',
+      news:      'breaking news style, bold red and white text, high contrast'
+    };
+    const styleHint = styleMap[style] || '';
 
-    const enhancedPrompt =
-      `${dimPrefix}\n\n` +
-      `Professional YouTube thumbnail, ${format}, cinematic composition, real photographic quality, ` +
-      `dramatic lighting with strong shadows, bold graphic design typography with thick white text + ` +
-      `one accent color (yellow OR red), large subject/person in foreground cutout style, ` +
-      `contextual background scene behind subject, layered depth: foreground subject + midground props + ` +
-      `background environment, NO flat illustrations, NO cartoon style, hyper-realistic photographic render, ` +
-      `high contrast, punchy colors, style reference: Indian news channel YouTube thumbnails. ` +
-      `User description: ${prompt.trim()}`;
+    // FIX 2 — Structured minimal prompt
+    let finalPrompt = `Create a high CTR YouTube thumbnail.
 
-    const size = aspectRatio === '9:16' ? '1024x1536' : '1536x1024';
+STYLE:
+- Cinematic, high contrast, photorealistic
+${styleHint ? `- ${styleHint}` : ''}
+LAYOUT:
+- One main subject only
+- Minimal background
+- No clutter
+- Clear focus
 
-    const result = await openaiClient.images.generate({ // openaiClient is non-null here (key checked above)
+TEXT:
+- Bold, large, readable headline (max 4 words)
+
+TOPIC:
+${prompt.trim()}
+
+IMPORTANT:
+- Avoid multiple elements
+- Avoid infographics or complex diagrams
+- Keep composition clean and simple`;
+
+    // FIX 4 — Clutter control
+    if (mode === 'minimal') {
+      finalPrompt += '\nExtremely minimal, only one subject, no extra objects.';
+    }
+
+    // FIX 5 — API call
+    const result = await openaiClient.images.generate({
       model:   'gpt-image-2',
-      prompt:  enhancedPrompt,
+      prompt:  finalPrompt,
       n:       1,
       size,
-      quality: 'low'
+      quality: 'medium'
     });
 
     const imageData = result.data?.[0]?.b64_json;
