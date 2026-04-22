@@ -231,25 +231,35 @@ a   { color: inherit; text-decoration: none; }
   position: relative;
   display: flex;
   flex-direction: column;
+  isolation: isolate;
 }
 
 /* Theatre background */
 .hero-bg {
   position: absolute;
   inset: 0;
-  background:
-    linear-gradient(to right,
-      rgba(0,0,0,.78) 0%,
-      rgba(0,0,0,.70) 45%,
-      rgba(0,0,0,.42) 100%),
-    url('/assets/theatre.jpeg') center/cover no-repeat;
-  /* Fallback when image missing */
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(120deg,
+      rgba(4, 4, 8, .86) 0%,
+      rgba(6, 6, 12, .74) 42%,
+      rgba(8, 8, 14, .56) 100%),
+    url('/assets/theatre.jpeg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  transform: scale(1.05);
+  transition: transform 8s ease-out;
+  /* Fallback when image is missing */
   background-color: #0d0d14;
 }
 
+.hero:hover .hero-bg { transform: scale(1.08); }
+
 .hero-content {
   position: relative;
-  z-index: 2;
+  z-index: 1;
   flex: 1;
   display: flex;
   align-items: center;

@@ -34,28 +34,180 @@ const OPENROUTER_API_URL  = 'https://openrouter.ai/api/v1/chat/completions';
 const OPENROUTER_KEY      = process.env._0xOK;
 const OPENROUTER_MODEL    = process.env._0xOM || 'openai/gpt-oss-20b';
 
-// ─── Brand knowledge base (prepended to every image generation) ────────────────
-const BRAND_KB = `Brand Visual Style Guide for Professional Thumbnails:
-- High contrast, bold aesthetic with cinematic quality
-- Dark gritty or dramatic backgrounds
-- Text rendered directly in the image with professional YouTube thumbnail typography
-- Text style variety (pick the best for each thumbnail):
-  * 3D extruded/embossed bold white text with depth and dark shadows (classic)
-  * Metallic chrome or silver text with reflections and shine
-  * Neon glow text (electric blue, red, green) with bloom effect against dark backgrounds
-  * Bold gradient text (white-to-gold, red-to-orange, blue-to-cyan) with 3D depth
-  * Clean modern sans-serif with colored highlight strips/banners behind key words
-  * Distressed/grunge textured text for edgy or dramatic topics
-  * Glass/transparent text with refraction effect for premium/tech topics
-- Key highlight words: Use contrasting color — yellow/gold, red banner, neon accent, or colored underline
-- Questions and exclamation points for engagement
-- Text interacts with scene — can overlap subjects, have realistic depth and occlusion
-- Layout 9:16: bold text in upper 40%, subject in center/lower area
-- Layout 16:9: subject on right 30-40%, bold text block on left 60-70%
-- Props and setting must match the topic (e.g. law books for legal, maps for geopolitics, charts for finance, etc.)
-- Cinematic lighting: rim light on subject, key light from front-right, subtle vignette on edges
-- Subjects and people must match the topic context and ethnicity where relevant
-- Hyper-realistic photographic quality, no cartoons or illustrations`;
+const VISUAL_PROMPT_SYSTEM = `You are a thumbnail visual prompt generator.
+
+Return a SHORT visual prompt.
+
+Rules:
+- Max 15–20 words
+- Only visual elements
+- No storytelling
+- No sentences
+- Comma-separated phrases only
+
+Format:
+subject, action/emotion, key props, lighting, camera style
+
+Example:
+student studying late night, desk lamp, books, wall calendar, focused, cinematic lighting
+
+Return ONLY the prompt.`;
+
+const HEADLINE_SYSTEM = `You are a YouTube thumbnail copywriter.
+
+Generate a SHORT, powerful headline.
+
+Rules:
+- Max 3–5 words
+- High curiosity or urgency
+- No filler words
+- Click-worthy
+
+Examples:
+CLAT in 7 Months → "CRACK CLAT FAST"
+Manipur protest → "VIOLENCE ERUPTS"
+IPL win → "MI CREATE HISTORY"
+
+Return ONLY the headline.`;
+
+function detectCategory(input = '') {
+  if (input.match(/clat|exam|study|upsc/i)) return 'education';
+  if (input.match(/war|attack|protest|news|blast/i)) return 'news';
+  return 'viral';
+}
+
+function getCategoryStyle(category) {
+  if (category === 'education') {
+    return `
+Category Direction:
+- clean desk setup
+- books, laptop, study elements
+- calm cinematic lighting
+- focused, determined, calm intensity`;
+  }
+
+  if (category === 'news') {
+    return `
+Category Direction:
+- dramatic lighting
+- emotional faces
+- fire, smoke, chaos elements
+- urgency tone
+- fear, anger, urgency, chaos`;
+  }
+
+  return `
+Category Direction:
+- exaggerated emotion
+- bold colors (balanced, not over-saturated)
+- dynamic framing
+- extreme emotion, surprise, excitement`;
+}
+
+function getLayoutStyle() {
+  const layouts = [
+    'text top, subject center',
+    'text center overlay, subject behind',
+    'text bottom, subject top'
+  ];
+  return layouts[Math.floor(Math.random() * layouts.length)];
+}
+
+async function createTextCompletion(systemPrompt, userInput, maxTokens = 80) {
+  const completion = await openaiClient.chat.completions.create({
+    model: 'gpt-4o-mini',
+    messages: [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: userInput }
+    ],
+    max_tokens: maxTokens
+  });
+
+  return completion.choices[0].message.content?.trim() || '';
+}
+
+async function generateVisualPrompt(input) {
+  return createTextCompletion(VISUAL_PROMPT_SYSTEM, input, 80);
+}
+
+function sanitizeHeadline(headline, fallbackInput) {
+  const cleaned = String(headline || '')
+    .replace(/["']/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  if (!cleaned) {
+    return fallbackInput.split(/\s+/).slice(0, 4).join(' ').toUpperCase();
+  }
+
+  return cleaned.split(/\s+/).slice(0, 5).join(' ');
+}
+
+async function generateHeadline(input) {
+  const rawHeadline = await createTextCompletion(HEADLINE_SYSTEM, input, 40);
+  return sanitizeHeadline(rawHeadline, input);
+}
+
+function buildThumbnailPrompt({ visualPrompt, headline, category, layoutStyle }) {
+  const categoryStyle = getCategoryStyle(category);
+
+  const finalPrompt = `
+Create a high-quality YouTube thumbnail.
+
+Subject:
+${visualPrompt}
+
+Headline:
+${headline}
+
+Style:
+- cinematic lighting
+- high contrast but NOT over-saturated
+- realistic skin tones
+- professional color grading (avoid HDR/glow)
+- avoid over-saturation
+- avoid excessive glow
+- avoid artificial HDR look
+- prefer cinematic color grading
+
+Composition:
+- clear focal subject
+- medium or close-up framing
+- background supports subject (not cluttered)
+- depth, lighting separation
+
+Text Layout:
+- BIG bold headline (max 3–5 words)
+- clean typography, high contrast colors (yellow/white/red)
+- subtle shadow or outline for readability
+- text must dominate composition
+- minimal words only
+- bold, readable typography
+- proper spacing
+- strong contrast background
+- no paragraph text
+- Headline: "${headline}"
+
+Layout:
+- ${layoutStyle}
+- text and subject should not overlap poorly
+- maintain clear readability
+
+${categoryStyle}
+
+Color Control:
+- strong contrast but controlled saturation
+- avoid neon colors
+- cinematic tones only
+
+Quality:
+- ultra sharp
+- photorealistic
+- professional thumbnail design
+`.trim();
+
+  return finalPrompt;
+}
 
 // ─── Multer config ─────────────────────────────────────────────────────────────
 const storage = multer.memoryStorage();
@@ -236,16 +388,7 @@ app.post('/api/suggest-prompt', promptLimiter, async (req, res) => {
       return res.status(400).json({ error: 'Topic is too long.' });
     }
 
-    const completion = await openaiClient.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [{
-        role: 'user',
-        content: `Write a detailed image generation prompt for a YouTube thumbnail about: ${userInput}. Make it cinematic, dramatic, high CTR. Include: subject, action, lighting, text overlay, background. Max 150 words.`
-      }],
-      max_tokens: 200
-    });
-
-    const prompt = completion.choices[0].message.content?.trim();
+    const prompt = await generateVisualPrompt(userInput);
     if (!prompt) {
       return res.status(500).json({ error: 'No prompt returned. Try a different topic.' });
     }
@@ -273,46 +416,37 @@ app.post('/api/generate', imageLimiter, async (req, res) => {
       return res.status(400).json({ error: 'Prompt exceeds maximum length of 2000 characters.' });
     }
 
-    let size;
-    if (aspectRatio === '9:16')      size = '1024x1792';
-    else if (aspectRatio === '16:9') size = '1792x1024';
-    else                             size = '1024x1024';
+    const userInput = prompt.trim();
+    const category = detectCategory(userInput);
+    const layoutStyle = getLayoutStyle();
 
-    const finalPrompt = `
-Create a HIGH CTR YouTube thumbnail (vertical 9:16 if selected).
+    const [visualPromptRaw, headline] = await Promise.all([
+      generateVisualPrompt(userInput),
+      generateHeadline(userInput)
+    ]);
 
-TOPIC:
-${prompt.trim()}
+    const visualPrompt = visualPromptRaw || userInput;
+    const finalPrompt = buildThumbnailPrompt({
+      visualPrompt,
+      headline,
+      category,
+      layoutStyle
+    });
 
-STYLE:
-- cinematic, photorealistic, high contrast
-
-COMPOSITION RULES:
-- ONLY ONE main subject
-- clean, minimal background
-- NO clutter
-- NO multiple objects
-- NO infographics
-- NO small details
-
-TEXT RULES:
-- EXACTLY ONE headline
-- max 4 words
-- large, bold, readable
-- no subtitles
-
-OUTPUT STYLE:
-- viral YouTube thumbnail
-- strong emotion
-- clear focus
-`;
+    console.log({
+      userInput,
+      visualPrompt,
+      headline,
+      category,
+      layoutStyle
+    });
 
     const result = await openaiClient.images.generate({
       model:   'gpt-image-2',
       prompt:  finalPrompt,
       n:       1,
-      size,
-      quality: 'medium'
+      size:    '1024x1792',
+      quality: 'high'
     });
 
     const imageData = result.data?.[0]?.b64_json;
@@ -320,7 +454,7 @@ OUTPUT STYLE:
       return res.status(500).json({ error: 'No image returned by OpenAI. Try a different prompt.' });
     }
 
-    activityLog(req.session.user, 'generate', { ratio: aspectRatio });
+    activityLog(req.session.user, 'generate', { ratio: aspectRatio, category, headline, layoutStyle });
     return res.json({
       success:    true,
       imageData,
