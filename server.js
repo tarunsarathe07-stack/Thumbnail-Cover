@@ -5,6 +5,7 @@ const fetch    = require('node-fetch');
 const path     = require('path');
 const fs       = require('fs');
 const OpenAI   = require('openai');
+const { toFile } = require('openai');
 const session  = require('cookie-session');
 const { rateLimit, ipKeyGenerator } = require('express-rate-limit');
 const { log: activityLog }          = require('./activity-logger');
@@ -220,137 +221,37 @@ app.get('/api/presets', (req, res) => {
   }
 });
 
-// ─── Suggest prompt ────────────────────────────────────────────────────────────
+// ─── Suggest prompt (OpenAI gpt-4o-mini) ──────────────────────────────────────
 app.post('/api/suggest-prompt', promptLimiter, async (req, res) => {
   try {
-    const { topic, category, aspectRatio } = req.body;
-    if (!topic && !category) {
+    if (!openaiClient) {
+      return res.status(500).json({ error: 'OpenAI API key not configured.' });
+    }
+    const { topic, category } = req.body;
+    const userInput = (topic || category || '').trim();
+    if (!userInput) {
       return res.status(400).json({ error: 'Topic or category is required.' });
     }
-    if ((topic && topic.length > 500) || (category && category.length > 200)) {
-      return res.status(400).json({ error: 'Topic or category is too long.' });
+    if (userInput.length > 500) {
+      return res.status(400).json({ error: 'Topic is too long.' });
     }
 
-    const ratioLabel = aspectRatio === '9:16' ? '9:16' : '16:9';
-    const platform   = aspectRatio === '9:16' ? 'Instagram Reels / YouTube Shorts' : 'YouTube';
+    const completion = await openaiClient.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [{
+        role: 'user',
+        content: `Write a detailed image generation prompt for a YouTube thumbnail about: ${userInput}. Make it cinematic, dramatic, high CTR. Include: subject, action, lighting, text overlay, background. Max 150 words.`
+      }],
+      max_tokens: 200
+    });
 
-    const systemPrompt = `You are an expert thumbnail prompt engineer for ${platform} content.
-
-Topic: "${topic || category}"
-Format: ${ratioLabel}
-
-First, ANALYZE the topic to determine:
-- CATEGORY: What kind of content is this? (e.g. exam prep, current affairs, geopolitics, finance, tech, lifestyle, motivation, etc.)
-- SUBJECTS: Who/what should appear? (e.g. students for exams, world leaders for geopolitics, collage of news events for current affairs, etc.)
-- PROPS: What objects fit the topic? (e.g. law books for legal, world maps for geopolitics, stock charts for finance, newspapers for current affairs, etc.)
-- HEADLINE: Convert the topic into a punchy ALL-CAPS headline (2-8 words)
-
-Generate exactly 3 thumbnail prompt variants with DIFFERENT scenes.
-Each prompt must include both a cinematic scene AND detailed 3D text rendering instructions.
-
-For the TEXT portion:
-- Each prompt should use a DIFFERENT text style from these options:
-  * 3D extruded/embossed bold white text with depth and dark shadows (classic style)
-  * Metallic chrome/silver text with reflections and shine
-  * Neon glow text (electric blue, red, green) with bloom effect on dark background
-  * Bold gradient text (white-to-gold, red-to-orange) with 3D depth
-  * Clean modern sans-serif with colored highlight strips/banners behind key words
-  * Distressed/grunge textured text for edgy topics
-- Key highlight words: use a contrasting color — yellow/gold, red banner, neon accent, or colored underline
-- Add question mark or exclamation for engagement where appropriate
-- Text should be in the upper portion of the image, large and dominant
-
-Format each prompt EXACTLY like this:
-Cinematic ${ratioLabel} thumbnail: [scene — subject, setting, cinematic lighting, topic-relevant props]; bold 3D extruded white text "[MAIN TEXT]" with strong depth and dark shadow in upper area, [highlight word] in yellow/gold 3D text [or on red/colored banner]; hyper-realistic photographic quality
-
-Rules:
-- Subjects, people, props, and settings MUST match the topic (not generic students unless topic is academic)
-- For current affairs: use collage of relevant news imagery, world leaders, event photos
-- For geopolitics: use maps, flags, political figures, dramatic lighting
-- For exams/academics: use Indian students, law books, OMR sheets, classrooms
-- Dark dramatic backgrounds with cinematic lighting
-- Text MUST be described as 3D/embossed/extruded — never flat
-- Vary the scenes: Prompt 1 = people/figures relevant to topic, Prompt 2 = action/emotion scene, Prompt 3 = symbolic/abstract concept
-
-Return ONLY 3 numbered lines:
-1. [prompt 1]
-2. [prompt 2]
-3. [prompt 3]`;
-
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 30000);
-
-    let raw = '';
-
-    // ── Try OpenRouter first, fall back to Gemini ──────────────────────────────
-    if (OPENROUTER_KEY) {
-      const orRes = await fetch(OPENROUTER_API_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type':  'application/json',
-          'Authorization': `Bearer ${OPENROUTER_KEY}`,
-          'HTTP-Referer':  process.env.APP_URL || `http://localhost:${PORT}`,
-          'X-Title':       'ThumbAI'
-        },
-        body: JSON.stringify({
-          model:      OPENROUTER_MODEL,
-          messages:   [{ role: 'user', content: systemPrompt }],
-          temperature: 0.8,
-          max_tokens:  2500
-        }),
-        signal: controller.signal
-      });
-      clearTimeout(timer);
-      const orData = await orRes.json();
-      if (orRes.ok) {
-        raw = orData?.choices?.[0]?.message?.content?.trim() || '';
-      } else {
-        console.warn('[OpenRouter] Error:', orData?.error?.message || orRes.status, '— falling back to Gemini');
-      }
+    const prompt = completion.choices[0].message.content?.trim();
+    if (!prompt) {
+      return res.status(500).json({ error: 'No prompt returned. Try a different topic.' });
     }
 
-    // ── Fallback: Gemini text model ────────────────────────────────────────────
-    if (!raw) {
-      if (!GEMINI_API_KEY || GEMINI_API_KEY === 'your_gemini_api_key_here') {
-        return res.status(500).json({ error: 'No prompt API configured (set GEMINI_API_KEY or _0xOK in .env).' });
-      }
-      const ctrl2 = new AbortController();
-      const timer2 = setTimeout(() => ctrl2.abort(), 30000);
-      const gRes = await fetch(`${GEMINI_TEXT_API_URL}?key=${GEMINI_API_KEY}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: systemPrompt }] }],
-          generationConfig: { temperature: 0.8, maxOutputTokens: 2500 }
-        }),
-        signal: ctrl2.signal
-      });
-      clearTimeout(timer2);
-      const gData = await gRes.json();
-      if (!gRes.ok) {
-        return res.status(gRes.status).json({ error: gData?.error?.message || 'Gemini API error' });
-      }
-      raw = gData?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
-    }
-
-    if (!raw) return res.status(500).json({ error: 'No prompt returned. Try a different topic.' });
-
-    // Parse numbered lines "1. ...", "2. ...", "3. ..."
-    const prompts = raw
-      .split('\n')
-      .map(l => l.trim())
-      .filter(l => /^\d+\.\s+/.test(l))
-      .map(l => l.replace(/^\d+\.\s+/, '').trim())
-      .filter(Boolean);
-
-    if (prompts.length === 0) {
-      // Fallback: return whole text as single prompt
-      activityLog(req.session.user, 'suggest-prompt', { topic: (topic || category || '').slice(0, 80) });
-      return res.json({ success: true, prompts: [raw] });
-    }
-
-    activityLog(req.session.user, 'suggest-prompt', { topic: (topic || category || '').slice(0, 80) });
-    res.json({ success: true, prompts });
+    activityLog(req.session.user, 'suggest-prompt', { topic: userInput.slice(0, 80) });
+    res.json({ prompt });
   } catch (err) {
     console.error('Suggest prompt error:', err);
     res.status(500).json({ error: err.message || 'Internal server error' });
@@ -391,7 +292,7 @@ app.post('/api/generate', imageLimiter, async (req, res) => {
     const size = aspectRatio === '9:16' ? '1024x1536' : '1536x1024';
 
     const result = await openaiClient.images.generate({ // openaiClient is non-null here (key checked above)
-      model:   'gpt-image-1.5',
+      model:   'gpt-image-2',
       prompt:  enhancedPrompt,
       n:       1,
       size,
@@ -416,121 +317,40 @@ app.post('/api/generate', imageLimiter, async (req, res) => {
   }
 });
 
-// ─── Face swap ─────────────────────────────────────────────────────────────────
-app.post('/api/faceswap', imageLimiter, upload.fields([
-  { name: 'sourceImage', maxCount: 1 },
-  { name: 'targetImage', maxCount: 1 }
-]), async (req, res) => {
+// ─── Face swap (OpenAI gpt-image-2) ───────────────────────────────────────────
+app.post('/api/faceswap', imageLimiter, async (req, res) => {
   try {
-    if (!GEMINI_API_KEY || GEMINI_API_KEY === 'your_gemini_api_key_here') {
-      return res.status(500).json({ error: 'Gemini API key not configured. Please set GEMINI_API_KEY in your .env file.' });
+    if (!openaiClient) {
+      return res.status(500).json({ error: 'OpenAI API key not configured.' });
     }
 
-    const sourceFile = req.files?.sourceImage?.[0];
-    const targetFile = req.files?.targetImage?.[0];
-
-    if (!sourceFile || !targetFile) {
-      return res.status(400).json({ error: 'Both source image (face to use) and target image (face to replace) are required.' });
+    const { targetDescription, faceImageBase64 } = req.body;
+    if (!targetDescription || !faceImageBase64) {
+      return res.status(400).json({ error: 'targetDescription and faceImageBase64 are required.' });
+    }
+    if (targetDescription.length > 500) {
+      return res.status(400).json({ error: 'Description is too long.' });
     }
 
-    const sourceBase64 = sourceFile.buffer.toString('base64');
-    const targetBase64 = targetFile.buffer.toString('base64');
-    const sourceMime   = sourceFile.mimetype;
-    const targetMime   = targetFile.mimetype;
+    const imageBuffer = Buffer.from(faceImageBase64, 'base64');
+    const imageFile   = await toFile(imageBuffer, 'face.png', { type: 'image/png' });
 
-    // Detailed photorealistic face-swap prompt (based on original LPT Cover Creator)
-    const defaultPrompt =
-      `YOUR MISSION: Create a PHOTOREALISTIC composite where the head from the Source Face image appears to have ALWAYS been part of the scene in the Target Image. The result must look like a real photograph, not an edited image.\n\n` +
-      `COMPLETE HEAD REPLACEMENT:\n` +
-      `1. IDENTIFY the main character in the Target Image whose head will be replaced\n` +
-      `2. EXTRACT the complete head from the Source Face: entire face (eyes, nose, mouth, cheeks, chin, forehead, jawline), complete hair (every strand, full hairstyle, colour, texture, length), ears if visible, facial hair if present, neck upper portion to blend with body\n` +
-      `3. REPLACE the character's head in the Target Image with the head from the Source Face\n` +
-      `4. PRESERVE the exact facial expression and emotion from the Target Image — match the exact mouth position, eye expression, and eyebrow position\n\n` +
-      `CRITICAL PHOTOREALISTIC BLENDING:\n` +
-      `- LIGHTING: Analyse lighting direction, intensity, and colour in the Target Image. Re-light the Source Face head to exactly match. Add highlights and shadows accordingly.\n` +
-      `- SKIN TONE: Adjust skin tone from the Source Face to match the lighting conditions of the Target Image. Ensure skin looks natural and consistent.\n` +
-      `- NECK BLEND: Seamlessly blend where head meets body — no visible seam, no colour mismatch, no harsh edges. Match skin tone at junction.\n` +
-      `- HAIR: Blend hair edges naturally with the background. Preserve hair texture and style. No artificial cutout edges.\n` +
-      `- SCALE: Match the head size proportionally to the body in the Target Image.\n\n` +
-      `OUTPUT REQUIREMENTS:\n` +
-      `- Return the complete image maintaining the EXACT same aspect ratio, composition, and dimensions as the Target Image\n` +
-      `- Every element of the Target Image must be preserved EXCEPT the head\n` +
-      `- The result must look like a real, unedited photograph`;
+    const prompt = `Create a YouTube thumbnail with this person's face: ${targetDescription}. Maintain the person's facial features exactly.`;
 
-    const prompt = req.body.prompt?.trim() || defaultPrompt;
-
-    const requestBody = {
-      contents: [{
-        parts: [
-          { text: 'Source Face image (use this face):' },
-          { inlineData: { mimeType: sourceMime, data: sourceBase64 } },
-          { text: 'Target image (replace the face in this image with the face from the Source Face above):' },
-          { inlineData: { mimeType: targetMime, data: targetBase64 } },
-          { text: prompt }
-        ]
-      }],
-      generationConfig: {
-        temperature: 0.4,
-        topK: 32,
-        topP: 1,
-        maxOutputTokens: 4096,
-        responseModalities: ['IMAGE', 'TEXT']
-      }
-    };
-
-    const ctrl2 = new AbortController();
-    const tId2  = setTimeout(() => ctrl2.abort(), 90000);
-    let fsResponse = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(requestBody),
-      signal: ctrl2.signal
+    const result = await openaiClient.images.edit({
+      model:  'gpt-image-2',
+      image:  imageFile,
+      prompt,
+      n:      1
     });
-    clearTimeout(tId2);
 
-    if (fsResponse.status === 404 || fsResponse.status === 400) {
-      const ctrl3 = new AbortController();
-      const tId3  = setTimeout(() => ctrl3.abort(), 90000);
-      fsResponse = await fetch(`${GEMINI_API_URL_FB}?key=${GEMINI_API_KEY}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestBody),
-        signal: ctrl3.signal
-      });
-      clearTimeout(tId3);
+    const imageData = result.data?.[0]?.b64_json;
+    if (!imageData) {
+      return res.status(500).json({ error: 'No image returned by OpenAI.' });
     }
 
-    const response = fsResponse;
-    const data = await response.json();
-
-    if (!response.ok) {
-      return res.status(response.status).json({ error: data?.error?.message || 'Gemini API error' });
-    }
-
-    const candidates = data?.candidates || [];
-    for (const candidate of candidates) {
-      for (const part of candidate?.content?.parts || []) {
-        if (part.inlineData?.mimeType?.startsWith('image/')) {
-          activityLog(req.session.user, 'faceswap', {});
-          return res.json({
-            success:   true,
-            imageData: part.inlineData.data,
-            mimeType:  part.inlineData.mimeType
-          });
-        }
-      }
-    }
-
-    let textResponse = '';
-    for (const candidate of candidates) {
-      for (const part of candidate?.content?.parts || []) {
-        if (part.text) textResponse += part.text;
-      }
-    }
-
-    return res.status(500).json({
-      error: textResponse || 'No image was returned. Gemini may have declined due to safety filters. Try different images.'
-    });
+    activityLog(req.session.user, 'faceswap', {});
+    return res.json({ success: true, imageData, mimeType: 'image/png' });
   } catch (err) {
     console.error('Face swap error:', err);
     res.status(500).json({ error: err.message || 'Internal server error' });

@@ -711,6 +711,49 @@ a   { color: inherit; text-decoration: none; }
 }
 .create-another a:hover { color: var(--text); }
 
+/* ── Tab switcher ──────────────────────────────────────────── */
+.gen-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 20px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 4px;
+  width: fit-content;
+}
+.gen-tab {
+  padding: 9px 22px;
+  border-radius: 9px;
+  border: none;
+  background: transparent;
+  font-size: .85rem;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  transition: var(--t);
+  font-family: inherit;
+}
+.gen-tab.active { background: var(--dark); color: #fff; }
+.gen-tab:hover:not(.active) { color: var(--text); background: var(--bg); }
+
+/* ── File upload zone ──────────────────────────────────────── */
+.upload-zone {
+  border: 2px dashed var(--border);
+  border-radius: var(--r);
+  padding: 28px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: var(--t);
+  position: relative;
+}
+.upload-zone:hover { border-color: var(--text); }
+.upload-zone.has-file { border-style: solid; border-color: #22c55e; background: #f0fdf4; }
+.upload-zone-icon  { font-size: 1.8rem; margin-bottom: 8px; }
+.upload-zone-label { font-size: .9rem; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+.upload-zone-sub   { font-size: .77rem; color: var(--muted); }
+.upload-preview    { max-height: 130px; margin: 0 auto; border-radius: var(--r-sm); display: block; }
+
 /* ── Responsive ────────────────────────────────────────────── */
 @media (max-width: 960px) {
   .hero-content { flex-direction: column; padding: 120px 28px 60px; gap: 44px; }
