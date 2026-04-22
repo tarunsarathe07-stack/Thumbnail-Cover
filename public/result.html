@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ThumbAI — Your Thumbnail</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <!-- Navbar -->
+  <nav class="nav">
+    <div class="nav-logo">ThumbAI</div>
+    <div class="nav-right">
+      <span class="nav-user" id="navUser"></span>
+      <button class="btn-logout" id="logoutBtn">Sign out</button>
+    </div>
+  </nav>
+
+  <!-- Main content -->
+  <main class="result-layout">
+    <div class="page-header fade-up">
+      <h1>Your Thumbnail</h1>
+      <p>Download it or go back to create another.</p>
+    </div>
+
+    <div class="result-grid fade-up">
+      <!-- Image frame -->
+      <div class="image-frame" id="imageFrame">
+        <div class="image-placeholder" id="imagePlaceholder">
+          <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" opacity=".3">
+            <rect x="3" y="3" width="18" height="18" rx="2"/>
+            <circle cx="8.5" cy="8.5" r="1.5"/>
+            <path d="M21 15l-5-5L5 21"/>
+          </svg>
+          <span>No image found</span>
+        </div>
+        <img id="resultImage" src="" alt="Generated thumbnail" style="display:none">
+      </div>
+
+      <!-- Sidebar -->
+      <div class="result-sidebar">
+        <div class="card result-info-card">
+          <h3>Details</h3>
+          <div class="info-row">
+            <span class="info-key">Format</span>
+            <span class="info-val" id="infoRatio">—</span>
+          </div>
+          <div class="info-row">
+            <span class="info-key">Dimensions</span>
+            <span class="info-val" id="infoDimensions">—</span>
+          </div>
+          <div class="info-row">
+            <span class="info-key">Created</span>
+            <span class="info-val" id="infoTime">—</span>
+          </div>
+        </div>
+
+        <div class="result-actions">
+          <button class="btn btn-primary" id="downloadBtn" disabled>
+            <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+            </svg>
+            Download PNG
+          </button>
+          <button class="btn btn-outline" id="regenerateBtn" onclick="window.location.href='/generator.html'">
+            <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.24"/>
+            </svg>
+            Create Another
+          </button>
+        </div>
+
+        <div class="card result-info-card" id="promptCard" style="display:none">
+          <h3>Prompt Used</h3>
+          <p id="promptText" style="font-size:.85rem;color:var(--muted);line-height:1.6;margin-top:8px"></p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="/js/app.js"></script>
+  <script>
+    'use strict';
+
+    // ── Auth check ────────────────────────────────────────────────
+    (async () => {
+      try {
+        const res = await fetch('/api/me', { credentials: 'include' });
+        if (!res.ok) { window.location.href = '/login'; return; }
+        const data = await res.json();
+        document.getElementById('navUser').textContent = data.user || '';
+      } catch {
+        window.location.href = '/login';
+      }
+    })();
+
+    // ── Logout ────────────────────────────────────────────────────
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+      await fetch('/api/logout', { method: 'POST', credentials: 'include' });
+      window.location.href = '/login';
+    });
+
+    // ── Load result from sessionStorage ──────────────────────────
+    const raw = sessionStorage.getItem('thumbai_result');
+
+    if (!raw) {
+      // Nothing in storage — redirect to generator
+      window.location.href = '/generator.html';
+    } else {
+      const result = JSON.parse(raw);
+
+      const img         = document.getElementById('resultImage');
+      const frame       = document.getElementById('imageFrame');
+      const placeholder = document.getElementById('imagePlaceholder');
+      const dlBtn       = document.getElementById('downloadBtn');
+
+      // Show image
+      const src = `data:${result.mimeType || 'image/png'};base64,${result.imageData}`;
+      img.src             = src;
+      img.style.display   = 'block';
+      placeholder.style.display = 'none';
+
+      // Portrait frame for 9:16
+      if (result.aspectRatio === '9:16') {
+        frame.classList.add('portrait');
+      }
+
+      // Info
+      document.getElementById('infoRatio').textContent      = result.aspectRatio || '16:9';
+      document.getElementById('infoDimensions').textContent =
+        result.aspectRatio === '9:16' ? '1024 × 1536' : '1536 × 1024';
+
+      if (result.timestamp) {
+        const d = new Date(result.timestamp);
+        document.getElementById('infoTime').textContent = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      }
+
+      // Prompt card
+      if (result.prompt) {
+        document.getElementById('promptText').textContent = result.prompt;
+        document.getElementById('promptCard').style.display = 'block';
+      }
+
+      // Download
+      dlBtn.disabled = false;
+      dlBtn.addEventListener('click', () => {
+        const link    = document.createElement('a');
+        link.href     = src;
+        link.download = `thumbai-${Date.now()}.png`;
+        link.click();
+      });
+    }
+  </script>
+</body>
+</html>
