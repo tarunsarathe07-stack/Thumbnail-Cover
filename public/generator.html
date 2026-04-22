@@ -9,187 +9,236 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/styles.css">
 </head>
-<body>
-  <div class="orb orb-1"></div>
-  <div class="orb orb-2"></div>
+<body class="page-body">
 
   <!-- Loading overlay -->
   <div class="loading-overlay" id="loadingOverlay">
     <div class="loading-ring"></div>
-    <div class="loading-text">Generating your thumbnail…</div>
+    <div class="loading-title">Generating your thumbnail…</div>
     <div class="loading-sub">This usually takes 10–20 seconds</div>
   </div>
 
   <!-- Navbar -->
   <nav class="nav">
-    <div class="nav-logo">ThumbAI</div>
+    <span class="nav-logo">ThumbAI</span>
+    <div class="nav-links">
+      <a class="nav-link" href="#">Features</a>
+      <a class="nav-link" href="#">Examples</a>
+      <a class="nav-link" href="#">Pricing</a>
+      <a class="nav-link" href="#">Blog</a>
+    </div>
     <div class="nav-right">
-      <span class="nav-user" id="navUser"></span>
-      <button class="btn-logout" id="logoutBtn">Sign out</button>
+      <span class="nav-credits" id="creditsLabel">⚡ 120 Credits</span>
+      <button class="nav-btn" id="logoutBtn">Sign out</button>
     </div>
   </nav>
 
-  <!-- Main content -->
-  <main class="generator-layout">
-    <div class="page-header fade-up">
-      <h1>Create Thumbnail</h1>
-      <p>Describe your thumbnail and our AI will bring it to life.</p>
+  <main class="page-inner">
+
+    <!-- Header -->
+    <div class="animate-in">
+      <div class="page-heading">Create Thumbnail</div>
+      <div class="page-sub">Describe your vision and our AI will bring it to life.</div>
     </div>
 
-    <div class="card generator-card fade-up">
-      <form class="generator-form" id="generatorForm" novalidate>
+    <!-- Step indicator -->
+    <div class="steps animate-in" style="animation-delay:.08s">
+      <div class="step active">
+        <div class="step-num">1</div>
+        <div class="step-label">Describe</div>
+      </div>
+      <div class="step-line"></div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-label">Customize</div>
+      </div>
+      <div class="step-line"></div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-label">Generate</div>
+      </div>
+    </div>
 
-        <!-- Prompt -->
-        <div class="form-group">
-          <div class="prompt-actions">
-            <label class="form-label" for="prompt">Your Description</label>
-            <button type="button" class="btn-suggest" id="suggestBtn">
-              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
-              </svg>
-              Suggest
-            </button>
-          </div>
-          <textarea
-            class="form-input form-textarea"
-            id="prompt"
-            name="prompt"
-            placeholder="e.g. A person looking shocked at a rising stock chart, bold text saying 'I MADE ₹10 LAKH IN ONE DAY'"
-            maxlength="800"
-            rows="4"
-          ></textarea>
-          <div class="char-count"><span id="charCount">0</span> / 800</div>
-        </div>
+    <form id="genForm" novalidate>
 
-        <div class="divider"></div>
-
-        <!-- Aspect ratio -->
-        <div class="form-group">
-          <label class="form-label">Aspect Ratio</label>
-          <div class="ratio-group">
-            <button type="button" class="ratio-btn active" data-ratio="16:9">
-              ▬ 16:9<br>
-              <span style="font-size:.72rem;font-weight:400;opacity:.7">YouTube</span>
-            </button>
-            <button type="button" class="ratio-btn" data-ratio="9:16">
-              ▮ 9:16<br>
-              <span style="font-size:.72rem;font-weight:400;opacity:.7">Shorts / Reels</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Error -->
-        <div class="msg msg-error" id="genError"></div>
-
-        <!-- Submit -->
-        <div class="generate-row">
-          <button class="btn btn-primary" type="submit" id="generateBtn">
-            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-            </svg>
-            <span id="generateBtnText">Generate Thumbnail</span>
-            <span class="spinner" id="generateSpinner" style="display:none"></span>
+      <!-- Prompt card -->
+      <div class="gen-card animate-in" style="animation-delay:.14s">
+        <div class="prompt-row">
+          <div class="gen-card-label">Your Prompt</div>
+          <button type="button" class="btn-suggest" id="suggestBtn">
+            ✦ Prompt Assistant
           </button>
         </div>
+        <textarea
+          class="prompt-textarea"
+          id="prompt"
+          placeholder="Example: shocked face, explosive background, bold text 'I QUIT!', cinematic lighting, dramatic colours"
+          maxlength="1000"
+          rows="4"
+        ></textarea>
+        <div class="prompt-foot">
+          <span class="char-counter"><span id="charCount">0</span> / 1000</span>
+        </div>
+      </div>
 
-      </form>
-    </div>
+      <!-- Aspect ratio card -->
+      <div class="gen-card animate-in" style="animation-delay:.20s">
+        <div class="gen-card-label">Aspect Ratio</div>
+        <div class="ratio-grid">
+          <div class="ratio-card selected" data-ratio="16:9" id="ratio169">
+            <div class="ratio-check">✓</div>
+            <div class="ratio-thumb-16"></div>
+            <div class="ratio-name">16 : 9</div>
+            <div class="ratio-desc">YouTube Thumbnail</div>
+          </div>
+          <div class="ratio-card" data-ratio="9:16" id="ratio916">
+            <div class="ratio-check">✓</div>
+            <div class="ratio-thumb-9"></div>
+            <div class="ratio-name">9 : 16</div>
+            <div class="ratio-desc">Shorts / Reels</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Style card -->
+      <div class="gen-card animate-in" style="animation-delay:.26s">
+        <div class="gen-card-label">Visual Style</div>
+        <div class="style-tags">
+          <button type="button" class="style-tag selected" data-style="Cinematic">Cinematic</button>
+          <button type="button" class="style-tag" data-style="Minimalist">Minimalist</button>
+          <button type="button" class="style-tag" data-style="Neon Cyber">Neon Cyber</button>
+          <button type="button" class="style-tag" data-style="Anime Core">Anime Core</button>
+        </div>
+      </div>
+
+      <!-- Advanced settings -->
+      <div class="gen-card animate-in" style="animation-delay:.30s">
+        <div class="accordion">
+          <button type="button" class="accordion-trigger" aria-expanded="false" id="accordionBtn">
+            Advanced Settings
+            <span class="accordion-icon">▾</span>
+          </button>
+          <div class="accordion-body" id="accordionBody">
+            Additional options coming soon — face placement, text overlay, brand colours, and more.
+          </div>
+        </div>
+      </div>
+
+      <!-- Error -->
+      <div class="msg msg-error" id="genError" style="margin-bottom:12px"></div>
+
+      <!-- Footer -->
+      <div class="gen-footer animate-in" style="animation-delay:.34s">
+        <div class="gen-cost">Estimated cost: <strong>2 credits</strong></div>
+        <button type="submit" class="btn btn-primary btn-lg" id="generateBtn">
+          <span id="genBtnText">⚡ Generate Thumbnail</span>
+          <span class="spinner" id="genSpinner" style="display:none"></span>
+        </button>
+      </div>
+
+    </form>
   </main>
 
   <script src="/js/app.js"></script>
   <script>
     'use strict';
 
-    // ── Auth check ────────────────────────────────────────────────
+    // ── Auth ──────────────────────────────────────────────────────
     (async () => {
       try {
-        const res = await fetch('/api/me', { credentials: 'include' });
-        if (!res.ok) { window.location.href = '/login'; return; }
-        const data = await res.json();
-        document.getElementById('navUser').textContent = data.user || '';
-      } catch {
-        window.location.href = '/login';
-      }
+        const r = await fetch('/api/me', { credentials: 'include' });
+        if (!r.ok) { window.location.href = '/login'; return; }
+      } catch { window.location.href = '/login'; }
     })();
 
-    // ── Logout ────────────────────────────────────────────────────
+    // ── Logout ─────────────────────────────────────────────────────
     document.getElementById('logoutBtn').addEventListener('click', async () => {
       await fetch('/api/logout', { method: 'POST', credentials: 'include' });
       window.location.href = '/login';
     });
 
-    // ── Prompt auto-resize ────────────────────────────────────────
+    // ── Textarea auto-resize ───────────────────────────────────────
     const promptEl   = document.getElementById('prompt');
-    const charCount  = document.getElementById('charCount');
+    const charCountEl = document.getElementById('charCount');
 
     function autoResize(el) {
       el.style.height    = 'auto';
       const sh           = el.scrollHeight;
-      el.style.height    = Math.min(sh, 250) + 'px';
-      el.style.overflowY = sh > 250 ? 'auto' : 'hidden';
+      el.style.height    = Math.min(sh, 260) + 'px';
+      el.style.overflowY = sh > 260 ? 'auto' : 'hidden';
     }
-
     promptEl.addEventListener('input', () => {
       autoResize(promptEl);
-      charCount.textContent = promptEl.value.length;
+      charCountEl.textContent = promptEl.value.length;
     });
 
-    // ── AI Suggest ────────────────────────────────────────────────
+    // ── Prompt Assistant ───────────────────────────────────────────
     const suggestBtn = document.getElementById('suggestBtn');
 
     suggestBtn.addEventListener('click', async () => {
       const topic = promptEl.value.trim();
       suggestBtn.disabled    = true;
-      suggestBtn.textContent = 'Thinking…';
+      suggestBtn.textContent = '✦ Thinking…';
 
       try {
-        const ratio = document.querySelector('.ratio-btn.active')?.dataset.ratio || '16:9';
-        const res = await fetch('/api/suggest-prompt', {
+        const ratio = document.querySelector('.ratio-card.selected')?.dataset.ratio || '16:9';
+        const r = await fetch('/api/suggest-prompt', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
           body: JSON.stringify({ topic, aspectRatio: ratio })
         });
-        const data = await res.json();
-        if (data.prompt) {
-          promptEl.value = data.prompt;
+        const d = await r.json();
+        if (d.prompt) {
+          promptEl.value = d.prompt;
           autoResize(promptEl);
-          charCount.textContent = data.prompt.length;
+          charCountEl.textContent = d.prompt.length;
         }
-      } catch {
-        // silently fail — user keeps their text
-      } finally {
+      } catch { /* silent */ }
+      finally {
         suggestBtn.disabled    = false;
-        suggestBtn.innerHTML   = `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>Suggest`;
+        suggestBtn.textContent = '✦ Prompt Assistant';
       }
     });
 
-    // ── Ratio buttons ─────────────────────────────────────────────
-    document.querySelectorAll('.ratio-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.ratio-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
+    // ── Aspect ratio selection ─────────────────────────────────────
+    document.querySelectorAll('.ratio-card').forEach(card => {
+      card.addEventListener('click', () => {
+        document.querySelectorAll('.ratio-card').forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
       });
     });
 
-    // ── Generate ──────────────────────────────────────────────────
-    const form        = document.getElementById('generatorForm');
-    const errorEl     = document.getElementById('genError');
-    const generateBtn = document.getElementById('generateBtn');
-    const generateTxt = document.getElementById('generateBtnText');
-    const generateSp  = document.getElementById('generateSpinner');
-    const overlay     = document.getElementById('loadingOverlay');
+    // ── Style tag selection ────────────────────────────────────────
+    document.querySelectorAll('.style-tag').forEach(tag => {
+      tag.addEventListener('click', () => {
+        document.querySelectorAll('.style-tag').forEach(t => t.classList.remove('selected'));
+        tag.classList.add('selected');
+      });
+    });
+
+    // ── Accordion ──────────────────────────────────────────────────
+    const accordionBtn  = document.getElementById('accordionBtn');
+    const accordionBody = document.getElementById('accordionBody');
+
+    accordionBtn.addEventListener('click', () => {
+      const open = accordionBody.classList.toggle('open');
+      accordionBtn.setAttribute('aria-expanded', open);
+    });
+
+    // ── Generate ───────────────────────────────────────────────────
+    const form      = document.getElementById('genForm');
+    const errorEl   = document.getElementById('genError');
+    const genBtn    = document.getElementById('generateBtn');
+    const genText   = document.getElementById('genBtnText');
+    const genSpin   = document.getElementById('genSpinner');
+    const overlay   = document.getElementById('loadingOverlay');
 
     function setGenerating(on) {
-      generateBtn.disabled      = on;
-      generateTxt.textContent   = on ? 'Generating…' : 'Generate Thumbnail';
-      generateSp.style.display  = on ? 'block' : 'none';
+      genBtn.disabled      = on;
+      genText.textContent  = on ? 'Generating…' : '⚡ Generate Thumbnail';
+      genSpin.style.display = on ? 'inline-block' : 'none';
       overlay.classList.toggle('visible', on);
-    }
-
-    function showError(msg) {
-      errorEl.textContent = msg;
-      errorEl.className   = 'msg msg-error visible';
     }
 
     form.addEventListener('submit', async (e) => {
@@ -197,40 +246,45 @@
       errorEl.className = 'msg msg-error';
 
       const prompt = promptEl.value.trim();
-      if (!prompt) { showError('Please describe what you want in your thumbnail.'); return; }
+      if (!prompt) {
+        errorEl.textContent = 'Please describe what you want in your thumbnail.';
+        errorEl.className   = 'msg msg-error visible';
+        return;
+      }
 
-      const aspectRatio = document.querySelector('.ratio-btn.active')?.dataset.ratio || '16:9';
+      const aspectRatio = document.querySelector('.ratio-card.selected')?.dataset.ratio || '16:9';
+      const style       = document.querySelector('.style-tag.selected')?.dataset.style  || 'Cinematic';
 
       setGenerating(true);
-
       try {
         const res = await fetch('/api/generate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
-          body: JSON.stringify({ prompt, aspectRatio })
+          body: JSON.stringify({ prompt, aspectRatio, style })
         });
-
         const data = await res.json();
 
         if (!res.ok || !data.success) {
-          showError(data.error || 'Generation failed. Please try again.');
+          errorEl.textContent = data.error || 'Generation failed. Please try again.';
+          errorEl.className   = 'msg msg-error visible';
           setGenerating(false);
           return;
         }
 
-        // Pass result to result page via sessionStorage
         sessionStorage.setItem('thumbai_result', JSON.stringify({
           imageData:   data.imageData,
           mimeType:    data.mimeType || 'image/png',
           aspectRatio: data.aspectRatio || aspectRatio,
+          style,
           prompt,
           timestamp:   new Date().toISOString()
         }));
 
         window.location.href = '/result.html';
-      } catch (err) {
-        showError('Network error. Please check your connection and try again.');
+      } catch {
+        errorEl.textContent = 'Network error. Please check your connection and try again.';
+        errorEl.className   = 'msg msg-error visible';
         setGenerating(false);
       }
     });

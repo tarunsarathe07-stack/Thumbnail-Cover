@@ -9,137 +9,130 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/styles.css">
 </head>
-<body>
-  <div class="orb orb-1"></div>
-  <div class="orb orb-2"></div>
+<body class="page-body">
 
   <!-- Navbar -->
   <nav class="nav">
-    <div class="nav-logo">ThumbAI</div>
+    <span class="nav-logo">ThumbAI</span>
+    <div class="nav-links">
+      <a class="nav-link" href="#">Features</a>
+      <a class="nav-link" href="#">Examples</a>
+      <a class="nav-link" href="#">Pricing</a>
+      <a class="nav-link" href="#">Blog</a>
+    </div>
     <div class="nav-right">
-      <span class="nav-user" id="navUser"></span>
-      <button class="btn-logout" id="logoutBtn">Sign out</button>
+      <span class="nav-credits">⚡ 118 Credits</span>
+      <button class="nav-btn" id="logoutBtn">Sign out</button>
     </div>
   </nav>
 
-  <!-- Main content -->
-  <main class="result-layout">
-    <div class="page-header fade-up">
-      <h1>Your Thumbnail</h1>
-      <p>Download it or go back to create another.</p>
+  <main class="page-inner">
+
+    <!-- Header -->
+    <div class="result-header animate-in">
+      <div class="done-badge">✓ Done</div>
+      <div class="result-title">Your Thumbnail is Ready</div>
+      <div class="result-sub">Download it, regenerate, or create something new.</div>
     </div>
 
-    <div class="result-grid fade-up">
-      <!-- Image frame -->
-      <div class="image-frame" id="imageFrame">
-        <div class="image-placeholder" id="imagePlaceholder">
-          <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" opacity=".3">
-            <rect x="3" y="3" width="18" height="18" rx="2"/>
-            <circle cx="8.5" cy="8.5" r="1.5"/>
-            <path d="M21 15l-5-5L5 21"/>
-          </svg>
-          <span>No image found</span>
-        </div>
-        <img id="resultImage" src="" alt="Generated thumbnail" style="display:none">
+    <!-- Image frame -->
+    <div class="img-frame animate-in" id="imgFrame" style="animation-delay:.08s">
+      <div class="img-placeholder" id="imgPlaceholder">
+        <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24" style="opacity:.25;margin:0 auto 10px">
+          <rect x="3" y="3" width="18" height="18" rx="2"/>
+          <circle cx="8.5" cy="8.5" r="1.5"/>
+          <path d="M21 15l-5-5L5 21"/>
+        </svg>
+        No image data — go back and generate one.
       </div>
-
-      <!-- Sidebar -->
-      <div class="result-sidebar">
-        <div class="card result-info-card">
-          <h3>Details</h3>
-          <div class="info-row">
-            <span class="info-key">Format</span>
-            <span class="info-val" id="infoRatio">—</span>
-          </div>
-          <div class="info-row">
-            <span class="info-key">Dimensions</span>
-            <span class="info-val" id="infoDimensions">—</span>
-          </div>
-          <div class="info-row">
-            <span class="info-key">Created</span>
-            <span class="info-val" id="infoTime">—</span>
-          </div>
-        </div>
-
-        <div class="result-actions">
-          <button class="btn btn-primary" id="downloadBtn" disabled>
-            <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
-            </svg>
-            Download PNG
-          </button>
-          <button class="btn btn-outline" id="regenerateBtn" onclick="window.location.href='/generator.html'">
-            <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.24"/>
-            </svg>
-            Create Another
-          </button>
-        </div>
-
-        <div class="card result-info-card" id="promptCard" style="display:none">
-          <h3>Prompt Used</h3>
-          <p id="promptText" style="font-size:.85rem;color:var(--muted);line-height:1.6;margin-top:8px"></p>
-        </div>
-      </div>
+      <img id="resultImg" src="" alt="Generated thumbnail" style="display:none">
     </div>
+
+    <!-- Thumbnail variations -->
+    <div class="variations animate-in" id="variationsRow" style="animation-delay:.14s">
+      <div class="variation selected-v" id="v1"><img id="v1img" src="" alt=""></div>
+      <div class="variation" id="v2"><img id="v2img" src="" alt="" style="opacity:.4"></div>
+      <div class="variation" id="v3"><img id="v3img" src="" alt="" style="opacity:.4"></div>
+      <div class="variation" id="v4"><img id="v4img" src="" alt="" style="opacity:.4"></div>
+    </div>
+
+    <!-- Action buttons -->
+    <div class="result-actions animate-in" style="animation-delay:.20s">
+      <button class="btn btn-primary btn-lg" id="downloadBtn" disabled>
+        ↓ Download Asset
+      </button>
+      <button class="btn btn-secondary btn-lg" onclick="window.location.href='/generator.html'">
+        ↺ Regenerate
+      </button>
+    </div>
+
+    <!-- Rating -->
+    <div class="rating-bar animate-in" style="animation-delay:.24s">
+      <span class="rating-label">Rate this result</span>
+      <button class="rating-btn" id="likeBtn">👍 Looks great</button>
+      <button class="rating-btn" id="dislikeBtn">👎 Needs work</button>
+    </div>
+
+    <!-- Prompt used -->
+    <div class="prompt-card animate-in" id="promptCard" style="animation-delay:.28s;display:none">
+      <div class="prompt-card-label">Prompt Used</div>
+      <div class="prompt-card-text" id="promptText"></div>
+    </div>
+
+    <!-- Create another -->
+    <div class="create-another animate-in" style="animation-delay:.32s">
+      <a href="/generator.html">← Create another thumbnail</a>
+    </div>
+
   </main>
 
   <script src="/js/app.js"></script>
   <script>
     'use strict';
 
-    // ── Auth check ────────────────────────────────────────────────
+    // ── Auth ──────────────────────────────────────────────────────
     (async () => {
       try {
-        const res = await fetch('/api/me', { credentials: 'include' });
-        if (!res.ok) { window.location.href = '/login'; return; }
-        const data = await res.json();
-        document.getElementById('navUser').textContent = data.user || '';
-      } catch {
-        window.location.href = '/login';
-      }
+        const r = await fetch('/api/me', { credentials: 'include' });
+        if (!r.ok) { window.location.href = '/login'; return; }
+      } catch { window.location.href = '/login'; }
     })();
 
-    // ── Logout ────────────────────────────────────────────────────
+    // ── Logout ─────────────────────────────────────────────────────
     document.getElementById('logoutBtn').addEventListener('click', async () => {
       await fetch('/api/logout', { method: 'POST', credentials: 'include' });
       window.location.href = '/login';
     });
 
-    // ── Load result from sessionStorage ──────────────────────────
+    // ── Load result ────────────────────────────────────────────────
     const raw = sessionStorage.getItem('thumbai_result');
 
     if (!raw) {
-      // Nothing in storage — redirect to generator
       window.location.href = '/generator.html';
     } else {
       const result = JSON.parse(raw);
+      const src    = `data:${result.mimeType || 'image/png'};base64,${result.imageData}`;
 
-      const img         = document.getElementById('resultImage');
-      const frame       = document.getElementById('imageFrame');
-      const placeholder = document.getElementById('imagePlaceholder');
+      const imgEl       = document.getElementById('resultImg');
+      const frame       = document.getElementById('imgFrame');
+      const placeholder = document.getElementById('imgPlaceholder');
       const dlBtn       = document.getElementById('downloadBtn');
 
       // Show image
-      const src = `data:${result.mimeType || 'image/png'};base64,${result.imageData}`;
-      img.src             = src;
-      img.style.display   = 'block';
+      imgEl.src            = src;
+      imgEl.style.display  = 'block';
       placeholder.style.display = 'none';
 
-      // Portrait frame for 9:16
+      // Portrait frame
       if (result.aspectRatio === '9:16') {
         frame.classList.add('portrait');
       }
 
-      // Info
-      document.getElementById('infoRatio').textContent      = result.aspectRatio || '16:9';
-      document.getElementById('infoDimensions').textContent =
-        result.aspectRatio === '9:16' ? '1024 × 1536' : '1536 × 1024';
-
-      if (result.timestamp) {
-        const d = new Date(result.timestamp);
-        document.getElementById('infoTime').textContent = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      }
+      // Variation thumbnails (same image shown as placeholders)
+      ['v1img','v2img','v3img','v4img'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.src = src;
+      });
 
       // Prompt card
       if (result.prompt) {
@@ -150,10 +143,23 @@
       // Download
       dlBtn.disabled = false;
       dlBtn.addEventListener('click', () => {
-        const link    = document.createElement('a');
-        link.href     = src;
-        link.download = `thumbai-${Date.now()}.png`;
-        link.click();
+        const a    = document.createElement('a');
+        a.href     = src;
+        a.download = `thumbai-${Date.now()}.png`;
+        a.click();
+      });
+
+      // Rating
+      const likeBtn    = document.getElementById('likeBtn');
+      const dislikeBtn = document.getElementById('dislikeBtn');
+
+      likeBtn.addEventListener('click', () => {
+        likeBtn.classList.toggle('liked');
+        dislikeBtn.classList.remove('disliked');
+      });
+      dislikeBtn.addEventListener('click', () => {
+        dislikeBtn.classList.toggle('disliked');
+        likeBtn.classList.remove('liked');
       });
     }
   </script>
