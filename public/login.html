@@ -1,316 +1,161 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sign In — ThumbAI</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      font-family: 'Inter', system-ui, sans-serif;
-      background: #1a1520;
-      color: #e8e0e5;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    /* Background orbs */
-    .orb {
-      position: fixed;
-      border-radius: 50%;
-      filter: blur(80px);
-      pointer-events: none;
-      z-index: 0;
-    }
-    .orb-1 {
-      width: 520px; height: 520px;
-      background: radial-gradient(circle, rgba(139,109,142,0.14) 0%, transparent 70%);
-      top: -160px; left: -140px;
-    }
-    .orb-2 {
-      width: 420px; height: 420px;
-      background: radial-gradient(circle, rgba(120,90,130,0.12) 0%, transparent 70%);
-      bottom: -120px; right: -100px;
-    }
-
-    /* Card */
-    .login-card {
-      position: relative;
-      z-index: 1;
-      width: 100%;
-      max-width: 400px;
-      margin: 24px;
-      background: rgba(255,245,250,0.035);
-      border: 1px solid rgba(255,240,245,0.08);
-      border-radius: 16px;
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      padding: 44px 40px 40px;
-      box-shadow: 0 8px 40px rgba(20,15,25,0.4), 0 0 0 1px rgba(139,109,142,0.06);
-    }
-
-    /* Logo / header */
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      justify-content: center;
-      margin-bottom: 6px;
-    }
-    .logo-icon {
-      font-size: 28px;
-      line-height: 1;
-    }
-    .logo-text {
-      font-size: 26px;
-      font-weight: 800;
-      background: linear-gradient(135deg, #e0d0e2, #cdb4cf, #b498b7);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      letter-spacing: -0.5px;
-    }
-    .login-sub {
-      text-align: center;
-      font-size: 14px;
-      color: #9a8d9e;
-      margin-bottom: 34px;
-    }
-
-    /* Form */
-    .field {
-      margin-bottom: 18px;
-    }
-    label {
-      display: block;
-      font-size: 13px;
-      font-weight: 500;
-      color: #d4c4d6;
-      margin-bottom: 7px;
-    }
-    .input-wrap {
-      position: relative;
-    }
-    input[type="text"],
-    input[type="password"] {
-      width: 100%;
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,240,245,0.08);
-      border-radius: 12px;
-      padding: 12px 44px 12px 14px;
-      color: #e8e0e5;
-      font-family: inherit;
-      font-size: 14px;
-      outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    input[type="text"]:focus,
-    input[type="password"]:focus {
-      border-color: rgba(139,109,142,0.4);
-      box-shadow: 0 0 0 3px rgba(139,109,142,0.1);
-      background: rgba(255,255,255,0.08);
-    }
-    input::placeholder { color: #5a4f5e; }
-
-    /* Show/hide password toggle */
-    .toggle-pw {
-      position: absolute;
-      right: 13px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: #9a8d9e;
-      font-size: 15px;
-      padding: 2px;
-      line-height: 1;
-      transition: color 0.2s;
-    }
-    .toggle-pw:hover { color: #d4c4d6; }
-
-    /* Error box */
-    .error-box {
-      display: none;
-      align-items: center;
-      gap: 8px;
-      background: rgba(248,113,113,0.1);
-      border: 1px solid rgba(248,113,113,0.28);
-      border-radius: 10px;
-      padding: 10px 14px;
-      margin-bottom: 20px;
-      font-size: 13px;
-      color: #fca5a5;
-    }
-    .error-box.visible { display: flex; }
-
-    /* Submit button */
-    .btn-login {
-      width: 100%;
-      padding: 13px;
-      border: 1px solid rgba(180,150,170,0.35);
-      border-radius: 12px;
-      background: rgba(139,109,142,0.18);
-      color: #e0d0e2;
-      font-family: inherit;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      letter-spacing: 0.5px;
-      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
-      box-shadow: none;
-      margin-top: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
-    .btn-login:hover:not(:disabled) {
-      background: rgba(139,109,142,0.28);
-      transform: translateY(-1px);
-      box-shadow: 0 4px 16px rgba(139,109,142,0.12);
-    }
-    .btn-login:active:not(:disabled) { transform: translateY(0); }
-    .btn-login:disabled { opacity: 0.6; cursor: not-allowed; }
-
-    /* Spinner */
-    .spinner {
-      width: 16px; height: 16px;
-      border: 2px solid rgba(255,255,255,0.3);
-      border-top-color: #fff;
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-      display: none;
-    }
-    .btn-login.loading .spinner { display: block; }
-    .btn-login.loading .btn-label { display: none; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    @media (max-width: 440px) {
-      .login-card { padding: 36px 24px 32px; }
-    }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ThumbAI — AI Thumbnail Generator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
 </head>
-<body>
-
+<body class="login-page">
   <div class="orb orb-1"></div>
   <div class="orb orb-2"></div>
 
-  <div class="login-card">
-    <div class="logo">
-      <span class="logo-icon">✨</span>
-      <span class="logo-text">ThumbAI</span>
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-eyebrow fade-up">
+      <span class="badge badge-accent">✦ AI-Powered</span>
     </div>
-    <p class="login-sub">Sign in to continue</p>
+    <h1 class="hero-title fade-up">
+      Thumbnails that<br><span>stop the scroll</span>
+    </h1>
+    <p class="hero-sub fade-up">
+      Generate stunning YouTube thumbnails and cover art in seconds using advanced AI.
+      Cinematic quality, zero design skills needed.
+    </p>
+  </section>
 
-    <div class="error-box" id="errorBox">
-      <span>⚠</span>
-      <span id="errorMsg">Invalid username or password.</span>
+  <!-- Login card -->
+  <section class="login-section">
+    <div class="card login-card fade-up">
+      <h2>Welcome back</h2>
+      <p>Sign in to start creating</p>
+
+      <form class="login-form" id="loginForm" autocomplete="off" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="username">Username</label>
+          <input
+            class="form-input"
+            type="text"
+            id="username"
+            name="username"
+            placeholder="Enter your username"
+            autocomplete="username"
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="password">Password</label>
+          <input
+            class="form-input"
+            type="password"
+            id="password"
+            name="password"
+            placeholder="Enter your password"
+            autocomplete="current-password"
+            required
+          >
+        </div>
+
+        <div class="msg msg-error" id="loginError"></div>
+
+        <button class="btn btn-primary btn-full" type="submit" id="loginBtn">
+          <span id="loginBtnText">Sign In</span>
+          <span class="spinner" id="loginSpinner" style="display:none"></span>
+        </button>
+      </form>
     </div>
+  </section>
 
-    <form id="loginForm" novalidate>
-      <div class="field">
-        <label for="username">Username</label>
-        <div class="input-wrap">
-          <input type="text" id="username" name="username"
-            placeholder="Enter your username" autocomplete="username" required />
-        </div>
-      </div>
-
-      <div class="field">
-        <label for="password">Password</label>
-        <div class="input-wrap">
-          <input type="password" id="password" name="password"
-            placeholder="Enter your password" autocomplete="current-password" required />
-          <button type="button" class="toggle-pw" id="togglePw" aria-label="Show/hide password">
-            👁
-          </button>
-        </div>
-      </div>
-
-      <button type="submit" class="btn-login" id="loginBtn">
-        <div class="spinner"></div>
-        <span class="btn-label">Sign In</span>
-      </button>
-    </form>
+  <!-- Feature chips -->
+  <div class="features">
+    <div class="feature-chip fade-up">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+      </svg>
+      Instant generation
+    </div>
+    <div class="feature-chip fade-up">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <rect x="2" y="3" width="20" height="14" rx="2"/>
+        <path d="M8 21h8M12 17v4"/>
+      </svg>
+      16:9 &amp; 9:16 formats
+    </div>
+    <div class="feature-chip fade-up">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="M12 8v4l3 3"/>
+      </svg>
+      Results in ~15s
+    </div>
+    <div class="feature-chip fade-up">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+      </svg>
+      One-click download
+    </div>
   </div>
 
+  <script src="/js/app.js"></script>
   <script>
-    const form      = document.getElementById('loginForm');
-    const loginBtn  = document.getElementById('loginBtn');
-    const errorBox  = document.getElementById('errorBox');
-    const errorMsg  = document.getElementById('errorMsg');
-    const togglePw  = document.getElementById('togglePw');
-    const pwInput   = document.getElementById('password');
+    'use strict';
 
-    // Show / hide password
-    togglePw.addEventListener('click', () => {
-      const show = pwInput.type === 'password';
-      pwInput.type = show ? 'text' : 'password';
-      togglePw.textContent = show ? '🙈' : '👁';
-    });
+    const form     = document.getElementById('loginForm');
+    const errorEl  = document.getElementById('loginError');
+    const btn      = document.getElementById('loginBtn');
+    const btnText  = document.getElementById('loginBtnText');
+    const spinner  = document.getElementById('loginSpinner');
+
+    function setLoading(on) {
+      btn.disabled    = on;
+      btnText.textContent = on ? 'Signing in…' : 'Sign In';
+      spinner.style.display = on ? 'block' : 'none';
+    }
 
     function showError(msg) {
-      errorMsg.textContent = msg;
-      errorBox.classList.add('visible');
-    }
-    function hideError() {
-      errorBox.classList.remove('visible');
+      errorEl.textContent = msg;
+      errorEl.className   = 'msg msg-error visible';
     }
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      hideError();
+      errorEl.className = 'msg msg-error';
 
       const username = document.getElementById('username').value.trim();
-      const password = pwInput.value;
+      const password = document.getElementById('password').value;
 
       if (!username || !password) {
         showError('Please enter both username and password.');
         return;
       }
 
-      loginBtn.disabled = true;
-      loginBtn.classList.add('loading');
+      setLoading(true);
 
       try {
         const res = await fetch('/api/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
           body: JSON.stringify({ username, password })
         });
 
         const data = await res.json();
 
         if (res.ok && data.success) {
-          // Redirect to app — replace so Back button doesn't return to login
-          window.location.replace('/');
+          window.location.href = '/generator.html';
         } else {
-          showError(data.error || 'Invalid username or password.');
+          showError(data.error || 'Invalid credentials. Please try again.');
+          setLoading(false);
         }
       } catch {
-        showError('Could not connect to server. Please try again.');
-      } finally {
-        loginBtn.disabled = false;
-        loginBtn.classList.remove('loading');
+        showError('Network error. Please check your connection and try again.');
+        setLoading(false);
       }
     });
-
-    // Clear error when user starts typing
-    form.addEventListener('input', hideError);
-
-    // If already logged in, skip login page
-    fetch('/api/health').then(r => r.json()).then(d => {
-      if (d.loggedIn) window.location.replace('/');
-    }).catch(() => {});
   </script>
 </body>
 </html>
