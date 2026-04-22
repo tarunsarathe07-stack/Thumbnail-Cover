@@ -265,7 +265,7 @@ app.post('/api/generate', imageLimiter, async (req, res) => {
       return res.status(500).json({ error: 'OpenAI API key not configured. Please set OPENAI_API_KEY in your .env file.' });
     }
 
-    const { prompt, aspectRatio, style, mode } = req.body;
+    const { prompt, aspectRatio } = req.body;
     if (!prompt || !prompt.trim()) {
       return res.status(400).json({ error: 'Prompt is required.' });
     }
@@ -273,49 +273,40 @@ app.post('/api/generate', imageLimiter, async (req, res) => {
       return res.status(400).json({ error: 'Prompt exceeds maximum length of 2000 characters.' });
     }
 
-    // FIX 1 — Aspect ratio → size
     let size;
     if (aspectRatio === '9:16')      size = '1024x1792';
     else if (aspectRatio === '16:9') size = '1792x1024';
     else                             size = '1024x1024';
 
-    // FIX 3 — Style mode modifiers
-    const styleMap = {
-      cinematic: 'dramatic lighting, shadows, depth',
-      minimal:   'very clean background, single subject, lots of empty space',
-      news:      'breaking news style, bold red and white text, high contrast'
-    };
-    const styleHint = styleMap[style] || '';
-
-    // FIX 2 — Structured minimal prompt
-    let finalPrompt = `Create a high CTR YouTube thumbnail.
-
-STYLE:
-- Cinematic, high contrast, photorealistic
-${styleHint ? `- ${styleHint}` : ''}
-LAYOUT:
-- One main subject only
-- Minimal background
-- No clutter
-- Clear focus
-
-TEXT:
-- Bold, large, readable headline (max 4 words)
+    const finalPrompt = `
+Create a HIGH CTR YouTube thumbnail (vertical 9:16 if selected).
 
 TOPIC:
 ${prompt.trim()}
 
-IMPORTANT:
-- Avoid multiple elements
-- Avoid infographics or complex diagrams
-- Keep composition clean and simple`;
+STYLE:
+- cinematic, photorealistic, high contrast
 
-    // FIX 4 — Clutter control
-    if (mode === 'minimal') {
-      finalPrompt += '\nExtremely minimal, only one subject, no extra objects.';
-    }
+COMPOSITION RULES:
+- ONLY ONE main subject
+- clean, minimal background
+- NO clutter
+- NO multiple objects
+- NO infographics
+- NO small details
 
-    // FIX 5 — API call
+TEXT RULES:
+- EXACTLY ONE headline
+- max 4 words
+- large, bold, readable
+- no subtitles
+
+OUTPUT STYLE:
+- viral YouTube thumbnail
+- strong emotion
+- clear focus
+`;
+
     const result = await openaiClient.images.generate({
       model:   'gpt-image-2',
       prompt:  finalPrompt,
