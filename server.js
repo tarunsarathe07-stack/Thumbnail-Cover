@@ -238,11 +238,17 @@ app.post('/api/suggest-prompt', promptLimiter, async (req, res) => {
 
     const completion = await openaiClient.chat.completions.create({
       model: 'gpt-4o-mini',
-      messages: [{
-        role: 'user',
-        content: `Write a detailed image generation prompt for a YouTube thumbnail about: ${userInput}. Make it cinematic, dramatic, high CTR. Include: subject, action, lighting, text overlay, background. Max 150 words.`
-      }],
-      max_tokens: 200
+      messages: [
+        {
+          role: 'system',
+          content: `Convert the user's topic into a YouTube thumbnail image prompt.
+Return comma-separated visual phrases only. Format:
+[subject], [emotion], [environment], [lighting], [camera], [composition].
+Maximum 80 words. No sentences. No markdown. No explanation.`
+        },
+        { role: 'user', content: userInput }
+      ],
+      max_tokens: 120
     });
 
     const prompt = completion.choices[0].message.content?.trim();
@@ -265,7 +271,7 @@ app.post('/api/generate', imageLimiter, async (req, res) => {
       return res.status(500).json({ error: 'OpenAI API key not configured. Please set OPENAI_API_KEY in your .env file.' });
     }
 
-    const { prompt, aspectRatio } = req.body;
+    const { prompt, aspect_ratio } = req.body;
     if (!prompt || !prompt.trim()) {
       return res.status(400).json({ error: 'Prompt is required.' });
     }
@@ -273,46 +279,25 @@ app.post('/api/generate', imageLimiter, async (req, res) => {
       return res.status(400).json({ error: 'Prompt exceeds maximum length of 2000 characters.' });
     }
 
+    const userPrompt = prompt.trim();
     let size;
-    if (aspectRatio === '9:16')      size = '1024x1792';
-    else if (aspectRatio === '16:9') size = '1792x1024';
-    else                             size = '1024x1024';
+    if (aspect_ratio === '9:16')      size = '1024x1792';
+    else if (aspect_ratio === '16:9') size = '1792x1024';
+    else                              size = '1024x1024';
 
-    const finalPrompt = `
-Create a HIGH CTR YouTube thumbnail (vertical 9:16 if selected).
-
-TOPIC:
-${prompt.trim()}
-
-STYLE:
-- cinematic, photorealistic, high contrast
-
-COMPOSITION RULES:
-- ONLY ONE main subject
-- clean, minimal background
-- NO clutter
-- NO multiple objects
-- NO infographics
-- NO small details
-
-TEXT RULES:
-- EXACTLY ONE headline
-- max 4 words
-- large, bold, readable
-- no subtitles
-
-OUTPUT STYLE:
-- viral YouTube thumbnail
-- strong emotion
-- clear focus
-`;
+    const finalPrompt = `${userPrompt},
+bold title text overlay integrated into design,
+cinematic composition, dramatic lighting, strong key light,
+dark background with warm spotlight, 50mm lens, shallow depth of field,
+ultra realistic, 8k, high contrast,
+designed as a professional YouTube thumbnail`;
 
     const result = await openaiClient.images.generate({
       model:   'gpt-image-2',
       prompt:  finalPrompt,
       n:       1,
       size,
-      quality: 'medium'
+      quality: 'high'
     });
 
     const imageData = result.data?.[0]?.b64_json;
@@ -320,12 +305,12 @@ OUTPUT STYLE:
       return res.status(500).json({ error: 'No image returned by OpenAI. Try a different prompt.' });
     }
 
-    activityLog(req.session.user, 'generate', { ratio: aspectRatio });
+    activityLog(req.session.user, 'generate', { ratio: aspect_ratio });
     return res.json({
       success:    true,
       imageData,
       mimeType:   'image/png',
-      aspectRatio
+      aspectRatio: aspect_ratio
     });
   } catch (err) {
     console.error('Generate error:', err);
