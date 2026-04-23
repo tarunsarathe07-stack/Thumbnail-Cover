@@ -271,7 +271,7 @@ app.post('/api/generate', imageLimiter, async (req, res) => {
       return res.status(500).json({ error: 'OpenAI API key not configured. Please set OPENAI_API_KEY in your .env file.' });
     }
 
-    const { prompt, aspect_ratio } = req.body;
+    const { prompt, aspectRatio } = req.body;
     if (!prompt || !prompt.trim()) {
       return res.status(400).json({ error: 'Prompt is required.' });
     }
@@ -281,9 +281,9 @@ app.post('/api/generate', imageLimiter, async (req, res) => {
 
     const userPrompt = prompt.trim();
     let size;
-    if (aspect_ratio === '9:16')      size = '1024x1792';
-    else if (aspect_ratio === '16:9') size = '1792x1024';
-    else                              size = '1024x1024';
+    if (aspectRatio === '9:16')      size = '1024x1792';
+    else if (aspectRatio === '16:9') size = '1792x1024';
+    else                             size = '1024x1024';
 
     const finalPrompt = `${userPrompt},
 bold title text overlay integrated into design,
@@ -305,12 +305,12 @@ designed as a professional YouTube thumbnail`;
       return res.status(500).json({ error: 'No image returned by OpenAI. Try a different prompt.' });
     }
 
-    activityLog(req.session.user, 'generate', { ratio: aspect_ratio });
+    activityLog(req.session.user, 'generate', { ratio: aspectRatio });
     return res.json({
       success:    true,
       imageData,
       mimeType:   'image/png',
-      aspectRatio: aspect_ratio
+      aspectRatio
     });
   } catch (err) {
     console.error('Generate error:', err);
