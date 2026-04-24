@@ -297,7 +297,7 @@ designed as a professional YouTube thumbnail`;
       prompt:  finalPrompt,
       n:       1,
       size,
-      quality: 'high'
+      quality: 'medium'
     });
 
     const imageData = result.data?.[0]?.b64_json;
