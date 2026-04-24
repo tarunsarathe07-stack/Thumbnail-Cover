@@ -8,18 +8,72 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/styles.css">
+  <style>
+    .hero {
+      min-height: 100vh;
+    }
+    .hero-bg {
+      background-size: cover !important;
+      background-position: center top !important;
+      min-height: 100vh;
+    }
+    @media (max-width: 768px) {
+      .hero-content {
+        flex-direction: column !important;
+        padding: 100px 20px 60px !important;
+        gap: 40px !important;
+      }
+      .hero-left, .hero-right {
+        width: 100% !important;
+        max-width: 100% !important;
+      }
+      .hero-left {
+        text-align: center;
+      }
+      .hero-actions {
+        justify-content: center;
+      }
+    }
+    .examples-section {
+      background: #f5f5f5;
+      padding: 72px 24px;
+    }
+    .examples-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .examples-heading {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #121212;
+      text-align: center;
+      margin-bottom: 36px;
+    }
+    .examples-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    .example-img {
+      width: 100%;
+      aspect-ratio: 16/9;
+      object-fit: cover;
+      border-radius: 12px;
+      background: #d0d0d0;
+      display: block;
+    }
+    @media (max-width: 768px) {
+      .examples-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 <body>
 
   <!-- Navbar -->
   <nav class="nav">
     <span class="nav-logo">ThumbAI</span>
-    <div class="nav-links">
-      <a class="nav-link" href="#">Features</a>
-      <a class="nav-link" href="#">Examples</a>
-      <a class="nav-link" href="#">Pricing</a>
-      <a class="nav-link" href="#">Blog</a>
-    </div>
   </nav>
 
   <!-- Hero -->
@@ -41,17 +95,18 @@
           Cinematic quality — zero design skills needed.
         </p>
         <div class="hero-actions">
-          <button class="btn btn-primary" onclick="document.getElementById('username').focus()">
+          <button
+            class="btn btn-primary"
+            style="background:#C8962E;color:#000;border-color:#C8962E;"
+            onclick="document.getElementById('loginSection').scrollIntoView({behavior:'smooth'})"
+          >
             Get Started Free
-          </button>
-          <button class="btn btn-ghost-white">
-            See Examples →
           </button>
         </div>
       </div>
 
       <!-- Right — login card -->
-      <div class="hero-right animate-in" style="animation-delay:.12s">
+      <div class="hero-right animate-in" id="loginSection" style="animation-delay:.12s">
         <div class="login-card">
           <div class="login-card-title">Welcome Back</div>
           <div class="login-card-sub">Sign in to start creating</div>
@@ -132,6 +187,18 @@
           <div class="feature-title">Prompt Assistant</div>
           <div class="feature-desc">AI suggests optimised prompts based on your topic so you get better results every time.</div>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Example thumbnails -->
+  <section class="examples-section">
+    <div class="examples-inner">
+      <div class="examples-heading">Real thumbnails created with ThumbAI</div>
+      <div class="examples-grid">
+        <img class="example-img" src="/assets/example-1.jpg" alt="Example thumbnail 1" onerror="this.style.background='#d0d0d0';this.removeAttribute('src')">
+        <img class="example-img" src="/assets/example-2.jpg" alt="Example thumbnail 2" onerror="this.style.background='#d0d0d0';this.removeAttribute('src')">
+        <img class="example-img" src="/assets/example-3.jpg" alt="Example thumbnail 3" onerror="this.style.background='#d0d0d0';this.removeAttribute('src')">
       </div>
     </div>
   </section>

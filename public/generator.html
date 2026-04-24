@@ -8,25 +8,106 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/styles.css">
+  <style>
+    .gen-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      z-index: 9999;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+    }
+    .gen-overlay.visible {
+      display: flex;
+    }
+    .gen-spinner {
+      width: 52px;
+      height: 52px;
+      border: 4px solid rgba(200,150,46,0.25);
+      border-top-color: #C8962E;
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .gen-overlay-title {
+      color: #fff;
+      font-size: 1.2rem;
+      font-weight: 700;
+      text-align: center;
+    }
+    .gen-overlay-sub {
+      color: rgba(255,255,255,0.65);
+      font-size: 0.85rem;
+      text-align: center;
+      max-width: 300px;
+      line-height: 1.5;
+    }
+    .gen-progress-wrap {
+      width: 280px;
+      height: 5px;
+      background: rgba(255,255,255,0.12);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .gen-progress-bar {
+      height: 100%;
+      width: 0%;
+      background: #C8962E;
+      border-radius: 999px;
+      transition: none;
+    }
+    .fs-upload-section {
+      margin-bottom: 4px;
+    }
+    .fs-submit-wrap {
+      margin-top: 8px;
+    }
+    .fs-submit-wrap .btn-swap {
+      display: block;
+      width: 100%;
+      padding: 16px;
+      background: #C8962E;
+      color: #000;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: center;
+      transition: opacity 0.2s;
+    }
+    .fs-submit-wrap .btn-swap:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .fs-processing-note {
+      text-align: center;
+      font-size: 0.78rem;
+      color: var(--muted, #888);
+      margin-top: 10px;
+    }
+  </style>
 </head>
 <body class="page-body">
 
   <!-- Loading overlay -->
-  <div class="loading-overlay" id="loadingOverlay">
-    <div class="loading-ring"></div>
-    <div class="loading-title" id="loadingTitle">Generating your thumbnail…</div>
-    <div class="loading-sub">This usually takes 10–20 seconds</div>
+  <div class="gen-overlay" id="loadingOverlay">
+    <div class="gen-spinner"></div>
+    <div class="gen-overlay-title">Creating your thumbnail…</div>
+    <div class="gen-overlay-sub">This takes 60–90 seconds.<br>Please don't close this tab.</div>
+    <div class="gen-progress-wrap">
+      <div class="gen-progress-bar" id="progressBar"></div>
+    </div>
   </div>
 
   <!-- Navbar -->
   <nav class="nav">
     <span class="nav-logo">ThumbAI</span>
-    <div class="nav-links">
-      <a class="nav-link" href="#">Features</a>
-      <a class="nav-link" href="#">Examples</a>
-      <a class="nav-link" href="#">Pricing</a>
-      <a class="nav-link" href="#">Blog</a>
-    </div>
     <div class="nav-right">
       <span class="nav-credits">⚡ 120 Credits</span>
       <button class="nav-btn" id="logoutBtn">Sign out</button>
@@ -41,26 +122,8 @@
       <div class="page-sub">Describe your vision and our AI will bring it to life.</div>
     </div>
 
-    <!-- Step indicator -->
-    <div class="steps animate-in" style="animation-delay:.08s">
-      <div class="step active">
-        <div class="step-num">1</div>
-        <div class="step-label">Describe</div>
-      </div>
-      <div class="step-line"></div>
-      <div class="step">
-        <div class="step-num">2</div>
-        <div class="step-label">Customize</div>
-      </div>
-      <div class="step-line"></div>
-      <div class="step">
-        <div class="step-num">3</div>
-        <div class="step-label">Generate</div>
-      </div>
-    </div>
-
     <!-- Tab switcher -->
-    <div class="gen-tabs animate-in" style="animation-delay:.12s">
+    <div class="gen-tabs animate-in" style="animation-delay:.08s">
       <button class="gen-tab active" id="tabGenerate">⚡ AI Generate</button>
       <button class="gen-tab"        id="tabFaceSwap">◉ Face Swap</button>
     </div>
@@ -70,6 +133,11 @@
     ════════════════════════════════════ -->
     <div id="panelGenerate">
       <form id="genForm" novalidate>
+
+        <!-- Section heading -->
+        <div class="gen-section-heading animate-in" style="animation-delay:.12s;font-size:1.1rem;font-weight:700;color:#121212;margin-bottom:16px;">
+          Describe Your Thumbnail
+        </div>
 
         <!-- Prompt card -->
         <div class="gen-card animate-in" style="animation-delay:.16s">
@@ -114,32 +182,9 @@
           </div>
         </div>
 
-        <!-- Style tags -->
-        <div class="gen-card animate-in" style="animation-delay:.28s">
-          <div class="gen-card-label">Visual Style</div>
-          <div class="style-tags">
-            <button type="button" class="style-tag selected" data-style="Cinematic">Cinematic</button>
-            <button type="button" class="style-tag" data-style="Minimalist">Minimalist</button>
-            <button type="button" class="style-tag" data-style="Neon Cyber">Neon Cyber</button>
-            <button type="button" class="style-tag" data-style="Anime Core">Anime Core</button>
-          </div>
-        </div>
-
-        <!-- Advanced -->
-        <div class="gen-card animate-in" style="animation-delay:.32s">
-          <div class="accordion">
-            <button type="button" class="accordion-trigger" aria-expanded="false" id="accordionBtn">
-              Advanced Settings <span class="accordion-icon">▾</span>
-            </button>
-            <div class="accordion-body" id="accordionBody">
-              Additional options coming soon — face placement, text overlay, brand colours, and more.
-            </div>
-          </div>
-        </div>
-
         <div class="msg msg-error" id="genError" style="margin-bottom:12px"></div>
 
-        <div class="gen-footer animate-in" style="animation-delay:.36s">
+        <div class="gen-footer animate-in" style="animation-delay:.28s">
           <div class="gen-cost">Estimated cost: <strong>2 credits</strong></div>
           <button type="submit" class="btn btn-primary btn-lg" id="generateBtn">
             <span id="genBtnText">⚡ Generate Thumbnail</span>
@@ -155,69 +200,45 @@
     ════════════════════════════════════ -->
     <div id="panelFaceSwap" style="display:none">
 
-      <!-- Face image upload -->
-      <div class="gen-card animate-in">
-        <div class="gen-card-label">Face Image</div>
+      <!-- Section 1: Upload Generated Thumbnail -->
+      <div class="gen-card animate-in fs-upload-section">
+        <div class="gen-card-label">Upload Generated Thumbnail</div>
+        <div class="upload-zone" id="thumbUploadZone">
+          <input type="file" id="thumbImageInput" accept="image/jpeg,image/png,image/webp" style="display:none">
+          <div id="thumbUploadDefault">
+            <div class="upload-zone-icon">▭</div>
+            <div class="upload-zone-label">Click to upload thumbnail</div>
+            <div class="upload-zone-sub">JPEG, PNG or WebP · max 10 MB</div>
+          </div>
+          <img id="thumbPreview" class="upload-preview" src="" alt="Thumbnail preview" style="display:none">
+        </div>
+      </div>
+
+      <!-- Section 2: Upload Face Photo -->
+      <div class="gen-card animate-in fs-upload-section" style="animation-delay:.08s">
+        <div class="gen-card-label">Upload Face Photo</div>
         <div class="upload-zone" id="faceUploadZone">
           <input type="file" id="faceImageInput" accept="image/jpeg,image/png,image/webp" style="display:none">
           <div id="faceUploadDefault">
             <div class="upload-zone-icon">👤</div>
-            <div class="upload-zone-label">Upload a face photo</div>
+            <div class="upload-zone-label">Click to upload face photo</div>
             <div class="upload-zone-sub">JPEG, PNG or WebP · max 10 MB</div>
           </div>
           <img id="facePreview" class="upload-preview" src="" alt="Face preview" style="display:none">
         </div>
         <div style="margin-top:10px;font-size:.78rem;color:var(--muted)">
-          The person's face from this photo will be used in the generated thumbnail.
-        </div>
-      </div>
-
-      <!-- Description -->
-      <div class="gen-card animate-in" style="animation-delay:.08s">
-        <div class="gen-card-label">Thumbnail Concept</div>
-        <textarea
-          class="prompt-textarea"
-          id="faceDescription"
-          placeholder="Example: person looking shocked at a stock chart going up, bold text 'I MADE ₹10 LAKH', dramatic background"
-          maxlength="500"
-          rows="3"
-        ></textarea>
-        <div class="prompt-foot">
-          <span class="char-counter"><span id="faceCharCount">0</span> / 500</span>
-        </div>
-      </div>
-
-      <!-- Aspect ratio (shared selectors) -->
-      <div class="gen-card animate-in" style="animation-delay:.12s">
-        <div class="gen-card-label">Aspect Ratio</div>
-        <div class="ratio-grid">
-          <div class="ratio-card selected" data-ratio="16:9" data-panel="faceswap">
-            <div class="ratio-check">✓</div>
-            <svg width="48" height="27" viewBox="0 0 48 27" fill="none" style="margin-bottom:12px">
-              <rect x="1" y="1" width="46" height="25" rx="3" stroke="#121212" stroke-width="2"/>
-            </svg>
-            <div class="ratio-name">16 : 9</div>
-            <div class="ratio-desc">YouTube Thumbnail</div>
-          </div>
-          <div class="ratio-card" data-ratio="9:16" data-panel="faceswap">
-            <div class="ratio-check">✓</div>
-            <svg width="27" height="48" viewBox="0 0 27 48" fill="none" style="margin-bottom:12px">
-              <rect x="1" y="1" width="25" height="46" rx="3" stroke="#121212" stroke-width="2"/>
-            </svg>
-            <div class="ratio-name">9 : 16</div>
-            <div class="ratio-desc">Shorts / Reels</div>
-          </div>
+          Clear front-facing photo works best
         </div>
       </div>
 
       <div class="msg msg-error" id="faceswapError" style="margin-bottom:12px"></div>
 
-      <div class="gen-footer animate-in" style="animation-delay:.16s">
-        <div class="gen-cost">Estimated cost: <strong>3 credits</strong></div>
-        <button type="button" class="btn btn-primary btn-lg" id="faceswapBtn">
-          <span id="faceswapBtnText">◉ Swap Face</span>
+      <div class="fs-submit-wrap animate-in" style="animation-delay:.12s">
+        <button type="button" class="btn-swap" id="faceswapBtn">
+          <span id="faceswapBtnText">Swap Face →</span>
           <span class="spinner" id="faceswapSpinner" style="display:none"></span>
         </button>
+        <div class="fs-processing-note">Processing takes 30–60 seconds</div>
       </div>
 
     </div>
@@ -243,10 +264,10 @@
     });
 
     // ── Tab switching ──────────────────────────────────────────────
-    const tabGenerate  = document.getElementById('tabGenerate');
-    const tabFaceSwap  = document.getElementById('tabFaceSwap');
-    const panelGen     = document.getElementById('panelGenerate');
-    const panelFs      = document.getElementById('panelFaceSwap');
+    const tabGenerate = document.getElementById('tabGenerate');
+    const tabFaceSwap = document.getElementById('tabFaceSwap');
+    const panelGen    = document.getElementById('panelGenerate');
+    const panelFs     = document.getElementById('panelFaceSwap');
 
     tabGenerate.addEventListener('click', () => {
       tabGenerate.classList.add('active');
@@ -274,13 +295,6 @@
     promptEl.addEventListener('input', () => {
       autoResize(promptEl);
       charCountEl.textContent = promptEl.value.length;
-    });
-
-    const faceDescEl    = document.getElementById('faceDescription');
-    const faceCharCount = document.getElementById('faceCharCount');
-    faceDescEl.addEventListener('input', () => {
-      autoResize(faceDescEl);
-      faceCharCount.textContent = faceDescEl.value.length;
     });
 
     // ── Prompt Assistant ───────────────────────────────────────────
@@ -319,55 +333,38 @@
         card.classList.add('selected');
       });
     });
-    document.querySelectorAll('#panelFaceSwap .ratio-card').forEach(card => {
-      card.addEventListener('click', () => {
-        document.querySelectorAll('#panelFaceSwap .ratio-card').forEach(c => c.classList.remove('selected'));
-        card.classList.add('selected');
-      });
-    });
 
-    // ── Style tag selection ────────────────────────────────────────
-    document.querySelectorAll('.style-tag').forEach(tag => {
-      tag.addEventListener('click', () => {
-        document.querySelectorAll('.style-tag').forEach(t => t.classList.remove('selected'));
-        tag.classList.add('selected');
-      });
-    });
+    // ── Progress bar ───────────────────────────────────────────────
+    const progressBar = document.getElementById('progressBar');
 
-    // ── Accordion ──────────────────────────────────────────────────
-    const accordionBtn  = document.getElementById('accordionBtn');
-    const accordionBody = document.getElementById('accordionBody');
-    accordionBtn.addEventListener('click', () => {
-      const open = accordionBody.classList.toggle('open');
-      accordionBtn.setAttribute('aria-expanded', open);
-    });
+    function startProgress() {
+      progressBar.style.transition = 'none';
+      progressBar.style.width      = '0%';
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        progressBar.style.transition = 'width 90s linear';
+        progressBar.style.width      = '95%';
+      }));
+    }
+    function stopProgress() {
+      progressBar.style.transition = 'width 0.3s ease';
+      progressBar.style.width      = '100%';
+      setTimeout(() => {
+        progressBar.style.transition = 'none';
+        progressBar.style.width      = '0%';
+      }, 400);
+    }
 
-    // ── Face image upload ──────────────────────────────────────────
-    const faceZone    = document.getElementById('faceUploadZone');
-    const faceInput   = document.getElementById('faceImageInput');
-    const faceDefault = document.getElementById('faceUploadDefault');
-    const facePreview = document.getElementById('facePreview');
-    let faceBase64    = null;
+    // ── Loading overlay ────────────────────────────────────────────
+    const overlay = document.getElementById('loadingOverlay');
 
-    faceZone.addEventListener('click', () => faceInput.click());
-
-    faceInput.addEventListener('change', () => {
-      const file = faceInput.files?.[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const dataUrl = e.target.result;
-        // Strip "data:image/...;base64," prefix
-        faceBase64 = dataUrl.split(',')[1];
-
-        facePreview.src            = dataUrl;
-        facePreview.style.display  = 'block';
-        faceDefault.style.display  = 'none';
-        faceZone.classList.add('has-file');
-      };
-      reader.readAsDataURL(file);
-    });
+    function showOverlay() {
+      overlay.classList.add('visible');
+      startProgress();
+    }
+    function hideOverlay() {
+      stopProgress();
+      overlay.classList.remove('visible');
+    }
 
     // ── Generate thumbnail ─────────────────────────────────────────
     const genForm  = document.getElementById('genForm');
@@ -375,15 +372,12 @@
     const genBtn   = document.getElementById('generateBtn');
     const genText  = document.getElementById('genBtnText');
     const genSpin  = document.getElementById('genSpinner');
-    const overlay  = document.getElementById('loadingOverlay');
-    const loadTitle = document.getElementById('loadingTitle');
 
-    function setGenerating(on, label) {
-      genBtn.disabled      = on;
-      genText.textContent  = on ? 'Generating…' : '⚡ Generate Thumbnail';
+    function setGenerating(on) {
+      genBtn.disabled       = on;
+      genText.textContent   = on ? 'Generating…' : '⚡ Generate Thumbnail';
       genSpin.style.display = on ? 'inline-block' : 'none';
-      loadTitle.textContent = label || 'Generating your thumbnail…';
-      overlay.classList.toggle('visible', on);
+      if (on) showOverlay(); else hideOverlay();
     }
 
     genForm.addEventListener('submit', async (e) => {
@@ -398,15 +392,14 @@
       }
 
       const aspectRatio = document.querySelector('#panelGenerate .ratio-card.selected')?.dataset.ratio || '16:9';
-      const style       = document.querySelector('.style-tag.selected')?.dataset.style || 'Cinematic';
 
-      setGenerating(true, 'Generating your thumbnail…');
+      setGenerating(true);
       try {
         const res  = await fetch('/api/generate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
-          body: JSON.stringify({ prompt, aspectRatio, style })
+          body: JSON.stringify({ prompt, aspectRatio })
         });
         const data = await res.json();
 
@@ -418,9 +411,11 @@
         }
 
         sessionStorage.setItem('thumbai_result', JSON.stringify({
-          imageData: data.imageData, mimeType: data.mimeType || 'image/png',
-          aspectRatio: data.aspectRatio || aspectRatio, style, prompt,
-          timestamp: new Date().toISOString()
+          imageData:   data.imageData,
+          mimeType:    data.mimeType || 'image/png',
+          aspectRatio: data.aspectRatio || aspectRatio,
+          prompt,
+          timestamp:   new Date().toISOString()
         }));
         window.location.href = '/result.html';
       } catch {
@@ -428,6 +423,52 @@
         genError.className   = 'msg msg-error visible';
         setGenerating(false);
       }
+    });
+
+    // ── Thumbnail upload (face swap) ───────────────────────────────
+    const thumbZone    = document.getElementById('thumbUploadZone');
+    const thumbInput   = document.getElementById('thumbImageInput');
+    const thumbDefault = document.getElementById('thumbUploadDefault');
+    const thumbPreview = document.getElementById('thumbPreview');
+    let   thumbBase64  = null;
+
+    thumbZone.addEventListener('click', () => thumbInput.click());
+    thumbInput.addEventListener('change', () => {
+      const file = thumbInput.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const dataUrl      = e.target.result;
+        thumbBase64        = dataUrl.split(',')[1];
+        thumbPreview.src   = dataUrl;
+        thumbPreview.style.display  = 'block';
+        thumbDefault.style.display  = 'none';
+        thumbZone.classList.add('has-file');
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // ── Face photo upload ──────────────────────────────────────────
+    const faceZone    = document.getElementById('faceUploadZone');
+    const faceInput   = document.getElementById('faceImageInput');
+    const faceDefault = document.getElementById('faceUploadDefault');
+    const facePreview = document.getElementById('facePreview');
+    let   faceBase64  = null;
+
+    faceZone.addEventListener('click', () => faceInput.click());
+    faceInput.addEventListener('change', () => {
+      const file = faceInput.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const dataUrl      = e.target.result;
+        faceBase64         = dataUrl.split(',')[1];
+        facePreview.src    = dataUrl;
+        facePreview.style.display  = 'block';
+        faceDefault.style.display  = 'none';
+        faceZone.classList.add('has-file');
+      };
+      reader.readAsDataURL(file);
     });
 
     // ── Face swap submit ───────────────────────────────────────────
@@ -438,28 +479,21 @@
 
     function setSwapping(on) {
       fsBtn.disabled       = on;
-      fsText.textContent   = on ? 'Swapping…' : '◉ Swap Face';
+      fsText.textContent   = on ? 'Processing…' : 'Swap Face →';
       fsSpin.style.display = on ? 'inline-block' : 'none';
-      loadTitle.textContent = 'Swapping face into thumbnail…';
-      overlay.classList.toggle('visible', on);
+      if (on) showOverlay(); else hideOverlay();
     }
 
     fsBtn.addEventListener('click', async () => {
       fsError.className = 'msg msg-error';
 
       if (!faceBase64) {
-        fsError.textContent = 'Please upload a face image first.';
-        fsError.className   = 'msg msg-error visible';
-        return;
-      }
-      const targetDescription = faceDescEl.value.trim();
-      if (!targetDescription) {
-        fsError.textContent = 'Please describe the thumbnail concept.';
+        fsError.textContent = 'Please upload a face photo first.';
         fsError.className   = 'msg msg-error visible';
         return;
       }
 
-      const aspectRatio = document.querySelector('#panelFaceSwap .ratio-card.selected')?.dataset.ratio || '16:9';
+      const targetDescription = 'YouTube thumbnail with this person\'s face, cinematic lighting, dramatic composition';
 
       setSwapping(true);
       try {
@@ -467,7 +501,11 @@
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
-          body: JSON.stringify({ targetDescription, faceImageBase64: faceBase64 })
+          body: JSON.stringify({
+            targetDescription,
+            faceImageBase64:      faceBase64,
+            thumbnailImageBase64: thumbBase64
+          })
         });
         const data = await res.json();
 
@@ -479,9 +517,11 @@
         }
 
         sessionStorage.setItem('thumbai_result', JSON.stringify({
-          imageData: data.imageData, mimeType: data.mimeType || 'image/png',
-          aspectRatio, prompt: targetDescription,
-          timestamp: new Date().toISOString()
+          imageData:   data.imageData,
+          mimeType:    data.mimeType || 'image/png',
+          aspectRatio: '16:9',
+          prompt:      targetDescription,
+          timestamp:   new Date().toISOString()
         }));
         window.location.href = '/result.html';
       } catch {
