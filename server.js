@@ -241,28 +241,10 @@ app.post('/api/suggest-prompt', promptLimiter, async (req, res) => {
       messages: [
         {
           role: 'system',
-          content: `You are a YouTube thumbnail creative director with deep world knowledge.
-
-Given a topic, classify it and build a cinematic image generation prompt.
-
-CLASSIFY the topic as one of:
-- CONFLICT/DEBATE: use split screen, two opposing landmark elements, VS divider
-- NEWS/CURRENT AFFAIRS: dramatic scene, relevant landmark + bold text overlay
-- EDUCATION/STUDY: student with relevant props, books, environment, calendar
-- PERSON/STATEMENT: dramatic portrait, recognizable figure, supporting scene
-
-USE world knowledge to include specific real elements:
-- Real buildings, landmarks, flags relevant to the topic
-- Recognizable visual symbols associated with the subject
-- Contextually accurate props and environment details
-
-BUILD the prompt in this order:
-scene/environment, subjects or split composition,
-specific world-knowledge elements, dramatic lighting,
-bold text overlay description, cinematic quality tags
-
-OUTPUT only the image prompt. Max 120 words.
-No explanation. No markdown. No labels.`
+          content: `Convert the user's topic into a YouTube thumbnail image prompt.
+Return comma-separated visual phrases only. Format:
+[subject], [emotion], [environment], [lighting], [camera], [composition].
+Maximum 80 words. No sentences. No markdown. No explanation.`
         },
         { role: 'user', content: userInput }
       ],
@@ -303,19 +285,19 @@ app.post('/api/generate', imageLimiter, async (req, res) => {
     else if (aspectRatio === '16:9') size = '1792x1024';
     else                             size = '1024x1024';
 
-    const finalPrompt = `${userPrompt}.
-Professional YouTube thumbnail composition.
-Bold integrated title text, high contrast typography.
-Cinematic dramatic lighting. Ultra realistic.
-High contrast. No watermarks. No logos.`;
+    const finalPrompt = `${userPrompt},
+bold title text overlay integrated into design,
+cinematic composition, dramatic lighting, strong key light,
+dark background with warm spotlight, 50mm lens, shallow depth of field,
+ultra realistic, 8k, high contrast,
+designed as a professional YouTube thumbnail`;
 
     const result = await openaiClient.images.generate({
-      model:         'gpt-image-2',
-      prompt:        finalPrompt,
-      n:             1,
+      model:   'gpt-image-2',
+      prompt:  finalPrompt,
+      n:       1,
       size,
-      quality:       'low',
-      output_format: 'jpeg'
+      quality: 'high'
     });
 
     const imageData = result.data?.[0]?.b64_json;
@@ -327,7 +309,7 @@ High contrast. No watermarks. No logos.`;
     return res.json({
       success:    true,
       imageData,
-      mimeType:   'image/jpeg',
+      mimeType:   'image/png',
       aspectRatio
     });
   } catch (err) {
