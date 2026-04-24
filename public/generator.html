@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ThumbAI — Generator</title>
+  <title>Create Thumbnail — ThumbAI</title>
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -143,8 +144,8 @@
         <div class="gen-card animate-in" style="animation-delay:.16s">
           <div class="prompt-row">
             <div class="gen-card-label">Your Prompt</div>
-            <button type="button" class="btn-suggest" id="suggestBtn">
-              ✦ Prompt Assistant
+            <button type="button" class="btn-suggest" id="suggestBtn" title="AI will improve your prompt for better results">
+              ✦ Enhance My Prompt
             </button>
           </div>
           <textarea
@@ -156,6 +157,7 @@
           ></textarea>
           <div class="prompt-foot">
             <span class="char-counter"><span id="charCount">0</span> / 1000</span>
+            <span style="font-size:.75rem;color:var(--muted,#888);">Ctrl+Enter to generate</span>
           </div>
         </div>
 
@@ -295,6 +297,13 @@
     promptEl.addEventListener('input', () => {
       autoResize(promptEl);
       charCountEl.textContent = promptEl.value.length;
+    });
+
+    promptEl.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        document.getElementById('genForm').requestSubmit();
+      }
     });
 
     // ── Prompt Assistant ───────────────────────────────────────────
