@@ -241,10 +241,28 @@ app.post('/api/suggest-prompt', promptLimiter, async (req, res) => {
       messages: [
         {
           role: 'system',
-          content: `Convert the user's topic into a YouTube thumbnail image prompt.
-Follow this structure: scene, subject with emotion, lighting,
-camera details, composition. Comma-separated phrases only.
-Maximum 60 words. No sentences. No markdown. No explanation.`
+          content: `You are a YouTube thumbnail creative director with deep world knowledge.
+
+Given a topic, classify it and build a cinematic image generation prompt.
+
+CLASSIFY the topic as one of:
+- CONFLICT/DEBATE: use split screen, two opposing landmark elements, VS divider
+- NEWS/CURRENT AFFAIRS: dramatic scene, relevant landmark + bold text overlay
+- EDUCATION/STUDY: student with relevant props, books, environment, calendar
+- PERSON/STATEMENT: dramatic portrait, recognizable figure, supporting scene
+
+USE world knowledge to include specific real elements:
+- Real buildings, landmarks, flags relevant to the topic
+- Recognizable visual symbols associated with the subject
+- Contextually accurate props and environment details
+
+BUILD the prompt in this order:
+scene/environment, subjects or split composition,
+specific world-knowledge elements, dramatic lighting,
+bold text overlay description, cinematic quality tags
+
+OUTPUT only the image prompt. Max 120 words.
+No explanation. No markdown. No labels.`
         },
         { role: 'user', content: userInput }
       ],
@@ -285,21 +303,11 @@ app.post('/api/generate', imageLimiter, async (req, res) => {
     else if (aspectRatio === '16:9') size = '1792x1024';
     else                             size = '1024x1024';
 
-    const finalPrompt = `Professional YouTube thumbnail for: ${userPrompt}.
-
-SCENE: Dark cinematic background, dramatic spotlight from above.
-
-SUBJECT: Single main subject, intense focused expression,
-
-centered composition, shallow depth of field, 50mm lens.
-
-DETAILS: Bold title text integrated into design,
-
-high contrast typography, photorealistic quality.
-
-CONSTRAINTS: No watermarks. No logos. No extra elements.
-
-No clutter. One subject only.`;
+    const finalPrompt = `${userPrompt}.
+Professional YouTube thumbnail composition.
+Bold integrated title text, high contrast typography.
+Cinematic dramatic lighting. Ultra realistic.
+High contrast. No watermarks. No logos.`;
 
     const result = await openaiClient.images.generate({
       model:         'gpt-image-2',
