@@ -242,9 +242,9 @@ app.post('/api/suggest-prompt', promptLimiter, async (req, res) => {
         {
           role: 'system',
           content: `Convert the user's topic into a YouTube thumbnail image prompt.
-Return comma-separated visual phrases only. Format:
-[subject], [emotion], [environment], [lighting], [camera], [composition].
-Maximum 80 words. No sentences. No markdown. No explanation.`
+Follow this structure: scene, subject with emotion, lighting,
+camera details, composition. Comma-separated phrases only.
+Maximum 60 words. No sentences. No markdown. No explanation.`
         },
         { role: 'user', content: userInput }
       ],
@@ -285,19 +285,29 @@ app.post('/api/generate', imageLimiter, async (req, res) => {
     else if (aspectRatio === '16:9') size = '1792x1024';
     else                             size = '1024x1024';
 
-    const finalPrompt = `${userPrompt},
-bold title text overlay integrated into design,
-cinematic composition, dramatic lighting, strong key light,
-dark background with warm spotlight, 50mm lens, shallow depth of field,
-ultra realistic, 8k, high contrast,
-designed as a professional YouTube thumbnail`;
+    const finalPrompt = `Professional YouTube thumbnail for: ${userPrompt}.
+
+SCENE: Dark cinematic background, dramatic spotlight from above.
+
+SUBJECT: Single main subject, intense focused expression,
+
+centered composition, shallow depth of field, 50mm lens.
+
+DETAILS: Bold title text integrated into design,
+
+high contrast typography, photorealistic quality.
+
+CONSTRAINTS: No watermarks. No logos. No extra elements.
+
+No clutter. One subject only.`;
 
     const result = await openaiClient.images.generate({
-      model:   'gpt-image-2',
-      prompt:  finalPrompt,
-      n:       1,
+      model:         'gpt-image-2',
+      prompt:        finalPrompt,
+      n:             1,
       size,
-      quality: 'medium'
+      quality:       'low',
+      output_format: 'jpeg'
     });
 
     const imageData = result.data?.[0]?.b64_json;
@@ -309,7 +319,7 @@ designed as a professional YouTube thumbnail`;
     return res.json({
       success:    true,
       imageData,
-      mimeType:   'image/png',
+      mimeType:   'image/jpeg',
       aspectRatio
     });
   } catch (err) {
