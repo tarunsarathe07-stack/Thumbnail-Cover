@@ -254,7 +254,9 @@ Based on the topic, append ONE typography style to the end of your prompt:
 - Religion/culture/tradition → append: 'ornate decorative typography, temple inscription style lettering'
 - Default/general → append: 'bold high contrast modern typography'
 
-Always append exactly one of these. Never skip it.`
+Always append exactly one of these. Never skip it.
+
+IMPORTANT: Never include bullet points, checklists, strategy lists, or multiple text items in the prompt. Single strong visual concept only.`
         },
         { role: 'user', content: userInput }
       ],
@@ -296,8 +298,12 @@ app.post('/api/generate', imageLimiter, async (req, res) => {
     else                             size = '1024x1024';
 
     const finalPrompt = `${userPrompt},
-bold integrated title text, professional YouTube thumbnail,
-ultra realistic, high contrast, no watermarks`;
+cinematic composition, dramatic lighting,
+bold integrated title text,
+professional YouTube thumbnail,
+ultra realistic, high contrast,
+no watermarks, no bullet points,
+no checklists, no text lists`;
 
     const result = await openaiClient.images.generate({
       model:   'gpt-image-2',
