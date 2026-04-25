@@ -246,14 +246,15 @@ Return comma-separated visual phrases only. Format:
 [subject], [emotion], [environment], [lighting], [camera], [composition].
 Maximum 80 words. No sentences. No markdown. No explanation.
 
-Based on the topic type, append ONE font style descriptor:
-- News/politics: add 'distressed grunge bold typography'
-- Education/exam: add 'clean bold sans-serif typography'
-- Legal/court: add 'newspaper headline bold typography'
-- Dramatic/conflict: add 'movie poster epic title lettering'
-- General: add 'bold high contrast typography'
+Based on the topic, append ONE typography style to the end of your prompt:
+- News/politics/current affairs → append: 'distressed grunge bold typography, breaking news headline style'
+- Education/exam/study → append: 'clean bold sans-serif typography, academic poster style'
+- Legal/court/justice → append: 'newspaper front page headline typography, official document bold text'
+- Conflict/war/drama → append: 'movie poster epic title lettering, metallic embossed text effect'
+- Religion/culture/tradition → append: 'ornate decorative typography, temple inscription style lettering'
+- Default/general → append: 'bold high contrast modern typography'
 
-Include this at the end of the generated prompt.`
+Always append exactly one of these. Never skip it.`
         },
         { role: 'user', content: userInput }
       ],
