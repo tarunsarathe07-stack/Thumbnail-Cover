@@ -156,10 +156,42 @@
           </div>
         </div>
 
+        <!-- Quality selector -->
+        <div class="gen-card animate-in" style="animation-delay:.26s">
+          <div class="gen-card-label">Quality</div>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-top:12px;">
+
+            <label style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-radius:12px;border:1.5px solid #e5e5e5;cursor:pointer;background:white;" id="qualityDraftLabel">
+              <div>
+                <div style="font-weight:600;font-size:14px;">⚡ Draft</div>
+                <div style="font-size:12px;color:#888;margin-top:2px;">Fast preview · 20–30 seconds · 1 credit</div>
+              </div>
+              <input type="radio" name="quality" value="low">
+            </label>
+
+            <label style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-radius:12px;border:1.5px solid #C8962E;cursor:pointer;background:#fffbf5;" id="qualityStandardLabel">
+              <div>
+                <div style="font-weight:600;font-size:14px;">✦ Standard</div>
+                <div style="font-size:12px;color:#888;margin-top:2px;">Good quality · ~1 minute · 1 credit</div>
+              </div>
+              <input type="radio" name="quality" value="medium" checked>
+            </label>
+
+            <label style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-radius:12px;border:1.5px solid #e5e5e5;cursor:pointer;background:white;" id="qualityPremiumLabel">
+              <div>
+                <div style="font-weight:600;font-size:14px;">👑 Premium</div>
+                <div style="font-size:12px;color:#888;margin-top:2px;">Best quality · ~2 minutes · 2 credits</div>
+              </div>
+              <input type="radio" name="quality" value="high">
+            </label>
+
+          </div>
+        </div>
+
         <div class="msg msg-error" id="genError" style="margin-bottom:12px"></div>
 
         <div class="gen-footer animate-in" style="animation-delay:.28s">
-          <div class="gen-cost">Estimated cost: <strong>1 credit</strong></div>
+          <div class="gen-cost">Estimated cost: <strong id="costDisplay">1 credit</strong></div>
           <button type="submit" class="btn btn-primary btn-lg" id="generateBtn">
             <span id="genBtnText">⚡ Generate Thumbnail</span>
             <span class="spinner" id="genSpinner" style="display:none"></span>
@@ -340,13 +372,16 @@
     let progressInterval;
     let messageIndex  = 0;
     let progressValue = 0;
+    let progressMax   = 70;
 
-    function showLoadingOverlay() {
+    function showLoadingOverlay(quality) {
+      progressMax = quality === 'low' ? 35 : quality === 'high' ? 110 : 70;
+
       const overlay = document.getElementById('loadingOverlay');
       overlay.style.display = 'flex';
 
       const msgEl = document.getElementById('loadingMessage');
-      msgEl.textContent  = loadingMessages[0];
+      msgEl.textContent   = loadingMessages[0];
       msgEl.style.opacity = '1';
 
       messageInterval = setInterval(() => {
@@ -362,11 +397,11 @@
       const progressEl = document.getElementById('loadingProgress');
       progressEl.style.width = '0%';
       progressInterval = setInterval(() => {
-        progressValue = Math.min(progressValue + 1, 95);
-        progressEl.style.width = progressValue + '%';
-        const remaining = Math.max(0, 100 - progressValue);
+        progressValue = Math.min(progressValue + 1, progressMax - 5);
+        progressEl.style.width = Math.round((progressValue / progressMax) * 95) + '%';
+        const remaining = Math.max(0, progressMax - progressValue);
         document.getElementById('loadingTimer').textContent =
-          remaining > 10
+          remaining > 5
             ? `About ${remaining} seconds remaining...`
             : 'Almost done...';
       }, 1000);
@@ -383,6 +418,20 @@
       }, 500);
     }
 
+    // ── Quality selector ───────────────────────────────────────────
+    document.querySelectorAll('input[name="quality"]').forEach(radio => {
+      radio.addEventListener('change', function () {
+        document.querySelectorAll('label[id^="quality"]').forEach(l => {
+          l.style.border     = '1.5px solid #e5e5e5';
+          l.style.background = 'white';
+        });
+        this.parentElement.style.border     = '1.5px solid #C8962E';
+        this.parentElement.style.background = '#fffbf5';
+        document.getElementById('costDisplay').textContent =
+          this.value === 'high' ? '2 credits' : '1 credit';
+      });
+    });
+
     // ── Generate thumbnail ─────────────────────────────────────────
     const genForm  = document.getElementById('genForm');
     const genError = document.getElementById('genError');
@@ -390,11 +439,11 @@
     const genText  = document.getElementById('genBtnText');
     const genSpin  = document.getElementById('genSpinner');
 
-    function setGenerating(on) {
+    function setGenerating(on, quality) {
       genBtn.disabled       = on;
       genText.textContent   = on ? 'Generating…' : '⚡ Generate Thumbnail';
       genSpin.style.display = on ? 'inline-block' : 'none';
-      if (on) showLoadingOverlay(); else hideLoadingOverlay();
+      if (on) showLoadingOverlay(quality); else hideLoadingOverlay();
     }
 
     genForm.addEventListener('submit', async (e) => {
@@ -409,14 +458,15 @@
       }
 
       const aspectRatio = document.querySelector('#panelGenerate .ratio-card.selected')?.dataset.ratio || '16:9';
+      const quality     = document.querySelector('input[name="quality"]:checked')?.value || 'medium';
 
-      setGenerating(true);
+      setGenerating(true, quality);
       try {
         const res  = await fetch('/api/generate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
-          body: JSON.stringify({ prompt, aspectRatio })
+          body: JSON.stringify({ prompt, aspectRatio, quality })
         });
         const data = await res.json();
 

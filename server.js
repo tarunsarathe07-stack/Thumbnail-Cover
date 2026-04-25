@@ -281,7 +281,7 @@ app.post('/api/generate', imageLimiter, async (req, res) => {
       return res.status(500).json({ error: 'OpenAI API key not configured. Please set OPENAI_API_KEY in your .env file.' });
     }
 
-    const { prompt, aspectRatio } = req.body;
+    const { prompt, aspectRatio, quality } = req.body;
     if (!prompt || !prompt.trim()) {
       return res.status(400).json({ error: 'Prompt is required.' });
     }
@@ -304,7 +304,7 @@ ultra realistic, high contrast, no watermarks`;
       prompt:  finalPrompt,
       n:       1,
       size,
-      quality: 'high'
+      quality: quality || 'medium'
     });
 
     const imageData = result.data?.[0]?.b64_json;
