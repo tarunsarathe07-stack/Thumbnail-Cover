@@ -244,7 +244,16 @@ app.post('/api/suggest-prompt', promptLimiter, async (req, res) => {
           content: `Convert the user's topic into a YouTube thumbnail image prompt.
 Return comma-separated visual phrases only. Format:
 [subject], [emotion], [environment], [lighting], [camera], [composition].
-Maximum 80 words. No sentences. No markdown. No explanation.`
+Maximum 80 words. No sentences. No markdown. No explanation.
+
+Based on the topic type, append ONE font style descriptor:
+- News/politics: add 'distressed grunge bold typography'
+- Education/exam: add 'clean bold sans-serif typography'
+- Legal/court: add 'newspaper headline bold typography'
+- Dramatic/conflict: add 'movie poster epic title lettering'
+- General: add 'bold high contrast typography'
+
+Include this at the end of the generated prompt.`
         },
         { role: 'user', content: userInput }
       ],
@@ -286,11 +295,8 @@ app.post('/api/generate', imageLimiter, async (req, res) => {
     else                             size = '1024x1024';
 
     const finalPrompt = `${userPrompt},
-bold title text overlay integrated into design,
-cinematic composition, dramatic lighting, strong key light,
-dark background with warm spotlight, 50mm lens, shallow depth of field,
-ultra realistic, 8k, high contrast,
-designed as a professional YouTube thumbnail`;
+bold integrated title text, professional YouTube thumbnail,
+ultra realistic, high contrast, no watermarks`;
 
     const result = await openaiClient.images.generate({
       model:   'gpt-image-2',
