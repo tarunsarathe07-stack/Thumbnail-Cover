@@ -82,7 +82,7 @@
   <nav class="nav">
     <span class="nav-logo">ThumbAI</span>
     <div class="nav-right">
-      <span class="nav-credits">⚡ 120 Credits</span>
+      <span class="nav-credits" id="navCredits">⚡ — Credits</span>
       <button class="nav-btn" id="logoutBtn">Sign out</button>
     </div>
   </nav>
@@ -259,11 +259,17 @@
   <script>
     'use strict';
 
-    // ── Auth ──────────────────────────────────────────────────────
+    // ── Auth + credits load ───────────────────────────────────────
+    function updateCreditsDisplay(n) {
+      document.getElementById('navCredits').textContent = `⚡ ${n} Credits`;
+    }
+
     (async () => {
       try {
         const r = await fetch('/api/v1/session', { credentials: 'include' });
         if (!r.ok) { window.location.href = '/login'; return; }
+        const d = await r.json();
+        if (typeof d.credits === 'number') updateCreditsDisplay(d.credits);
       } catch { window.location.href = '/login'; }
     })();
 
@@ -477,6 +483,7 @@
           return;
         }
 
+        if (typeof data.creditsRemaining === 'number') updateCreditsDisplay(data.creditsRemaining);
         sessionStorage.setItem('thumbai_result', JSON.stringify({
           imageData:   data.imageData,
           mimeType:    data.mimeType || 'image/png',
