@@ -242,7 +242,7 @@ a   { color: inherit; text-decoration: none; }
       rgba(0,0,0,.78) 0%,
       rgba(0,0,0,.70) 45%,
       rgba(0,0,0,.42) 100%),
-    url('/assets/theatre.jpeg') center/cover no-repeat;
+    url('/theatre.jpeg') center/cover no-repeat;
   /* Fallback when image missing */
   background-color: #0d0d14;
 }
