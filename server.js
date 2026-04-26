@@ -176,7 +176,7 @@ app.post('/api/v1/end', (req, res) => {
   res.json({ success: true });
 });
 
-app.get('/api/health', (req, res) => {
+app.get('/api/v1/status', (req, res) => {
   res.json({
     status: 'ok',
     keyConfigured: !!OPENAI_API_KEY,
@@ -193,12 +193,12 @@ app.use(requireAuth);
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ─── Current user ──────────────────────────────────────────────────────────────
-app.get('/api/me', (req, res) => {
+app.get('/api/v1/session', (req, res) => {
   res.json({ user: req.session.user || 'User' });
 });
 
 // ─── Preset faces ──────────────────────────────────────────────────────────────
-app.get('/api/presets', (req, res) => {
+app.get('/api/v1/config', (req, res) => {
   const presetsDir = path.join(__dirname, 'public', 'presets');
   const allowed    = ['.jpg', '.jpeg', '.png', '.svg', '.gif', '.webp'];
   try {

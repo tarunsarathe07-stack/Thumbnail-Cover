@@ -262,7 +262,7 @@
     // ── Auth ──────────────────────────────────────────────────────
     (async () => {
       try {
-        const r = await fetch('/api/me', { credentials: 'include' });
+        const r = await fetch('/api/v1/session', { credentials: 'include' });
         if (!r.ok) { window.location.href = '/login'; return; }
       } catch { window.location.href = '/login'; }
     })();
