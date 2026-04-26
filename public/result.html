@@ -44,7 +44,7 @@
   <nav class="nav">
     <span class="nav-logo">ThumbAI</span>
     <div class="nav-right">
-      <span class="nav-credits">⚡ 118 Credits</span>
+      <span class="nav-credits" id="navCredits">⚡ — Credits</span>
       <button class="nav-btn" id="logoutBtn">Sign out</button>
     </div>
   </nav>
@@ -107,9 +107,7 @@
       </div>
 
       <!-- Credit line -->
-      <div class="credit-line animate-in" id="creditLine" style="animation-delay:.22s">
-        1 credit used
-      </div>
+      <div class="credit-line animate-in" id="creditLine" style="animation-delay:.22s"></div>
 
       <!-- Rating -->
       <div class="rating-bar animate-in" style="animation-delay:.24s">
@@ -132,13 +130,23 @@
   <script>
     'use strict';
 
-    // ── Auth ──────────────────────────────────────────────────────
+    // ── Auth + credits ────────────────────────────────────────────
     (async () => {
       try {
         const r = await fetch('/api/v1/session', { credentials: 'include' });
         if (!r.ok) { window.location.href = '/login'; return; }
+        const d = await r.json();
+        if (typeof d.credits === 'number') {
+          document.getElementById('navCredits').textContent = `⚡ ${d.credits} Credits`;
+        }
       } catch { window.location.href = '/login'; }
     })();
+
+    // ── Credit cost used ──────────────────────────────────────────
+    const cost = parseInt(localStorage.getItem('lastCreditCost') || '1', 10);
+    document.getElementById('creditLine').textContent =
+      `${cost} credit${cost > 1 ? 's' : ''} used`;
+    localStorage.removeItem('lastCreditCost');
 
     // ── Logout ─────────────────────────────────────────────────────
     document.getElementById('logoutBtn').addEventListener('click', async () => {

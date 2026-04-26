@@ -484,6 +484,8 @@
         }
 
         if (typeof data.creditsRemaining === 'number') updateCreditsDisplay(data.creditsRemaining);
+        const cost = quality === 'high' ? 2 : 1;
+        localStorage.setItem('lastCreditCost', cost);
         sessionStorage.setItem('thumbai_result', JSON.stringify({
           imageData:   data.imageData,
           mimeType:    data.mimeType || 'image/png',
