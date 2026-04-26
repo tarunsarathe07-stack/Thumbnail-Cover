@@ -242,7 +242,7 @@ a   { color: inherit; text-decoration: none; }
       rgba(0,0,0,.78) 0%,
       rgba(0,0,0,.70) 45%,
       rgba(0,0,0,.42) 100%),
-    url('/assets/theatre.jpeg') center/cover no-repeat;
+    url('/assets/theatre.jpeg') center/cover no-repeat fixed;
   /* Fallback when image missing */
   background-color: #0d0d14;
 }
@@ -773,4 +773,50 @@ a   { color: inherit; text-decoration: none; }
   .result-title  { font-size: 1.7rem; }
   .rating-bar    { flex-direction: column; align-items: flex-start; gap: 10px; }
   .variations    { gap: 7px; }
+}
+
+@media (max-width: 768px) {
+  .hero-bg {
+    background:
+      rgba(0,0,0,0.6),
+      url('/assets/theatre.jpeg') center/cover no-repeat fixed;
+    background-color: #0d0d14;
+  }
+  .hero-content {
+    flex-direction: column !important;
+    align-items: center !important;
+    padding-top: 80px !important;
+    gap: 32px !important;
+  }
+  .hero-left  { text-align: center; }
+  .hero-right { width: 100%; max-width: 100%; }
+}
+
+/* ── Quality dots ───────────────────────────────────────── */
+.quality-dots {
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: #C8962E;
+}
+
+/* ── Ratio badges ───────────────────────────────────────── */
+.ratio-badge-yt {
+  background: #FF0000;
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+  display: inline-block;
+  margin-bottom: 6px;
+}
+.ratio-badge-reels {
+  background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+  display: inline-block;
+  margin-bottom: 6px;
 }
