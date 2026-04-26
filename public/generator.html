@@ -269,7 +269,7 @@
 
     // ── Logout ─────────────────────────────────────────────────────
     document.getElementById('logoutBtn').addEventListener('click', async () => {
-      await fetch('/api/logout', { method: 'POST', credentials: 'include' });
+      await fetch('/api/v1/end', { method: 'POST', credentials: 'include' });
       window.location.href = '/login';
     });
 
@@ -324,7 +324,7 @@
 
       try {
         const ratio = document.querySelector('#panelGenerate .ratio-card.selected')?.dataset.ratio || '16:9';
-        const r = await fetch('/api/suggest-prompt', {
+        const r = await fetch('/api/v1/enhance', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
@@ -462,7 +462,7 @@
 
       setGenerating(true, quality);
       try {
-        const res  = await fetch('/api/generate', {
+        const res  = await fetch('/api/v1/process', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
@@ -564,7 +564,7 @@
 
       setSwapping(true);
       try {
-        const res  = await fetch('/api/faceswap', {
+        const res  = await fetch('/api/v1/transform', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',

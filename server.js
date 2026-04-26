@@ -20,12 +20,12 @@ const { log: activityLog }          = require('./activity-logger');
 const app  = express();
 const PORT = process.env.PORT || 3000;
 
-// OpenAI — used by /api/generate
+// OpenAI — used by /api/v1/process
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 // Initialise lazily so the server starts cleanly even without the key set
 const openaiClient   = OPENAI_API_KEY ? new OpenAI({ apiKey: OPENAI_API_KEY }) : null;
 
-// Gemini — used by /api/faceswap and /api/suggest-prompt
+// Gemini — used by /api/v1/transform and /api/v1/enhance
 const GEMINI_API_KEY      = process.env.GEMINI_API_KEY;
 const GEMINI_API_URL      = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp-image-generation:generateContent';
 const GEMINI_API_URL_FB   = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp-image-generation:generateContent';
@@ -148,7 +148,7 @@ app.get('/login', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
-app.post('/api/login', loginLimiter, (req, res) => {
+app.post('/api/v1/auth', loginLimiter, (req, res) => {
   const { username, password } = req.body;
   const validUser = process.env.LOGIN_USER;
   const validPass = process.env.LOGIN_PASS;
@@ -169,7 +169,7 @@ app.post('/api/login', loginLimiter, (req, res) => {
   res.status(401).json({ error: 'Invalid username or password.' });
 });
 
-app.post('/api/logout', (req, res) => {
+app.post('/api/v1/end', (req, res) => {
   const user = req.session.user;
   req.session = null; // clears the cookie-session cookie
   activityLog(user, 'logout', {});
@@ -222,7 +222,7 @@ app.get('/api/presets', (req, res) => {
 });
 
 // ─── Suggest prompt (OpenAI gpt-4o-mini) ──────────────────────────────────────
-app.post('/api/suggest-prompt', promptLimiter, async (req, res) => {
+app.post('/api/v1/enhance', promptLimiter, async (req, res) => {
   try {
     if (!openaiClient) {
       return res.status(500).json({ error: 'OpenAI API key not configured.' });
@@ -277,7 +277,7 @@ IMPORTANT: Never include bullet points, checklists, strategy lists, or multiple 
 });
 
 // ─── Generate thumbnail (OpenAI gpt-image-2) ────────────────────────────────
-app.post('/api/generate', imageLimiter, async (req, res) => {
+app.post('/api/v1/process', imageLimiter, async (req, res) => {
   try {
     if (!OPENAI_API_KEY) {
       return res.status(500).json({ error: 'OpenAI API key not configured. Please set OPENAI_API_KEY in your .env file.' });
@@ -332,7 +332,7 @@ no checklists, no text lists`;
 });
 
 // ─── Face swap (OpenAI gpt-image-2) ───────────────────────────────────────────
-app.post('/api/faceswap', imageLimiter, async (req, res) => {
+app.post('/api/v1/transform', imageLimiter, async (req, res) => {
   try {
     if (!openaiClient) {
       return res.status(500).json({ error: 'OpenAI API key not configured.' });
