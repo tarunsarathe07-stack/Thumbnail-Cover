@@ -703,12 +703,16 @@
       tabFaceSwap.classList.remove('active');
       panelGen.style.display = '';
       panelFs.style.display  = 'none';
+      document.getElementById('generateBtn').style.display = '';
+      document.getElementById('faceswapBtn').style.display = 'none';
     });
     tabFaceSwap.addEventListener('click', () => {
       tabFaceSwap.classList.add('active');
       tabGenerate.classList.remove('active');
       panelFs.style.display  = '';
       panelGen.style.display = 'none';
+      document.getElementById('faceswapBtn').style.display = '';
+      document.getElementById('generateBtn').style.display = 'none';
     });
 
     // ── Textarea auto-resize ───────────────────────────────────────
@@ -841,11 +845,13 @@
     document.querySelectorAll('input[name="quality"]').forEach(radio => {
       radio.addEventListener('change', function () {
         document.querySelectorAll('label[id^="quality"]').forEach(l => {
-          l.style.border     = '1.5px solid #e5e5e5';
-          l.style.background = 'white';
+          l.style.border     = '1px solid rgba(255,255,255,0.07)';
+          l.style.background = 'rgba(255,255,255,0.04)';
+          l.style.color      = 'rgba(255,255,255,0.5)';
         });
-        this.parentElement.style.border     = '1.5px solid #C8962E';
-        this.parentElement.style.background = '#fffbf5';
+        this.parentElement.style.border     = '1px solid rgba(200,150,46,0.4)';
+        this.parentElement.style.background = 'rgba(200,150,46,0.08)';
+        this.parentElement.style.color      = '#C8962E';
         document.getElementById('costDisplay').textContent =
           this.value === 'high' ? '2 credits' : '1 credit';
       });
@@ -906,12 +912,40 @@
           prompt,
           timestamp:   new Date().toISOString()
         }));
-        window.location.href = '/result.html';
+
+        // Show result in canvas
+        const mimeType = data.mimeType || 'image/png';
+        const src      = `data:${mimeType};base64,${data.imageData}`;
+        document.getElementById('canvasEmpty').style.display = 'none';
+        document.getElementById('canvasResult').classList.add('visible');
+        document.getElementById('canvasResultImg').src = src;
+
+        document.getElementById('resultDownloadBtn').onclick = () => {
+          const now  = new Date();
+          const yyyy = now.getFullYear();
+          const mm   = String(now.getMonth() + 1).padStart(2, '0');
+          const dd   = String(now.getDate()).padStart(2, '0');
+          const hhmm = String(now.getHours()).padStart(2, '0') + String(now.getMinutes()).padStart(2, '0');
+          const ext  = mimeType === 'image/jpeg' ? 'jpg' : 'png';
+          const a    = document.createElement('a');
+          a.href     = src;
+          a.download = `thumbai-${yyyy}-${mm}-${dd}-${hhmm}.${ext}`;
+          a.click();
+        };
+
+        setGenerating(false);
       } catch {
         genError.textContent = 'Network error. Please check your connection and try again.';
         genError.className   = 'msg msg-error visible';
         setGenerating(false);
       }
+    });
+
+    // ── New generation button ──────────────────────────────────────
+    document.getElementById('resultNewBtn').addEventListener('click', () => {
+      document.getElementById('canvasResult').classList.remove('visible');
+      document.getElementById('canvasEmpty').style.display = 'flex';
+      document.getElementById('canvasResultImg').src = '';
     });
 
     // ── Thumbnail upload (face swap) ───────────────────────────────
@@ -1012,7 +1046,28 @@
           prompt:      targetDescription,
           timestamp:   new Date().toISOString()
         }));
-        window.location.href = '/result.html';
+
+        // Show result in canvas
+        const mimeType = data.mimeType || 'image/png';
+        const src      = `data:${mimeType};base64,${data.imageData}`;
+        document.getElementById('canvasEmpty').style.display = 'none';
+        document.getElementById('canvasResult').classList.add('visible');
+        document.getElementById('canvasResultImg').src = src;
+
+        document.getElementById('resultDownloadBtn').onclick = () => {
+          const now  = new Date();
+          const yyyy = now.getFullYear();
+          const mm   = String(now.getMonth() + 1).padStart(2, '0');
+          const dd   = String(now.getDate()).padStart(2, '0');
+          const hhmm = String(now.getHours()).padStart(2, '0') + String(now.getMinutes()).padStart(2, '0');
+          const ext  = mimeType === 'image/jpeg' ? 'jpg' : 'png';
+          const a    = document.createElement('a');
+          a.href     = src;
+          a.download = `thumbai-${yyyy}-${mm}-${dd}-${hhmm}.${ext}`;
+          a.click();
+        };
+
+        setSwapping(false);
       } catch {
         fsError.textContent = 'Network error. Please check your connection and try again.';
         fsError.className   = 'msg msg-error visible';
