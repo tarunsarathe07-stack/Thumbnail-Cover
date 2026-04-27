@@ -455,201 +455,218 @@
 </head>
 <body class="page-body">
 
-  <!-- Loading overlay -->
-  <div id="loadingOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:9999;flex-direction:column;align-items:center;justify-content:center;padding:40px;">
+  <div class="workspace">
 
-    <div style="display:flex;gap:8px;margin-bottom:40px;">
-      <div class="dot" style="animation-delay:0s"></div>
-      <div class="dot" style="animation-delay:0.2s"></div>
-      <div class="dot" style="animation-delay:0.4s"></div>
-    </div>
+    <!-- ══════════════════════════════════════
+         LEFT — CONTROL PANEL
+    ══════════════════════════════════════ -->
+    <div class="control-panel">
 
-    <div style="color:white;font-size:20px;font-weight:600;text-align:center;margin-bottom:8px;">
-      Creating your thumbnail
-    </div>
-
-    <div id="loadingMessage" style="color:#C8962E;font-size:14px;text-align:center;margin-bottom:40px;min-height:44px;max-width:260px;line-height:1.6;transition:opacity 0.4s ease;"></div>
-
-    <div style="width:200px;height:2px;background:rgba(255,255,255,0.08);border-radius:999px;overflow:hidden;">
-      <div id="loadingProgress" style="height:100%;width:0%;background:#C8962E;border-radius:999px;transition:width 1s linear;"></div>
-    </div>
-
-    <div id="loadingTimer" style="color:#555;font-size:12px;margin-top:16px;text-align:center;"></div>
-
-  </div>
-
-  <!-- Navbar -->
-  <nav class="nav">
-    <span class="nav-logo">ThumbAI</span>
-    <div class="nav-right">
-      <span class="nav-credits" id="navCredits">⚡ — Credits</span>
-      <button class="nav-btn" id="logoutBtn">Sign out</button>
-    </div>
-  </nav>
-
-  <main class="page-inner">
-
-    <!-- Header -->
-    <div class="animate-in">
-      <div class="page-heading">Create Thumbnail</div>
-      <div class="page-sub">Describe your vision and our AI will bring it to life.</div>
-    </div>
-
-    <!-- Tab switcher -->
-    <div class="gen-tabs animate-in" style="animation-delay:.08s">
-      <button class="gen-tab active" id="tabGenerate">⚡ AI Generate</button>
-      <button class="gen-tab"        id="tabFaceSwap">◉ Face Swap</button>
-    </div>
-
-    <!-- ════════════════════════════════════
-         AI GENERATE PANEL
-    ════════════════════════════════════ -->
-    <div id="panelGenerate">
-      <form id="genForm" novalidate>
-
-        <!-- Section heading -->
-        <div class="gen-section-heading animate-in" style="animation-delay:.12s;font-size:1.1rem;font-weight:700;color:#121212;margin-bottom:16px;">
-          Describe Your Thumbnail
+      <!-- Panel header: logo + credits + sign out -->
+      <div class="panel-header">
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div class="panel-logo">ThumbAI</div>
+          <button class="sign-out-btn" id="logoutBtn" type="button">Sign out</button>
         </div>
-
-        <!-- Prompt card -->
-        <div class="gen-card animate-in" style="animation-delay:.16s">
-          <div class="prompt-row">
-            <div class="gen-card-label">Your Prompt</div>
-            <button type="button" class="btn-suggest" id="suggestBtn" title="AI will improve your prompt for better results">
-              ✦ Enhance My Prompt
-            </button>
-          </div>
-          <textarea
-            class="prompt-textarea"
-            id="prompt"
-            placeholder="Example: shocked face, explosive background, bold text 'I QUIT!', cinematic lighting, dramatic colours"
-            maxlength="1000"
-            rows="4"
-          ></textarea>
-          <div class="prompt-foot">
-            <span class="char-counter"><span id="charCount">0</span> / 1000</span>
-            <span style="font-size:.75rem;color:var(--muted,#888);">Ctrl+Enter to generate</span>
-          </div>
-        </div>
-
-        <!-- Aspect ratio -->
-        <div class="gen-card animate-in" style="animation-delay:.22s">
-          <div class="gen-card-label">Aspect Ratio</div>
-          <div class="ratio-grid">
-            <div class="ratio-card selected" data-ratio="16:9">
-              <div class="ratio-check">✓</div>
-              <span class="ratio-badge-yt">YT</span>
-              <div class="ratio-name">16 : 9</div>
-              <div class="ratio-desc">YouTube Thumbnail</div>
-            </div>
-            <div class="ratio-card" data-ratio="9:16">
-              <div class="ratio-check">✓</div>
-              <span class="ratio-badge-reels">Reels</span>
-              <div class="ratio-name">9 : 16</div>
-              <div class="ratio-desc">Shorts / Reels</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Quality selector -->
-        <div class="gen-card animate-in" style="animation-delay:.26s">
-          <div class="gen-card-label">Quality</div>
-          <div style="display:flex;flex-direction:column;gap:8px;margin-top:12px;">
-
-            <label style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-radius:12px;border:1.5px solid #e5e5e5;cursor:pointer;background:white;" id="qualityDraftLabel">
-              <div>
-                <div style="font-weight:600;font-size:14px;"><span class="quality-dots">●○○</span> Draft</div>
-                <div style="font-size:12px;color:#888;margin-top:2px;">Fast preview · 20–30 seconds · 1 credit</div>
-              </div>
-              <input type="radio" name="quality" value="low">
-            </label>
-
-            <label style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-radius:12px;border:1.5px solid #C8962E;cursor:pointer;background:#fffbf5;" id="qualityStandardLabel">
-              <div>
-                <div style="font-weight:600;font-size:14px;"><span class="quality-dots">●●○</span> Standard</div>
-                <div style="font-size:12px;color:#888;margin-top:2px;">Good quality · ~1 minute · 1 credit</div>
-              </div>
-              <input type="radio" name="quality" value="medium" checked>
-            </label>
-
-            <label style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-radius:12px;border:1.5px solid #e5e5e5;cursor:pointer;background:white;" id="qualityPremiumLabel">
-              <div>
-                <div style="font-weight:600;font-size:14px;"><span class="quality-dots">●●●</span> Premium</div>
-                <div style="font-size:12px;color:#888;margin-top:2px;">Best quality · ~2 minutes · 2 credits</div>
-              </div>
-              <input type="radio" name="quality" value="high">
-            </label>
-
-          </div>
-        </div>
-
-        <div class="msg msg-error" id="genError" style="margin-bottom:12px"></div>
-
-        <div class="gen-footer animate-in" style="animation-delay:.28s">
-          <div class="gen-cost">Estimated cost: <strong id="costDisplay">1 credit</strong></div>
-          <button type="submit" class="btn btn-primary btn-lg" id="generateBtn">
-            <span id="genBtnText">⚡ Generate Thumbnail</span>
-            <span class="spinner" id="genSpinner" style="display:none"></span>
-          </button>
-        </div>
-
-      </form>
-    </div>
-
-    <!-- ════════════════════════════════════
-         FACE SWAP PANEL
-    ════════════════════════════════════ -->
-    <div id="panelFaceSwap" style="display:none">
-
-      <!-- Section 1: Upload Generated Thumbnail -->
-      <div class="gen-card animate-in fs-upload-section">
-        <div class="gen-card-label">Upload Generated Thumbnail</div>
-        <div class="upload-zone" id="thumbUploadZone">
-          <input type="file" id="thumbImageInput" accept="image/jpeg,image/png,image/webp" style="display:none">
-          <div id="thumbUploadDefault">
-            <div class="upload-zone-icon">▭</div>
-            <div class="upload-zone-label">Click to upload thumbnail</div>
-            <div class="upload-zone-sub">JPEG, PNG or WebP · max 10 MB</div>
-          </div>
-          <img id="thumbPreview" class="upload-preview" src="" alt="Thumbnail preview" style="display:none">
+        <div style="margin-top:12px;">
+          <span class="credits-badge" id="navCredits">⚡ — Credits</span>
         </div>
       </div>
 
-      <!-- Section 2: Upload Face Photo -->
-      <div class="gen-card animate-in fs-upload-section" style="animation-delay:.08s">
-        <div class="gen-card-label">Upload Face Photo</div>
-        <div class="upload-zone" id="faceUploadZone">
-          <input type="file" id="faceImageInput" accept="image/jpeg,image/png,image/webp" style="display:none">
-          <div id="faceUploadDefault">
-            <div class="upload-zone-icon">👤</div>
-            <div class="upload-zone-label">Click to upload face photo</div>
-            <div class="upload-zone-sub">JPEG, PNG or WebP · max 10 MB</div>
+      <!-- Panel body: scrollable controls -->
+      <div class="panel-body">
+
+        <!-- Tab switcher -->
+        <div class="tab-switcher">
+          <button class="tab-btn active" id="tabGenerate" type="button">⚡ AI Generate</button>
+          <button class="tab-btn"        id="tabFaceSwap" type="button">◉ Face Swap</button>
+        </div>
+
+        <!-- ════════════════════════════════
+             AI GENERATE PANEL
+        ════════════════════════════════ -->
+        <div id="panelGenerate">
+          <form id="genForm" novalidate>
+
+            <!-- Prompt -->
+            <div style="margin-bottom:20px;">
+              <div class="section-label">Your Prompt</div>
+              <textarea
+                class="prompt-textarea"
+                id="prompt"
+                placeholder="Example: shocked face, explosive background, bold text 'I QUIT!', cinematic lighting, dramatic colours"
+                maxlength="1000"
+                rows="5"
+              ></textarea>
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;">
+                <span style="font-size:.72rem;color:rgba(255,255,255,0.25);"><span id="charCount">0</span> / 1000</span>
+                <span style="font-size:.72rem;color:rgba(255,255,255,0.2);">Ctrl+Enter to generate</span>
+              </div>
+              <button type="button" class="enhance-btn" id="suggestBtn" title="AI will improve your prompt for better results">
+                ✦ Enhance My Prompt
+              </button>
+            </div>
+
+            <!-- Aspect ratio -->
+            <div style="margin-bottom:20px;">
+              <div class="section-label">Aspect Ratio</div>
+              <div class="ratio-grid">
+                <div class="ratio-card selected" data-ratio="16:9">
+                  <div class="ratio-check" style="display:none">✓</div>
+                  <span class="ratio-badge-yt">YT</span>
+                  <div class="ratio-name">16 : 9</div>
+                  <div class="ratio-desc">YouTube Thumbnail</div>
+                </div>
+                <div class="ratio-card" data-ratio="9:16">
+                  <div class="ratio-check" style="display:none">✓</div>
+                  <span class="ratio-badge-reels">Reels</span>
+                  <div class="ratio-name">9 : 16</div>
+                  <div class="ratio-desc">Shorts / Reels</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Quality selector -->
+            <div style="margin-bottom:20px;">
+              <div class="section-label">Quality</div>
+              <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px;">
+
+                <label id="qualityDraftLabel" style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.04);cursor:pointer;color:rgba(255,255,255,0.5);">
+                  <div>
+                    <div style="font-weight:600;font-size:13px;"><span class="quality-dots">●○○</span> Draft</div>
+                    <div style="font-size:11px;margin-top:2px;opacity:0.6;">Fast preview · 20–30 seconds · 1 credit</div>
+                  </div>
+                  <input type="radio" name="quality" value="low">
+                </label>
+
+                <label id="qualityStandardLabel" style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-radius:10px;border:1px solid rgba(200,150,46,0.4);background:rgba(200,150,46,0.08);cursor:pointer;color:#C8962E;">
+                  <div>
+                    <div style="font-weight:600;font-size:13px;"><span class="quality-dots">●●○</span> Standard</div>
+                    <div style="font-size:11px;margin-top:2px;opacity:0.6;">Good quality · ~1 minute · 1 credit</div>
+                  </div>
+                  <input type="radio" name="quality" value="medium" checked>
+                </label>
+
+                <label id="qualityPremiumLabel" style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.04);cursor:pointer;color:rgba(255,255,255,0.5);">
+                  <div>
+                    <div style="font-weight:600;font-size:13px;"><span class="quality-dots">●●●</span> Premium</div>
+                    <div style="font-size:11px;margin-top:2px;opacity:0.6;">Best quality · ~2 minutes · 2 credits</div>
+                  </div>
+                  <input type="radio" name="quality" value="high">
+                </label>
+
+              </div>
+            </div>
+
+            <div class="msg msg-error" id="genError" style="margin-bottom:12px"></div>
+
+            <div class="cost-line">Estimated cost: <span id="costDisplay">1 credit</span></div>
+
+          </form>
+        </div><!-- /panelGenerate -->
+
+        <!-- ════════════════════════════════
+             FACE SWAP PANEL
+        ════════════════════════════════ -->
+        <div id="panelFaceSwap" style="display:none">
+
+          <!-- Upload Generated Thumbnail -->
+          <div class="fs-upload-section">
+            <div class="section-label">Upload Generated Thumbnail</div>
+            <div class="upload-zone" id="thumbUploadZone">
+              <input type="file" id="thumbImageInput" accept="image/jpeg,image/png,image/webp" style="display:none">
+              <div id="thumbUploadDefault">
+                <div class="upload-zone-icon">▭</div>
+                <div class="upload-zone-label">Click to upload thumbnail</div>
+                <div class="upload-zone-sub">JPEG, PNG or WebP · max 10 MB</div>
+              </div>
+              <img id="thumbPreview" class="upload-preview" src="" alt="Thumbnail preview" style="display:none">
+            </div>
           </div>
-          <img id="facePreview" class="upload-preview" src="" alt="Face preview" style="display:none">
-        </div>
-        <div style="margin-top:10px;font-size:.78rem;color:var(--muted)">
-          Clear front-facing photo works best
-        </div>
-      </div>
 
-      <div class="msg msg-error" id="faceswapError" style="margin-bottom:12px"></div>
+          <!-- Upload Face Photo -->
+          <div class="fs-upload-section">
+            <div class="section-label">Upload Face Photo</div>
+            <div class="upload-zone" id="faceUploadZone">
+              <input type="file" id="faceImageInput" accept="image/jpeg,image/png,image/webp" style="display:none">
+              <div id="faceUploadDefault">
+                <div class="upload-zone-icon">👤</div>
+                <div class="upload-zone-label">Click to upload face photo</div>
+                <div class="upload-zone-sub">JPEG, PNG or WebP · max 10 MB</div>
+              </div>
+              <img id="facePreview" class="upload-preview" src="" alt="Face preview" style="display:none">
+            </div>
+            <div style="margin-top:8px;font-size:.78rem;color:rgba(255,255,255,0.3);">
+              Clear front-facing photo works best
+            </div>
+          </div>
 
-      <div class="fs-submit-wrap animate-in" style="animation-delay:.12s">
-        <button type="button" class="btn-swap" id="faceswapBtn">
+          <div class="msg msg-error" id="faceswapError" style="margin-bottom:12px"></div>
+          <div class="fs-processing-note">Processing takes 30–60 seconds</div>
+
+        </div><!-- /panelFaceSwap -->
+
+      </div><!-- /panel-body -->
+
+      <!-- Panel footer: sticky generate / swap buttons -->
+      <div class="panel-footer">
+        <!-- AI Generate submit button (linked to genForm via form attr) -->
+        <button type="submit" form="genForm" class="generate-btn" id="generateBtn">
+          <span id="genBtnText">⚡ Generate Thumbnail</span>
+          <span class="spinner" id="genSpinner" style="display:none"></span>
+        </button>
+        <!-- Face Swap button (shown when face swap tab active) -->
+        <button type="button" class="swap-footer-btn" id="faceswapBtn" style="display:none">
           <span id="faceswapBtnText">Swap Face →</span>
           <span class="spinner" id="faceswapSpinner" style="display:none"></span>
         </button>
-        <div class="fs-processing-note">Processing takes 30–60 seconds</div>
       </div>
 
-    </div>
+    </div><!-- /control-panel -->
 
-  </main>
+    <!-- ══════════════════════════════════════
+         RIGHT — CANVAS PANEL
+    ══════════════════════════════════════ -->
+    <div class="canvas-panel">
 
-  <footer style="text-align:center;font-size:12px;color:#888888;padding:24px 0;">
-    Handcrafted with <span style="color:#C8962E;">♥</span> by Tarun
-  </footer>
+      <!-- Loading overlay (scoped to canvas) -->
+      <div id="loadingOverlay" style="display:none;inset:0;flex-direction:column;align-items:center;justify-content:center;padding:40px;">
+        <div style="display:flex;gap:8px;margin-bottom:40px;">
+          <div class="dot" style="animation-delay:0s"></div>
+          <div class="dot" style="animation-delay:0.2s"></div>
+          <div class="dot" style="animation-delay:0.4s"></div>
+        </div>
+        <div style="color:white;font-size:20px;font-weight:600;text-align:center;margin-bottom:8px;">
+          Creating your thumbnail
+        </div>
+        <div id="loadingMessage" style="color:#C8962E;font-size:14px;text-align:center;margin-bottom:40px;min-height:44px;max-width:260px;line-height:1.6;transition:opacity 0.4s ease;"></div>
+        <div style="width:200px;height:2px;background:rgba(255,255,255,0.08);border-radius:999px;overflow:hidden;">
+          <div id="loadingProgress" style="height:100%;width:0%;background:#C8962E;border-radius:999px;transition:width 1s linear;"></div>
+        </div>
+        <div id="loadingTimer" style="color:#555;font-size:12px;margin-top:16px;text-align:center;"></div>
+      </div>
+
+      <!-- Empty state -->
+      <div class="canvas-empty" id="canvasEmpty">
+        <div class="canvas-empty-icon">⚡</div>
+        <div class="canvas-empty-title">Your thumbnail will appear here</div>
+        <div class="canvas-empty-sub">Fill in the prompt and hit Generate</div>
+      </div>
+
+      <!-- Result state -->
+      <div class="canvas-result" id="canvasResult">
+        <div class="result-image-wrap">
+          <img id="canvasResultImg" src="" alt="Generated thumbnail">
+        </div>
+        <div class="canvas-result-actions">
+          <button class="result-download-btn" id="resultDownloadBtn">↓ Download</button>
+          <button class="result-new-btn"      id="resultNewBtn">↺ New Generation</button>
+        </div>
+      </div>
+
+    </div><!-- /canvas-panel -->
+
+  </div><!-- /workspace -->
 
   <script src="/js/app.js"></script>
   <script>
