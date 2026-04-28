@@ -443,6 +443,91 @@
       z-index: 10;
     }
 
+    /* VISUAL FRAME RATIO SELECTOR */
+    .ratio-selector-v2 {
+      display: flex;
+      gap: 8px;
+    }
+
+    .ratio-selector-v2 .ratio-card {
+      flex: 1;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 14px;
+      padding: 14px 10px 12px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+
+    .ratio-selector-v2 .ratio-card:hover {
+      border-color: rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.05);
+    }
+
+    .ratio-selector-v2 .ratio-card.active {
+      border-color: #D4A84F;
+      background: rgba(212,168,79,0.07);
+      box-shadow: 0 0 0 1px rgba(212,168,79,0.2),
+                  0 0 20px rgba(212,168,79,0.15);
+    }
+
+    .ratio-frame-wrap {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 44px;
+    }
+
+    .ratio-frame {
+      border: 2px solid rgba(255,255,255,0.2);
+      border-radius: 3px;
+      transition: border-color 0.2s ease;
+    }
+
+    .ratio-selector-v2 .ratio-card.active .ratio-frame {
+      border-color: #D4A84F;
+      box-shadow: 0 0 8px rgba(212,168,79,0.4);
+    }
+
+    .ratio-frame-169 { width: 44px; height: 26px; }
+    .ratio-frame-916 { width: 22px; height: 38px; }
+    .ratio-frame-11  { width: 32px; height: 32px; }
+
+    .ratio-card-label {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: rgba(255,255,255,0.5);
+    }
+
+    .ratio-selector-v2 .ratio-card.active .ratio-card-label { color: #D4A84F; }
+
+    .ratio-card-sub {
+      font-size: 0.65rem;
+      color: rgba(255,255,255,0.25);
+      text-align: center;
+      line-height: 1.3;
+    }
+
+    .ratio-badge-pill {
+      font-size: 0.58rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      padding: 2px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+    .ratio-badge-pill.yt    { background: #ff0000; color: #ffffff; }
+    .ratio-badge-pill.reels { background: linear-gradient(135deg, #833ab4, #fd1d1d); color: #ffffff; }
+    .ratio-badge-pill.post  { background: rgba(212,168,79,0.2); color: #D4A84F; border: 1px solid rgba(212,168,79,0.3); }
+
     /* MOBILE */
     @media (max-width: 768px) {
       body.page-body { overflow: auto; height: auto; }
@@ -510,19 +595,41 @@
             <!-- Aspect ratio -->
             <div style="margin-bottom:20px;">
               <div class="section-label">Aspect Ratio</div>
-              <div class="ratio-grid">
-                <div class="ratio-card selected" data-ratio="16:9">
-                  <div class="ratio-check" style="display:none">✓</div>
-                  <span class="ratio-badge-yt">YT</span>
-                  <div class="ratio-name">16 : 9</div>
-                  <div class="ratio-desc">YouTube Thumbnail</div>
+              <div class="ratio-selector-v2" id="ratioSelector">
+
+                <div class="ratio-card active" data-ratio="16:9" data-width="1536" data-height="1024">
+                  <div class="ratio-frame-wrap">
+                    <div class="ratio-frame ratio-frame-169"></div>
+                  </div>
+                  <div class="ratio-card-label">
+                    <span class="ratio-badge-pill yt">YT</span>
+                    16 : 9
+                  </div>
+                  <div class="ratio-card-sub">YouTube Thumbnail</div>
                 </div>
-                <div class="ratio-card" data-ratio="9:16">
-                  <div class="ratio-check" style="display:none">✓</div>
-                  <span class="ratio-badge-reels">Reels</span>
-                  <div class="ratio-name">9 : 16</div>
-                  <div class="ratio-desc">Shorts / Reels</div>
+
+                <div class="ratio-card" data-ratio="9:16" data-width="1024" data-height="1536">
+                  <div class="ratio-frame-wrap">
+                    <div class="ratio-frame ratio-frame-916"></div>
+                  </div>
+                  <div class="ratio-card-label">
+                    <span class="ratio-badge-pill reels">Reels</span>
+                    9 : 16
+                  </div>
+                  <div class="ratio-card-sub">Shorts / Reels</div>
                 </div>
+
+                <div class="ratio-card" data-ratio="1:1" data-width="1024" data-height="1024">
+                  <div class="ratio-frame-wrap">
+                    <div class="ratio-frame ratio-frame-11"></div>
+                  </div>
+                  <div class="ratio-card-label">
+                    <span class="ratio-badge-pill post">Post</span>
+                    1 : 1
+                  </div>
+                  <div class="ratio-card-sub">Square Post</div>
+                </div>
+
               </div>
             </div>
 
@@ -746,7 +853,7 @@
       suggestBtn.textContent = '✦ Thinking…';
 
       try {
-        const ratio = document.querySelector('#panelGenerate .ratio-card.selected')?.dataset.ratio || '16:9';
+        const ratio = document.querySelector('.ratio-card.active')?.dataset.ratio || '16:9';
         const r = await fetch('/api/v1/enhance', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -767,10 +874,16 @@
     });
 
     // ── Ratio card selection ───────────────────────────────────────
-    document.querySelectorAll('#panelGenerate .ratio-card').forEach(card => {
+    const ratioCards = document.querySelectorAll('.ratio-card');
+    let selectedWidth  = 1536;
+    let selectedHeight = 1024;
+
+    ratioCards.forEach(card => {
       card.addEventListener('click', () => {
-        document.querySelectorAll('#panelGenerate .ratio-card').forEach(c => c.classList.remove('selected'));
-        card.classList.add('selected');
+        ratioCards.forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+        selectedWidth  = parseInt(card.dataset.width);
+        selectedHeight = parseInt(card.dataset.height);
       });
     });
 
@@ -882,7 +995,7 @@
         return;
       }
 
-      const aspectRatio = document.querySelector('#panelGenerate .ratio-card.selected')?.dataset.ratio || '16:9';
+      const aspectRatio = document.querySelector('.ratio-card.active')?.dataset.ratio || '16:9';
       const quality     = document.querySelector('input[name="quality"]:checked')?.value || 'medium';
 
       setGenerating(true, quality);
