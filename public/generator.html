@@ -397,9 +397,11 @@
       max-width: 100%;
       max-height: 100%;
       object-fit: contain;
-      border-radius: 12px;
-      box-shadow: 0 0 0 1px rgba(255,255,255,0.08),
-                  0 20px 60px -20px rgba(0,0,0,0.9);
+      border-radius: 16px;
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.08),
+        0 20px 60px -10px rgba(0,0,0,0.9),
+        0 0 40px rgba(200,150,46,0.08);
     }
 
     .canvas-result-actions { display: flex; gap: 12px; flex-shrink: 0; }
@@ -436,11 +438,99 @@
     }
     .result-new-btn:hover { border-color: rgba(255,255,255,0.3); color: #ffffff; }
 
-    /* LOADING OVERLAY — scoped to canvas panel */
-    .canvas-panel #loadingOverlay {
-      position: absolute !important;
-      background: rgba(10,10,11,0.95) !important;
+    /* LOADING OVERLAY — neural scanner */
+    .loading-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(10,10,11,0.96);
+      display: none;
+      align-items: center;
+      justify-content: center;
       z-index: 10;
+      flex-direction: column;
+    }
+    .loading-overlay.active { display: flex; }
+
+    .neural-scanner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 28px;
+    }
+    .neural-silhouette {
+      position: relative;
+      width: 120px;
+      height: 160px;
+    }
+    .neural-svg {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      z-index: 2;
+    }
+    .neural-shape {
+      fill: none;
+      stroke: rgba(212,168,79,0.25);
+      stroke-width: 1.5;
+      animation: neural-trace 3s ease-in-out infinite;
+    }
+    .neural-shape.body { animation-delay: 0.5s; }
+    @keyframes neural-trace {
+      0%   { stroke: rgba(212,168,79,0.1);  stroke-width: 1; }
+      50%  { stroke: rgba(212,168,79,0.6);  stroke-width: 2; filter: drop-shadow(0 0 4px rgba(212,168,79,0.8)); }
+      100% { stroke: rgba(212,168,79,0.1);  stroke-width: 1; }
+    }
+    .neural-scan-line {
+      position: absolute;
+      top: 0;
+      left: -10px;
+      right: -10px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(212,168,79,0.8), transparent);
+      box-shadow: 0 0 8px rgba(212,168,79,0.6);
+      animation: scan-sweep 2s ease-in-out infinite;
+      z-index: 3;
+    }
+    @keyframes scan-sweep {
+      0%   { top: 0;     opacity: 0; }
+      10%  {             opacity: 1; }
+      90%  {             opacity: 1; }
+      100% { top: 160px; opacity: 0; }
+    }
+    .neural-rim-glow {
+      position: absolute;
+      inset: -20px;
+      border-radius: 50%;
+      background: radial-gradient(ellipse, rgba(212,168,79,0.15) 0%, transparent 70%);
+      animation: rim-pulse 2s ease-in-out infinite;
+      z-index: 1;
+    }
+    @keyframes rim-pulse {
+      0%, 100% { opacity: 0.3; transform: scale(0.95); }
+      50%      { opacity: 1;   transform: scale(1.05); }
+    }
+    .neural-status {
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.4);
+      letter-spacing: 0.05em;
+      text-align: center;
+      min-height: 20px;
+      transition: opacity 0.4s;
+    }
+    .neural-progress-wrap {
+      width: 200px;
+      height: 2px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .neural-progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #C8962E, #D4A84F);
+      border-radius: 2px;
+      transition: width 0.5s ease;
+      box-shadow: 0 0 8px rgba(212,168,79,0.5);
     }
 
     /* VISUAL FRAME RATIO SELECTOR */
@@ -528,6 +618,169 @@
     .ratio-badge-pill.reels { background: linear-gradient(135deg, #833ab4, #fd1d1d); color: #ffffff; }
     .ratio-badge-pill.post  { background: rgba(212,168,79,0.2); color: #D4A84F; border: 1px solid rgba(212,168,79,0.3); }
 
+    /* HOVER ACTION BAR */
+    .result-hover-wrap {
+      position: relative;
+      display: inline-block;
+      width: 100%;
+      max-width: 100%;
+    }
+    .result-hover-bar {
+      position: absolute;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%) translateY(8px);
+      display: flex;
+      gap: 10px;
+      background: rgba(10,10,11,0.7);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 40px;
+      padding: 8px 16px;
+      opacity: 0;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    .result-hover-wrap:hover .result-hover-bar {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+      pointer-events: all;
+    }
+    .hover-action-btn {
+      background: linear-gradient(135deg, #D4A84F, #C8962E);
+      border: none;
+      border-radius: 20px;
+      color: #000;
+      font-size: 0.82rem;
+      font-weight: 700;
+      padding: 7px 16px;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      font-family: inherit;
+    }
+    .hover-action-btn:hover { opacity: 0.85; }
+    .hover-action-btn.ghost {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.2);
+      color: rgba(255,255,255,0.7);
+    }
+    .hover-action-btn.ghost:hover {
+      border-color: rgba(255,255,255,0.4);
+      color: #ffffff;
+    }
+
+    /* PRESENTER UPLOAD */
+    .presenter-upload-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 4px;
+    }
+    .presenter-upload-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,255,255,0.04);
+      border: 1px dashed rgba(255,255,255,0.15);
+      border-radius: 8px;
+      padding: 8px 14px;
+      cursor: pointer;
+      flex: 1;
+      transition: all 0.2s;
+    }
+    .presenter-upload-label:hover {
+      border-color: rgba(212,168,79,0.4);
+      background: rgba(212,168,79,0.05);
+    }
+    .presenter-icon { font-size: 0.9rem; }
+    .presenter-text {
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.4);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .presenter-clear-btn {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 6px;
+      color: rgba(255,255,255,0.5);
+      font-size: 0.75rem;
+      padding: 6px 10px;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    .presenter-clear-btn:hover {
+      background: rgba(255,50,50,0.1);
+      border-color: rgba(255,50,50,0.3);
+      color: #ff6b6b;
+    }
+    .presenter-preview {
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+    }
+    .presenter-preview img {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid rgba(212,168,79,0.4);
+      box-shadow: 0 0 12px rgba(212,168,79,0.2);
+    }
+
+    /* HISTORY FILMSTRIP */
+    .history-strip {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(10,10,11,0.85);
+      backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 5;
+    }
+    .history-strip-label {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.25);
+      flex-shrink: 0;
+    }
+    .history-strip-scroll {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      flex: 1;
+    }
+    .history-strip-scroll::-webkit-scrollbar { display: none; }
+    .history-thumb {
+      width: 80px;
+      height: 45px;
+      border-radius: 6px;
+      object-fit: cover;
+      border: 1px solid rgba(255,255,255,0.08);
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: all 0.2s;
+      opacity: 0.6;
+    }
+    .history-thumb:hover {
+      opacity: 1;
+      border-color: rgba(212,168,79,0.5);
+      box-shadow: 0 0 12px rgba(212,168,79,0.2);
+    }
+
     /* MOBILE */
     @media (max-width: 768px) {
       body.page-body { overflow: auto; height: auto; }
@@ -590,6 +843,17 @@
               <button type="button" class="enhance-btn" id="suggestBtn" title="AI will improve your prompt for better results">
                 ✦ Enhance My Prompt
               </button>
+              <div class="presenter-upload-wrap">
+                <label class="presenter-upload-label" for="presenterImageInput">
+                  <span class="presenter-icon">📎</span>
+                  <span class="presenter-text" id="presenterText">Add presenter photo (optional)</span>
+                  <input type="file" id="presenterImageInput" accept="image/*" style="display:none" />
+                </label>
+                <button class="presenter-clear-btn" id="presenterClearBtn" type="button" style="display:none">✕</button>
+              </div>
+              <div id="presenterPreview" class="presenter-preview" style="display:none">
+                <img id="presenterPreviewImg" src="" alt="Presenter" />
+              </div>
             </div>
 
             <!-- Aspect ratio -->
@@ -726,21 +990,24 @@
     ══════════════════════════════════════ -->
     <div class="canvas-panel">
 
-      <!-- Loading overlay (scoped to canvas) -->
-      <div id="loadingOverlay" style="display:none;inset:0;flex-direction:column;align-items:center;justify-content:center;padding:40px;">
-        <div style="display:flex;gap:8px;margin-bottom:40px;">
-          <div class="dot" style="animation-delay:0s"></div>
-          <div class="dot" style="animation-delay:0.2s"></div>
-          <div class="dot" style="animation-delay:0.4s"></div>
+      <!-- Loading overlay (neural scanner) -->
+      <div class="loading-overlay" id="loadingOverlay">
+        <div class="neural-scanner">
+          <div class="neural-silhouette">
+            <svg viewBox="0 0 120 160" class="neural-svg">
+              <ellipse cx="60" cy="35" rx="28" ry="32"
+                class="neural-shape head" />
+              <path d="M32 70 Q20 90 18 130 Q40 145 60 145 Q80 145 102 130 Q100 90 88 70 Q75 60 60 58 Q45 60 32 70Z"
+                class="neural-shape body" />
+            </svg>
+            <div class="neural-scan-line" id="neuralScanLine"></div>
+            <div class="neural-rim-glow" id="neuralRimGlow"></div>
+          </div>
+          <div class="neural-status" id="neuralStatus">Initialising neural composition...</div>
+          <div class="neural-progress-wrap">
+            <div class="neural-progress-bar" id="neuralProgressBar"></div>
+          </div>
         </div>
-        <div style="color:white;font-size:20px;font-weight:600;text-align:center;margin-bottom:8px;">
-          Creating your thumbnail
-        </div>
-        <div id="loadingMessage" style="color:#C8962E;font-size:14px;text-align:center;margin-bottom:40px;min-height:44px;max-width:260px;line-height:1.6;transition:opacity 0.4s ease;"></div>
-        <div style="width:200px;height:2px;background:rgba(255,255,255,0.08);border-radius:999px;overflow:hidden;">
-          <div id="loadingProgress" style="height:100%;width:0%;background:#C8962E;border-radius:999px;transition:width 1s linear;"></div>
-        </div>
-        <div id="loadingTimer" style="color:#555;font-size:12px;margin-top:16px;text-align:center;"></div>
       </div>
 
       <!-- Empty state -->
@@ -753,12 +1020,24 @@
       <!-- Result state -->
       <div class="canvas-result" id="canvasResult">
         <div class="result-image-wrap">
-          <img id="canvasResultImg" src="" alt="Generated thumbnail">
+          <div class="result-hover-wrap">
+            <img id="canvasResultImg" src="" alt="Generated thumbnail" />
+            <div class="result-hover-bar">
+              <button class="hover-action-btn" id="hoverDownloadBtn">↓ Download</button>
+              <button class="hover-action-btn ghost" id="hoverRegenBtn">↺ Regenerate</button>
+            </div>
+          </div>
         </div>
         <div class="canvas-result-actions">
           <button class="result-download-btn" id="resultDownloadBtn">↓ Download</button>
           <button class="result-new-btn"      id="resultNewBtn">↺ New Generation</button>
         </div>
+      </div>
+
+      <!-- History filmstrip -->
+      <div class="history-strip" id="historyStrip" style="display:none">
+        <div class="history-strip-label">Recent</div>
+        <div class="history-strip-scroll" id="historyScroll"></div>
       </div>
 
     </div><!-- /canvas-panel -->
@@ -877,70 +1156,51 @@
       });
     });
 
-    // ── Loading overlay ────────────────────────────────────────────
-    const loadingMessages = [
-      'Studying the best YouTube thumbnails ever made...',
-      'Adding the perfect amount of drama 🎬',
-      'Making sure the text is absolutely unignorable...',
-      'Consulting the algorithm gods...',
-      'Applying cinematic lighting to every pixel...',
-      'This will stop the scroll. Promise.',
-      'Currently outperforming your last designer...',
-      'Adding that NewsChannel energy ⚡',
-      'Making your competition nervous...',
-      'Almost there. Good things take time.',
-      'The AI is being extra careful with this one...',
-      'Rendering at movie-poster quality...',
-      'Your next viral thumbnail is loading...',
+    // ── Neural scanner loading overlay ────────────────────────────
+    const neuralMessages = [
+      'Initialising neural composition...',
+      'Analysing topic context...',
+      'Calculating CTR composition...',
+      'Placing subject in frame...',
+      'Applying cinematic lighting...',
+      'Rendering high-contrast palette...',
+      'Finalising thumbnail...'
     ];
 
-    let messageInterval;
-    let progressInterval;
-    let messageIndex  = 0;
-    let progressValue = 0;
-    let progressMax   = 70;
+    let neuralInterval = null;
+    let neuralProgress = 0;
+
+    function startNeuralScanner() {
+      const statusEl   = document.getElementById('neuralStatus');
+      const progressEl = document.getElementById('neuralProgressBar');
+      let msgIndex = 0;
+      neuralProgress = 0;
+      if (statusEl)   statusEl.textContent = neuralMessages[0];
+      if (progressEl) progressEl.style.width = '0%';
+      neuralInterval = setInterval(() => {
+        msgIndex = (msgIndex + 1) % neuralMessages.length;
+        neuralProgress = Math.min(neuralProgress + (100 / neuralMessages.length), 92);
+        if (statusEl)   statusEl.textContent = neuralMessages[msgIndex];
+        if (progressEl) progressEl.style.width = neuralProgress + '%';
+      }, 2000);
+    }
+
+    function stopNeuralScanner() {
+      if (neuralInterval) clearInterval(neuralInterval);
+      const progressEl = document.getElementById('neuralProgressBar');
+      if (progressEl) progressEl.style.width = '100%';
+    }
 
     function showLoadingOverlay(quality) {
-      progressMax = quality === 'low' ? 35 : quality === 'high' ? 110 : 70;
-
-      const overlay = document.getElementById('loadingOverlay');
-      overlay.style.display = 'flex';
-
-      const msgEl = document.getElementById('loadingMessage');
-      msgEl.textContent   = loadingMessages[0];
-      msgEl.style.opacity = '1';
-
-      messageInterval = setInterval(() => {
-        messageIndex = (messageIndex + 1) % loadingMessages.length;
-        msgEl.style.opacity = '0';
-        setTimeout(() => {
-          msgEl.textContent   = loadingMessages[messageIndex];
-          msgEl.style.opacity = '1';
-        }, 300);
-      }, 4000);
-
-      progressValue = 0;
-      const progressEl = document.getElementById('loadingProgress');
-      progressEl.style.width = '0%';
-      progressInterval = setInterval(() => {
-        progressValue = Math.min(progressValue + 1, progressMax - 5);
-        progressEl.style.width = Math.round((progressValue / progressMax) * 95) + '%';
-        const remaining = Math.max(0, progressMax - progressValue);
-        document.getElementById('loadingTimer').textContent =
-          remaining > 5
-            ? `About ${remaining} seconds remaining...`
-            : 'Almost done...';
-      }, 1000);
+      document.getElementById('loadingOverlay').classList.add('active');
+      startNeuralScanner();
     }
 
     function hideLoadingOverlay() {
-      clearInterval(messageInterval);
-      clearInterval(progressInterval);
-      document.getElementById('loadingProgress').style.width = '100%';
+      stopNeuralScanner();
       setTimeout(() => {
-        document.getElementById('loadingOverlay').style.display = 'none';
-        progressValue = 0;
-        messageIndex  = 0;
+        document.getElementById('loadingOverlay').classList.remove('active');
+        neuralProgress = 0;
       }, 500);
     }
 
@@ -996,7 +1256,7 @@
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
-          body: JSON.stringify({ prompt, aspectRatio, quality })
+          body: JSON.stringify({ prompt, aspectRatio, quality, presenterImage: presenterImageBase64 || null })
         });
         const data = await res.json();
 
@@ -1024,6 +1284,7 @@
         document.getElementById('canvasEmpty').style.display = 'none';
         document.getElementById('canvasResult').classList.add('visible');
         document.getElementById('canvasResultImg').src = src;
+        saveToHistory(src);
 
         document.getElementById('resultDownloadBtn').onclick = () => {
           const now  = new Date();
@@ -1052,6 +1313,102 @@
       document.getElementById('canvasEmpty').style.display = 'flex';
       document.getElementById('canvasResultImg').src = '';
     });
+
+    // ── Hover action bar ──────────────────────────────────────────
+    const hoverDownloadBtn = document.getElementById('hoverDownloadBtn');
+    const hoverRegenBtn    = document.getElementById('hoverRegenBtn');
+
+    if (hoverDownloadBtn) {
+      hoverDownloadBtn.addEventListener('click', () => {
+        const img = document.getElementById('canvasResultImg');
+        if (img && img.src) {
+          const a = document.createElement('a');
+          a.href     = img.src;
+          a.download = 'thumbai-' + Date.now() + '.png';
+          a.click();
+        }
+      });
+    }
+
+    if (hoverRegenBtn) {
+      hoverRegenBtn.addEventListener('click', () => {
+        document.querySelector('.canvas-result').classList.remove('visible');
+        document.querySelector('.canvas-empty').style.display = 'flex';
+      });
+    }
+
+    // ── Presenter photo upload ─────────────────────────────────────
+    const presenterImageInput  = document.getElementById('presenterImageInput');
+    const presenterText        = document.getElementById('presenterText');
+    const presenterClearBtn    = document.getElementById('presenterClearBtn');
+    const presenterPreview     = document.getElementById('presenterPreview');
+    const presenterPreviewImg  = document.getElementById('presenterPreviewImg');
+    let   presenterImageFile   = null;
+    let   presenterImageBase64 = null;
+
+    presenterImageInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      presenterImageFile = file;
+      presenterText.textContent = file.name;
+      presenterClearBtn.style.display = 'block';
+      presenterPreview.style.display  = 'flex';
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        presenterImageBase64    = ev.target.result;
+        presenterPreviewImg.src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    presenterClearBtn.addEventListener('click', () => {
+      presenterImageFile         = null;
+      presenterImageBase64       = null;
+      presenterImageInput.value  = '';
+      presenterText.textContent  = 'Add presenter photo (optional)';
+      presenterClearBtn.style.display = 'none';
+      presenterPreview.style.display  = 'none';
+    });
+
+    // ── Generation history filmstrip ───────────────────────────────
+    const HISTORY_KEY = 'thumbai_history';
+    const MAX_HISTORY = 10;
+
+    function loadHistory() {
+      try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); }
+      catch { return []; }
+    }
+
+    function saveToHistory(imageUrl) {
+      const history = loadHistory();
+      history.unshift({ url: imageUrl, ts: Date.now() });
+      if (history.length > MAX_HISTORY) history.pop();
+      localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+      renderHistory();
+    }
+
+    function renderHistory() {
+      const history = loadHistory();
+      const strip  = document.getElementById('historyStrip');
+      const scroll = document.getElementById('historyScroll');
+      if (!history.length) { strip.style.display = 'none'; return; }
+      strip.style.display = 'flex';
+      scroll.innerHTML = '';
+      history.forEach(item => {
+        const img   = document.createElement('img');
+        img.className = 'history-thumb';
+        img.src       = item.url;
+        img.title     = new Date(item.ts).toLocaleTimeString();
+        img.addEventListener('click', () => {
+          document.getElementById('canvasResultImg').src = item.url;
+          document.querySelector('.canvas-empty').style.display = 'none';
+          document.querySelector('.canvas-result').classList.add('visible');
+        });
+        scroll.appendChild(img);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', renderHistory);
 
     // ── Thumbnail upload (face swap) ───────────────────────────────
     const thumbZone    = document.getElementById('thumbUploadZone');
@@ -1160,6 +1517,7 @@
         document.getElementById('canvasEmpty').style.display = 'none';
         document.getElementById('canvasResult').classList.add('visible');
         document.getElementById('canvasResultImg').src = src;
+        saveToHistory(src);
 
         document.getElementById('resultDownloadBtn').onclick = () => {
           const now  = new Date();

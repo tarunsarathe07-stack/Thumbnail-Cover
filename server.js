@@ -270,36 +270,55 @@ app.post('/api/v1/enhance', promptLimiter, async (req, res) => {
       messages: [
         {
           role: 'system',
-          content: `You are a YouTube thumbnail strategist. Your job is to convert the user's topic into an image prompt engineered for maximum click-through rate.
+          content: `You are a YouTube thumbnail strategist. Convert the user's topic into a visual image prompt engineered for maximum click-through rate.
 
-CRITICAL RULE: You MUST preserve the exact subject, named entities, and core event from the user's input. Do not replace or rename the topic.
-If the user says "Supreme Court strikes down reservation", the output must still be about the Supreme Court and reservation — not a generic activist.
-If the user says "UAE leaves OPEC", the output must reference UAE and OPEC.
-Build the visual around the actual topic. Never invent a substitute.
+RULE 1 — TOPIC PRESERVATION (most important):
+Never replace, rename, or substitute the user's topic.
+Use the exact subject, named entities, and event from the input.
+"Supreme Court strikes down reservation" → output must feature the Supreme Court and reservation policy — not a generic judge or activist.
+"UAE leaves OPEC" → output must reference UAE and OPEC visually.
+"CLAT 2026 last 30 days" → output must feature a CLAT student, not a generic student.
+Build the visual around the actual topic. Never invent a substitute narrative.
 
-CTR PSYCHOLOGY RULES — apply all of them:
-1. FACE DOMINANCE: If the topic involves a person, place a close-up human face (extreme emotion: shock, excitement, fear, joy) as the dominant element — faces drive 38% higher CTR.
-2. CONTRAST & POP: Demand vivid complementary colours that make the subject impossible to miss against the background. High contrast, no muddy tones.
-3. CURIOSITY GAP: Frame the scene so the viewer can tell something dramatic is happening but cannot immediately resolve it — they must click to understand.
-4. TEXT PLACEMENT ZONE: Reserve the left third or bottom strip for bold title text (do NOT describe the text content — just note 'bold overlay text area left' or 'bold title text bottom').
-5. DEPTH & DRAMA: Use cinematic depth-of-field, volumetric light rays, or atmospheric haze to add perceived production value.
-6. SIMPLICITY: One hero subject, one background, maximum two supporting elements. Never cluttered.
+RULE 2 — FACE DOMINANCE:
+Include a human face showing extreme emotion matching the topic sentiment.
+Shock, disbelief, fear, excitement — pick the one that fits.
+Close-up framing, face fills 50%+ of the left side of the frame.
+
+RULE 3 — CONTRAST & POP:
+Vivid complementary colours. Subject pops against background.
+High contrast. No muddy or flat tones.
+
+RULE 4 — CURIOSITY GAP:
+One unexpected or unresolved visual element that makes the viewer ask "what happened?"
+
+RULE 5 — TEXT PLACEMENT ZONE:
+Reserve the right third of the frame as clear negative space for title text overlay.
+Always end with: 'clear text space right third'.
+
+RULE 6 — DEPTH & DRAMA:
+Cinematic depth-of-field, rim lighting, or volumetric light rays.
+Never flat lighting.
+
+RULE 7 — SIMPLICITY:
+One hero subject. One background. Maximum two supporting elements.
 
 OUTPUT FORMAT:
-Return comma-separated visual phrases only — no sentences, no markdown, no explanation.
-Structure: [hero subject + emotion], [background/environment], [lighting], [camera angle], [colour palette], [text placement zone], [typography style]
+Comma-separated visual phrases only. No sentences. No markdown. No explanation.
+Structure: [hero subject + emotion tied to actual topic], [environment matching topic],
+[lighting], [camera angle], [colour palette], [text placement], [typography style]
 Maximum 90 words.
 
-TYPOGRAPHY — append exactly one based on topic:
+TYPOGRAPHY — append exactly one:
 - News/politics/current affairs → 'distressed grunge bold typography, breaking news style'
-- Education/exam/study → 'clean bold sans-serif, academic poster style'
-- Legal/court/justice → 'newspaper headline bold, official document style'
+- Education/exam/CLAT/study → 'clean bold sans-serif, academic poster style'
+- Legal/court/justice/Supreme Court → 'newspaper headline bold, official document style'
 - Conflict/war/drama → 'movie poster epic lettering, metallic embossed'
-- Religion/culture/tradition → 'ornate decorative lettering, temple inscription style'
-- Finance/business/money → 'sleek modern sans-serif, Forbes magazine style'
-- Default/general → 'bold high-contrast modern typography'
+- Finance/business/economy/OPEC → 'sleek modern sans-serif, Forbes magazine style'
+- Default → 'bold high-contrast modern typography'
 
-NEVER include bullet points, lists, or multiple text items. One powerful visual concept only.`
+NEVER include: bullet points, lists, watermarks, YouTube UI elements, play buttons.
+One powerful visual concept only.`
         },
         { role: 'user', content: userInput }
       ],
@@ -370,13 +389,27 @@ ultra realistic, high contrast,
 no watermarks, no bullet points,
 no checklists, no text lists`;
 
-    const result = await openaiClient.images.generate({
-      model:   'gpt-image-2',
-      prompt:  finalPrompt,
-      n:       1,
-      size,
-      quality
-    });
+    let result;
+    if (req.body.presenterImage) {
+      const base64Data  = req.body.presenterImage.replace(/^data:image\/[^;]+;base64,/, '');
+      const imageBuffer = Buffer.from(base64Data, 'base64');
+      const imageFile   = await toFile(imageBuffer, 'presenter.png', { type: 'image/png' });
+      result = await openaiClient.images.edit({
+        model:  'gpt-image-2',
+        image:  imageFile,
+        prompt: finalPrompt,
+        size,
+        n:      1
+      });
+    } else {
+      result = await openaiClient.images.generate({
+        model:   'gpt-image-2',
+        prompt:  finalPrompt,
+        n:       1,
+        size,
+        quality
+      });
+    }
 
     const imageData = result.data?.[0]?.b64_json;
     if (!imageData) {
