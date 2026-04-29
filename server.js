@@ -325,7 +325,8 @@ One powerful visual concept only.`
       max_tokens: 120
     });
 
-    const prompt = completion.choices[0].message.content?.trim();
+    const rawPrompt = completion.choices[0].message.content?.trim();
+    const prompt = `Title: ${userInput}\n\n${rawPrompt}`;
     if (!prompt) {
       return res.status(500).json({ error: 'No prompt returned. Try a different topic.' });
     }
