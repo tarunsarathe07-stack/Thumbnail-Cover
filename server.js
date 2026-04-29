@@ -270,22 +270,31 @@ app.post('/api/v1/enhance', promptLimiter, async (req, res) => {
       messages: [
         {
           role: 'system',
-          content: `Convert the user's topic into a YouTube thumbnail image prompt.
-Return comma-separated visual phrases only. Format:
-[subject], [emotion], [environment], [lighting], [camera], [composition].
-Maximum 80 words. No sentences. No markdown. No explanation.
+          content: `You are a YouTube CTR specialist. Convert the user's topic into a single image-generation prompt engineered for maximum click-through rate.
 
-Based on the topic, append ONE typography style to the end of your prompt:
-- News/politics/current affairs → append: 'distressed grunge bold typography, breaking news headline style'
-- Education/exam/study → append: 'clean bold sans-serif typography, academic poster style'
-- Legal/court/justice → append: 'newspaper front page headline typography, official document bold text'
-- Conflict/war/drama → append: 'movie poster epic title lettering, metallic embossed text effect'
-- Religion/culture/tradition → append: 'ornate decorative typography, temple inscription style lettering'
-- Default/general → append: 'bold high contrast modern typography'
+CTR PSYCHOLOGY RULES — apply all of them:
+1. FACE DOMINANCE: If the topic involves a person, place a close-up human face (extreme emotion: shock, excitement, fear, joy) as the dominant element — faces drive 38% higher CTR.
+2. CONTRAST & POP: Demand vivid complementary colours that make the subject impossible to miss against the background. High contrast, no muddy tones.
+3. CURIOSITY GAP: Frame the scene so the viewer can tell something dramatic is happening but cannot immediately resolve it — they must click to understand.
+4. TEXT PLACEMENT ZONE: Reserve the left third or bottom strip for bold title text (do NOT describe the text content — just note 'bold overlay text area left' or 'bold title text bottom').
+5. DEPTH & DRAMA: Use cinematic depth-of-field, volumetric light rays, or atmospheric haze to add perceived production value.
+6. SIMPLICITY: One hero subject, one background, maximum two supporting elements. Never cluttered.
 
-Always append exactly one of these. Never skip it.
+OUTPUT FORMAT:
+Return comma-separated visual phrases only — no sentences, no markdown, no explanation.
+Structure: [hero subject + emotion], [background/environment], [lighting], [camera angle], [colour palette], [text placement zone], [typography style]
+Maximum 90 words.
 
-IMPORTANT: Never include bullet points, checklists, strategy lists, or multiple text items in the prompt. Single strong visual concept only.`
+TYPOGRAPHY — append exactly one based on topic:
+- News/politics/current affairs → 'distressed grunge bold typography, breaking news style'
+- Education/exam/study → 'clean bold sans-serif, academic poster style'
+- Legal/court/justice → 'newspaper headline bold, official document style'
+- Conflict/war/drama → 'movie poster epic lettering, metallic embossed'
+- Religion/culture/tradition → 'ornate decorative lettering, temple inscription style'
+- Finance/business/money → 'sleek modern sans-serif, Forbes magazine style'
+- Default/general → 'bold high-contrast modern typography'
+
+NEVER include bullet points, lists, or multiple text items. One powerful visual concept only.`
         },
         { role: 'user', content: userInput }
       ],
@@ -335,7 +344,7 @@ app.post('/api/v1/process', imageLimiter, async (req, res) => {
     }
 
     // MOVE 2 — Aspect ratio validation
-    const validRatios = ['16:9', '9:16', '1:1'];
+    const validRatios = ['16:9', '9:16'];
     if (!validRatios.includes(aspectRatio)) {
       return res.status(400).json({ error: 'Invalid aspect ratio.' });
     }
@@ -345,9 +354,8 @@ app.post('/api/v1/process', imageLimiter, async (req, res) => {
     if (!validQualities.includes(quality)) quality = 'medium';
 
     let size;
-    if (aspectRatio === '9:16')      size = '1024x1792';
-    else if (aspectRatio === '16:9') size = '1792x1024';
-    else                             size = '1024x1024';
+    if (aspectRatio === '9:16') size = '1024x1792';
+    else                        size = '1792x1024';
 
     const finalPrompt = `${sanitized},
 cinematic composition, dramatic lighting,

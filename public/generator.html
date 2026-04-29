@@ -619,16 +619,6 @@
                   <div class="ratio-card-sub">Shorts / Reels</div>
                 </div>
 
-                <div class="ratio-card" data-ratio="1:1" data-width="1024" data-height="1024">
-                  <div class="ratio-frame-wrap">
-                    <div class="ratio-frame ratio-frame-11"></div>
-                  </div>
-                  <div class="ratio-card-label">
-                    <span class="ratio-badge-pill post">Post</span>
-                    1 : 1
-                  </div>
-                  <div class="ratio-card-sub">Square Post</div>
-                </div>
 
               </div>
             </div>
@@ -640,7 +630,7 @@
 
                 <label id="qualityDraftLabel" style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.04);cursor:pointer;color:rgba(255,255,255,0.5);">
                   <div>
-                    <div style="font-weight:600;font-size:13px;"><span class="quality-dots">●○○</span> Draft</div>
+                    <div style="font-weight:600;font-size:13px;"><span class="quality-dots">●○○</span> Instant</div>
                     <div style="font-size:11px;margin-top:2px;opacity:0.6;">Fast preview · 20–30 seconds · 1 credit</div>
                   </div>
                   <input type="radio" name="quality" value="low">
@@ -998,6 +988,8 @@
       const aspectRatio = document.querySelector('.ratio-card.active')?.dataset.ratio || '16:9';
       const quality     = document.querySelector('input[name="quality"]:checked')?.value || 'medium';
 
+      document.getElementById('canvasResult').classList.remove('visible');
+      document.getElementById('canvasEmpty').style.display = 'none';
       setGenerating(true, quality);
       try {
         const res  = await fetch('/api/v1/process', {
@@ -1131,6 +1123,8 @@
 
       const targetDescription = 'YouTube thumbnail with this person\'s face, cinematic lighting, dramatic composition';
 
+      document.getElementById('canvasResult').classList.remove('visible');
+      document.getElementById('canvasEmpty').style.display = 'none';
       setSwapping(true);
       try {
         const res  = await fetch('/api/v1/transform', {
