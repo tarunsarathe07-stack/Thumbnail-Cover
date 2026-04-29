@@ -392,10 +392,14 @@
       justify-content: center;
       width: 100%;
       min-height: 0;
+      overflow: hidden;
+      padding: 24px;
     }
     .result-image-wrap img {
       max-width: 100%;
       max-height: 100%;
+      width: auto;
+      height: auto;
       object-fit: contain;
       border-radius: 16px;
       box-shadow:
@@ -451,71 +455,69 @@
     }
     .loading-overlay.active { display: flex; }
 
-    .neural-scanner {
+    .clean-loader {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 28px;
+      gap: 32px;
     }
-    .neural-silhouette {
+    .loader-rings {
       position: relative;
-      width: 120px;
-      height: 160px;
+      width: 80px;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-    .neural-svg {
-      width: 100%;
-      height: 100%;
-      position: relative;
-      z-index: 2;
-    }
-    .neural-shape {
-      fill: none;
-      stroke: rgba(212,168,79,0.25);
-      stroke-width: 1.5;
-      animation: neural-trace 3s ease-in-out infinite;
-    }
-    .neural-shape.body { animation-delay: 0.5s; }
-    @keyframes neural-trace {
-      0%   { stroke: rgba(212,168,79,0.1);  stroke-width: 1; }
-      50%  { stroke: rgba(212,168,79,0.6);  stroke-width: 2; filter: drop-shadow(0 0 4px rgba(212,168,79,0.8)); }
-      100% { stroke: rgba(212,168,79,0.1);  stroke-width: 1; }
-    }
-    .neural-scan-line {
+    .loader-ring {
       position: absolute;
-      top: 0;
-      left: -10px;
-      right: -10px;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, rgba(212,168,79,0.8), transparent);
-      box-shadow: 0 0 8px rgba(212,168,79,0.6);
-      animation: scan-sweep 2s ease-in-out infinite;
-      z-index: 3;
-    }
-    @keyframes scan-sweep {
-      0%   { top: 0;     opacity: 0; }
-      10%  {             opacity: 1; }
-      90%  {             opacity: 1; }
-      100% { top: 160px; opacity: 0; }
-    }
-    .neural-rim-glow {
-      position: absolute;
-      inset: -20px;
       border-radius: 50%;
-      background: radial-gradient(ellipse, rgba(212,168,79,0.15) 0%, transparent 70%);
-      animation: rim-pulse 2s ease-in-out infinite;
-      z-index: 1;
+      border: 1.5px solid transparent;
+      animation: ring-spin linear infinite;
     }
-    @keyframes rim-pulse {
-      0%, 100% { opacity: 0.3; transform: scale(0.95); }
-      50%      { opacity: 1;   transform: scale(1.05); }
+    .ring-1 {
+      width: 80px;
+      height: 80px;
+      border-top-color: #D4A84F;
+      border-right-color: rgba(212,168,79,0.3);
+      animation-duration: 1.8s;
     }
-    .neural-status {
+    .ring-2 {
+      width: 56px;
+      height: 56px;
+      border-top-color: rgba(212,168,79,0.6);
+      border-left-color: rgba(212,168,79,0.2);
+      animation-duration: 1.2s;
+      animation-direction: reverse;
+    }
+    .ring-3 {
+      width: 32px;
+      height: 32px;
+      border-top-color: rgba(212,168,79,0.9);
+      animation-duration: 0.8s;
+    }
+    .loader-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #D4A84F;
+      box-shadow: 0 0 12px rgba(212,168,79,0.8);
+      animation: dot-pulse 1.8s ease-in-out infinite;
+    }
+    @keyframes ring-spin {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+    @keyframes dot-pulse {
+      0%, 100% { opacity: 0.4; transform: scale(0.8); }
+      50%      { opacity: 1;   transform: scale(1.2); }
+    }
+    .loader-status {
       font-size: 0.82rem;
       color: rgba(255,255,255,0.4);
       letter-spacing: 0.05em;
       text-align: center;
       min-height: 20px;
-      transition: opacity 0.4s;
     }
     .neural-progress-wrap {
       width: 200px;
@@ -781,6 +783,44 @@
       box-shadow: 0 0 12px rgba(212,168,79,0.2);
     }
 
+    /* ENHANCED PROMPT PREVIEW */
+    #enhancedPreview {
+      display: none;
+      margin-top: 8px;
+    }
+    .enhanced-preview-inner {
+      background: rgba(212,168,79,0.06);
+      border: 1px solid rgba(212,168,79,0.2);
+      border-radius: 10px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .enhanced-preview-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #D4A84F;
+    }
+    .enhanced-preview-text {
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.5);
+      line-height: 1.5;
+      font-style: italic;
+    }
+    .enhanced-preview-note {
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.3);
+      line-height: 1.4;
+      margin-top: 2px;
+    }
+    .enhanced-preview-note strong {
+      color: rgba(255,255,255,0.6);
+      font-style: normal;
+    }
+
     /* MOBILE */
     @media (max-width: 768px) {
       body.page-body { overflow: auto; height: auto; }
@@ -990,20 +1030,16 @@
     ══════════════════════════════════════ -->
     <div class="canvas-panel">
 
-      <!-- Loading overlay (neural scanner) -->
+      <!-- Loading overlay -->
       <div class="loading-overlay" id="loadingOverlay">
-        <div class="neural-scanner">
-          <div class="neural-silhouette">
-            <svg viewBox="0 0 120 160" class="neural-svg">
-              <ellipse cx="60" cy="35" rx="28" ry="32"
-                class="neural-shape head" />
-              <path d="M32 70 Q20 90 18 130 Q40 145 60 145 Q80 145 102 130 Q100 90 88 70 Q75 60 60 58 Q45 60 32 70Z"
-                class="neural-shape body" />
-            </svg>
-            <div class="neural-scan-line" id="neuralScanLine"></div>
-            <div class="neural-rim-glow" id="neuralRimGlow"></div>
+        <div class="clean-loader">
+          <div class="loader-rings">
+            <div class="loader-ring ring-1"></div>
+            <div class="loader-ring ring-2"></div>
+            <div class="loader-ring ring-3"></div>
+            <div class="loader-dot"></div>
           </div>
-          <div class="neural-status" id="neuralStatus">Initialising neural composition...</div>
+          <div class="loader-status" id="neuralStatus">Initialising generation...</div>
           <div class="neural-progress-wrap">
             <div class="neural-progress-bar" id="neuralProgressBar"></div>
           </div>
@@ -1027,10 +1063,6 @@
               <button class="hover-action-btn ghost" id="hoverRegenBtn">↺ Regenerate</button>
             </div>
           </div>
-        </div>
-        <div class="canvas-result-actions">
-          <button class="result-download-btn" id="resultDownloadBtn">↓ Download</button>
-          <button class="result-new-btn"      id="resultNewBtn">↺ New Generation</button>
         </div>
       </div>
 
@@ -1114,10 +1146,16 @@
     });
 
     // ── Prompt Assistant ───────────────────────────────────────────
+    let enhancedPromptValue = null;
+
     const suggestBtn = document.getElementById('suggestBtn');
 
     suggestBtn.addEventListener('click', async () => {
       const topic = promptEl.value.trim();
+      if (!topic) {
+        promptEl.focus();
+        return;
+      }
       suggestBtn.disabled    = true;
       suggestBtn.textContent = '✦ Thinking…';
 
@@ -1131,9 +1169,8 @@
         });
         const d = await r.json();
         if (d.prompt) {
-          promptEl.value = d.prompt;
-          autoResize(promptEl);
-          charCountEl.textContent = d.prompt.length;
+          enhancedPromptValue = d.prompt;
+          showEnhancedPreview(topic, d.prompt);
         }
       } catch { /* silent */ }
       finally {
@@ -1141,6 +1178,24 @@
         suggestBtn.textContent = '✦ Prompt Assistant';
       }
     });
+
+    function showEnhancedPreview(originalTopic, enhancedPrompt) {
+      let preview = document.getElementById('enhancedPreview');
+      if (!preview) {
+        preview = document.createElement('div');
+        preview.id = 'enhancedPreview';
+        suggestBtn.parentNode.insertBefore(preview, suggestBtn.nextSibling);
+      }
+      preview.innerHTML = `
+        <div class="enhanced-preview-inner">
+          <div class="enhanced-preview-label">✦ Enhanced prompt ready</div>
+          <div class="enhanced-preview-text">${enhancedPrompt}</div>
+          <div class="enhanced-preview-note">Your topic "<strong>${originalTopic}</strong>"
+          is preserved. This visual description will be used on Generate.</div>
+        </div>
+      `;
+      preview.style.display = 'block';
+    }
 
     // ── Ratio card selection ───────────────────────────────────────
     const ratioCards = document.querySelectorAll('.ratio-card');
@@ -1238,8 +1293,8 @@
       e.preventDefault();
       genError.className = 'msg msg-error';
 
-      const prompt = promptEl.value.trim();
-      if (!prompt) {
+      const promptToSend = enhancedPromptValue || promptEl.value.trim();
+      if (!promptToSend) {
         genError.textContent = 'Please describe what you want in your thumbnail.';
         genError.className   = 'msg msg-error visible';
         return;
@@ -1248,6 +1303,9 @@
       const aspectRatio = document.querySelector('.ratio-card.active')?.dataset.ratio || '16:9';
       const quality     = document.querySelector('input[name="quality"]:checked')?.value || 'medium';
 
+      enhancedPromptValue = null;
+      const ep = document.getElementById('enhancedPreview');
+      if (ep) ep.style.display = 'none';
       document.getElementById('canvasResult').classList.remove('visible');
       document.getElementById('canvasEmpty').style.display = 'none';
       setGenerating(true, quality);
@@ -1256,7 +1314,7 @@
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
-          body: JSON.stringify({ prompt, aspectRatio, quality, presenterImage: presenterImageBase64 || null })
+          body: JSON.stringify({ prompt: promptToSend, aspectRatio, quality, presenterImage: presenterImageBase64 || null })
         });
         const data = await res.json();
 
@@ -1274,30 +1332,35 @@
           imageData:   data.imageData,
           mimeType:    data.mimeType || 'image/png',
           aspectRatio: data.aspectRatio || aspectRatio,
-          prompt,
+          prompt:      promptToSend,
           timestamp:   new Date().toISOString()
         }));
 
-        // Show result in canvas
-        const mimeType = data.mimeType || 'image/png';
-        const src      = `data:${mimeType};base64,${data.imageData}`;
-        document.getElementById('canvasEmpty').style.display = 'none';
-        document.getElementById('canvasResult').classList.add('visible');
-        document.getElementById('canvasResultImg').src = src;
-        saveToHistory(src);
+        try {
+          // Show result in canvas
+          const mimeType = data.mimeType || 'image/png';
+          const src      = `data:${mimeType};base64,${data.imageData}`;
+          document.getElementById('canvasEmpty').style.display = 'none';
+          document.getElementById('canvasResult').classList.add('visible');
+          document.getElementById('canvasResultImg').src = src;
+          saveToHistory(src);
 
-        document.getElementById('resultDownloadBtn').onclick = () => {
-          const now  = new Date();
-          const yyyy = now.getFullYear();
-          const mm   = String(now.getMonth() + 1).padStart(2, '0');
-          const dd   = String(now.getDate()).padStart(2, '0');
-          const hhmm = String(now.getHours()).padStart(2, '0') + String(now.getMinutes()).padStart(2, '0');
-          const ext  = mimeType === 'image/jpeg' ? 'jpg' : 'png';
-          const a    = document.createElement('a');
-          a.href     = src;
-          a.download = `thumbai-${yyyy}-${mm}-${dd}-${hhmm}.${ext}`;
-          a.click();
-        };
+          const hoverDlBtn = document.getElementById('hoverDownloadBtn');
+          if (hoverDlBtn) hoverDlBtn.onclick = () => {
+            const now  = new Date();
+            const yyyy = now.getFullYear();
+            const mm   = String(now.getMonth() + 1).padStart(2, '0');
+            const dd   = String(now.getDate()).padStart(2, '0');
+            const hhmm = String(now.getHours()).padStart(2, '0') + String(now.getMinutes()).padStart(2, '0');
+            const ext  = mimeType === 'image/jpeg' ? 'jpg' : 'png';
+            const a    = document.createElement('a');
+            a.href     = src;
+            a.download = `thumbai-${yyyy}-${mm}-${dd}-${hhmm}.${ext}`;
+            a.click();
+          };
+        } catch (successErr) {
+          console.error('Result render error:', successErr);
+        }
 
         setGenerating(false);
       } catch {
@@ -1307,33 +1370,15 @@
       }
     });
 
-    // ── New generation button ──────────────────────────────────────
-    document.getElementById('resultNewBtn').addEventListener('click', () => {
-      document.getElementById('canvasResult').classList.remove('visible');
-      document.getElementById('canvasEmpty').style.display = 'flex';
-      document.getElementById('canvasResultImg').src = '';
-    });
-
     // ── Hover action bar ──────────────────────────────────────────
     const hoverDownloadBtn = document.getElementById('hoverDownloadBtn');
     const hoverRegenBtn    = document.getElementById('hoverRegenBtn');
-
-    if (hoverDownloadBtn) {
-      hoverDownloadBtn.addEventListener('click', () => {
-        const img = document.getElementById('canvasResultImg');
-        if (img && img.src) {
-          const a = document.createElement('a');
-          a.href     = img.src;
-          a.download = 'thumbai-' + Date.now() + '.png';
-          a.click();
-        }
-      });
-    }
 
     if (hoverRegenBtn) {
       hoverRegenBtn.addEventListener('click', () => {
         document.querySelector('.canvas-result').classList.remove('visible');
         document.querySelector('.canvas-empty').style.display = 'flex';
+        document.getElementById('canvasResultImg').src = '';
       });
     }
 
@@ -1511,26 +1556,31 @@
           timestamp:   new Date().toISOString()
         }));
 
-        // Show result in canvas
-        const mimeType = data.mimeType || 'image/png';
-        const src      = `data:${mimeType};base64,${data.imageData}`;
-        document.getElementById('canvasEmpty').style.display = 'none';
-        document.getElementById('canvasResult').classList.add('visible');
-        document.getElementById('canvasResultImg').src = src;
-        saveToHistory(src);
+        try {
+          // Show result in canvas
+          const mimeType = data.mimeType || 'image/png';
+          const src      = `data:${mimeType};base64,${data.imageData}`;
+          document.getElementById('canvasEmpty').style.display = 'none';
+          document.getElementById('canvasResult').classList.add('visible');
+          document.getElementById('canvasResultImg').src = src;
+          saveToHistory(src);
 
-        document.getElementById('resultDownloadBtn').onclick = () => {
-          const now  = new Date();
-          const yyyy = now.getFullYear();
-          const mm   = String(now.getMonth() + 1).padStart(2, '0');
-          const dd   = String(now.getDate()).padStart(2, '0');
-          const hhmm = String(now.getHours()).padStart(2, '0') + String(now.getMinutes()).padStart(2, '0');
-          const ext  = mimeType === 'image/jpeg' ? 'jpg' : 'png';
-          const a    = document.createElement('a');
-          a.href     = src;
-          a.download = `thumbai-${yyyy}-${mm}-${dd}-${hhmm}.${ext}`;
-          a.click();
-        };
+          const hoverDlBtn = document.getElementById('hoverDownloadBtn');
+          if (hoverDlBtn) hoverDlBtn.onclick = () => {
+            const now  = new Date();
+            const yyyy = now.getFullYear();
+            const mm   = String(now.getMonth() + 1).padStart(2, '0');
+            const dd   = String(now.getDate()).padStart(2, '0');
+            const hhmm = String(now.getHours()).padStart(2, '0') + String(now.getMinutes()).padStart(2, '0');
+            const ext  = mimeType === 'image/jpeg' ? 'jpg' : 'png';
+            const a    = document.createElement('a');
+            a.href     = src;
+            a.download = `thumbai-${yyyy}-${mm}-${dd}-${hhmm}.${ext}`;
+            a.click();
+          };
+        } catch (successErr) {
+          console.error('Result render error:', successErr);
+        }
 
         setSwapping(false);
       } catch {
