@@ -1,8 +1,8 @@
 'use strict';
 
-// Fade-up on scroll
-const observer = new IntersectionObserver(
+// Fade-up on scroll via IntersectionObserver
+const io = new IntersectionObserver(
   entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }),
-  { threshold: 0.12 }
+  { threshold: 0.1 }
 );
-document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+document.querySelectorAll('.fade-up').forEach(el => io.observe(el));
