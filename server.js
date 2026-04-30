@@ -377,9 +377,16 @@ app.post('/api/v1/process', imageLimiter, async (req, res) => {
       return res.status(400).json({ error: 'Invalid aspect ratio.' });
     }
 
-    // MOVE 3 — Quality validation
-    const validQualities = ['low', 'medium', 'high'];
-    if (!validQualities.includes(quality)) quality = 'medium';
+    // Quality tier mapping
+    const qualityMap = {
+      'low':      'low',
+      'instant':  'low',
+      'standard': 'medium',
+      'medium':   'medium',
+      'premium':  'high',
+      'high':     'high'
+    };
+    const imageQuality = qualityMap[quality?.toLowerCase()] || 'medium';
 
     let size;
     if (aspectRatio === '9:16') size = '1024x1792';
@@ -411,7 +418,7 @@ no checklists, no text lists`;
         prompt:  finalPrompt,
         n:       1,
         size,
-        quality
+        quality: imageQuality
       });
     }
 
@@ -421,7 +428,7 @@ no checklists, no text lists`;
     }
 
     // MOVE 1 — Deduct credits after success
-    const cost = quality === 'high' ? 2 : 1;
+    const cost = imageQuality === 'high' ? 2 : 1;
     req.session.credits = Math.max(0, currentCredits - cost);
 
     activityLog(req.session.user, 'generate', { ratio: aspectRatio, quality, creditsLeft: req.session.credits });
