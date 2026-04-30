@@ -195,24 +195,28 @@
 
     /* ENHANCE BUTTON */
     .enhance-btn {
+      margin-top: 8px;
       padding: 9px 16px;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(212,168,79,0.08);
+      border: 1px solid rgba(212,168,79,0.25);
       border-radius: 8px;
-      color: rgba(255,255,255,0.6);
+      color: #D4A84F;
       font-size: 0.82rem;
-      font-weight: 600;
+      font-weight: 700;
       cursor: pointer;
-      display: inline-flex;
+      display: flex;
       align-items: center;
       gap: 6px;
       transition: all 0.2s;
+      align-self: flex-start;
+      letter-spacing: 0.01em;
       font-family: inherit;
     }
     .enhance-btn:hover {
-      background: rgba(255,255,255,0.08);
-      color: #ffffff;
-      border-color: rgba(255,255,255,0.2);
+      background: rgba(212,168,79,0.15);
+      border-color: rgba(212,168,79,0.4);
+      color: #D4A84F;
+      box-shadow: 0 0 12px rgba(212,168,79,0.15);
     }
     .enhance-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
@@ -802,6 +806,23 @@
       font-style: normal;
     }
 
+    /* ERROR TOAST */
+    .error-toast {
+      background: rgba(255, 60, 60, 0.1);
+      border: 1px solid rgba(255, 60, 60, 0.3);
+      border-radius: 10px;
+      color: #ff6b6b;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 10px 14px;
+      display: none;
+      margin-top: 4px;
+      line-height: 1.4;
+    }
+    .error-toast.visible {
+      display: block;
+    }
+
     /* MOBILE */
     @media (max-width: 768px) {
       body.page-body { overflow: auto; height: auto; }
@@ -938,8 +959,6 @@
               </div>
             </div>
 
-            <div class="msg msg-error" id="genError" style="margin-bottom:12px"></div>
-
             <div class="cost-line">Estimated cost: <span id="costDisplay">1 credit</span></div>
 
           </form>
@@ -985,6 +1004,9 @@
           <div class="fs-processing-note">Processing takes 30–60 seconds</div>
 
         </div><!-- /panelFaceSwap -->
+
+        <!-- Error toast — visible above footer -->
+        <div class="error-toast" id="genError"></div>
 
       </div><!-- /panel-body -->
 
@@ -1268,12 +1290,13 @@
 
     genForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      genError.className = 'msg msg-error';
+      genError.classList.remove('visible');
 
       const promptToSend = enhancedPromptValue || promptEl.value.trim();
       if (!promptToSend) {
         genError.textContent = 'Please describe what you want in your thumbnail.';
-        genError.className   = 'msg msg-error visible';
+        genError.classList.add('visible');
+        setTimeout(() => genError.classList.remove('visible'), 4000);
         return;
       }
 
@@ -1297,7 +1320,8 @@
 
         if (!res.ok || !data.success) {
           genError.textContent = data.error || 'Generation failed. Please try again.';
-          genError.className   = 'msg msg-error visible';
+          genError.classList.add('visible');
+          setTimeout(() => genError.classList.remove('visible'), 4000);
           setGenerating(false);
           return;
         }
@@ -1328,7 +1352,8 @@
         setGenerating(false);
       } catch {
         genError.textContent = 'Network error. Please check your connection and try again.';
-        genError.className   = 'msg msg-error visible';
+        genError.classList.add('visible');
+        setTimeout(() => genError.classList.remove('visible'), 4000);
         setGenerating(false);
       }
     });
@@ -1413,6 +1438,7 @@
     }
 
     function saveToHistory(imageUrl) {
+      console.log('[ThumbAI] Saving to history:', imageUrl.slice(0, 60));
       const history = loadHistory();
       history.unshift({ url: imageUrl, ts: Date.now() });
       if (history.length > MAX_HISTORY) history.pop();
