@@ -293,8 +293,11 @@ RULE 4 — CURIOSITY GAP:
 One unexpected or unresolved visual element that makes the viewer ask "what happened?"
 
 RULE 5 — TEXT PLACEMENT ZONE:
-Reserve the right third of the frame as clear negative space for title text overlay.
-Always end with: 'clear text space right third'.
+For ALL aspect ratios, use bold text integrated at the top or bottom of the frame.
+Never push text to the side or reserve a side column.
+For 16:9: bold title text bottom, full width, high contrast.
+For 9:16: bold title text top or bottom, full width, cinematic.
+Always end with: 'bold title text bottom full width'.
 
 RULE 6 — DEPTH & DRAMA:
 Cinematic depth-of-field, rim lighting, or volumetric light rays.
@@ -306,7 +309,7 @@ One hero subject. One background. Maximum two supporting elements.
 OUTPUT FORMAT:
 Comma-separated visual phrases only. No sentences. No markdown. No explanation.
 Structure: [hero subject + emotion tied to actual topic], [environment matching topic],
-[lighting], [camera angle], [colour palette], [text placement], [typography style]
+[lighting], [camera angle], [colour palette], [text placement — always 'bold title text bottom full width'], [typography style]
 Maximum 90 words.
 
 TYPOGRAPHY — append exactly one:
