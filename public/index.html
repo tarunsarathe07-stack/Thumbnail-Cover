@@ -5,16 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ScrollStop — Thumbnails That Stop The Scroll</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
-  <meta name="description" content="Generate cinematic YouTube thumbnails in seconds. Built for creators who refuse to be ignored.">
+  <meta name="description" content="Generate cinematic YouTube thumbnails in seconds. AI-powered CTR optimisation. Built for creators who refuse to be ignored.">
   <meta property="og:title" content="ScrollStop — Thumbnails That Stop The Scroll">
   <meta property="og:description" content="Generate cinematic YouTube thumbnails in seconds. Built for creators who refuse to be ignored.">
   <meta property="og:image" content="/assets/hero-poster.jpg">
+  <meta property="og:type" content="website">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="ScrollStop">
   <meta name="twitter:description" content="Generate cinematic YouTube thumbnails in seconds.">
+  <meta name="theme-color" content="#0A0A0B">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="preload" as="style"
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+    onload="this.onload=null;this.rel='stylesheet'">
+  <noscript>
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap">
+  </noscript>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -733,8 +741,8 @@
         muted
         loop
         playsinline
-        class="hero-video"
-        poster="/assets/hero-poster.jpg">
+        preload="none"
+        class="hero-video">
         <source src="/assets/hero.mp4" type="video/mp4">
       </video>
       <div class="hero-video-overlay"></div>
