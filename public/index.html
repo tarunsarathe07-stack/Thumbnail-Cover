@@ -56,10 +56,13 @@
     .hero-bg-static {
       position: absolute;
       inset: 0;
-      background-image: url('/assets/hero-poster.jpg');
-      background-size: cover;
-      background-position: center;
-      opacity: 0.4;
+      background: linear-gradient(
+        135deg,
+        #0a0a0b 0%,
+        #0d1117 40%,
+        #111827 70%,
+        #0a0a0b 100%
+      );
       z-index: 0;
     }
 
@@ -161,22 +164,24 @@
 
     .hero-headline {
       font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: clamp(3rem, 7vw, 6rem);
+      font-size: clamp(2.2rem, 4.5vw, 4rem);
       font-weight: 800;
-      line-height: 1.0;
-      letter-spacing: -0.04em;
+      line-height: 1.08;
+      letter-spacing: -0.03em;
       color: #ffffff;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
     }
 
     .hero-headline-em {
       font-family: 'Playfair Display', serif;
       font-style: italic;
       font-weight: 700;
+      font-size: clamp(2.4rem, 5vw, 4.5rem);
       background: linear-gradient(135deg, #D4A84F, #C8962E);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
+      display: block;
     }
 
     .hero-sub {
@@ -189,24 +194,75 @@
       margin-bottom: 36px;
     }
 
-    .hero-cta {
-      display: inline-block;
-      padding: 16px 44px;
-      background: linear-gradient(135deg, #D4A84F, #C8962E);
-      color: #000000;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: 0.95rem;
-      font-weight: 700;
-      border-radius: 980px;
-      text-decoration: none;
-      letter-spacing: 0.01em;
-      box-shadow: 0 0 30px rgba(200,150,46,0.4);
-      transition: all 0.2s ease;
+    .hero-email-form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
     }
 
-    .hero-cta:hover {
-      box-shadow: 0 0 50px rgba(200,150,46,0.6);
-      transform: translateY(-2px);
+    .hero-email-wrap {
+      display: flex;
+      align-items: center;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 980px;
+      padding: 6px 6px 6px 20px;
+      gap: 8px;
+      backdrop-filter: blur(20px);
+      width: 100%;
+      max-width: 480px;
+      transition: border-color 0.2s;
+    }
+
+    .hero-email-wrap:focus-within {
+      border-color: rgba(212,168,79,0.5);
+    }
+
+    .hero-email-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #ffffff;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 400;
+      min-width: 0;
+    }
+
+    .hero-email-input::placeholder {
+      color: rgba(255,255,255,0.35);
+    }
+
+    .hero-email-btn {
+      padding: 11px 24px;
+      background: linear-gradient(135deg, #D4A84F, #C8962E);
+      border: none;
+      border-radius: 980px;
+      color: #000000;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      letter-spacing: 0.02em;
+      transition: opacity 0.2s;
+      flex-shrink: 0;
+    }
+
+    .hero-email-btn:hover { opacity: 0.85; }
+
+    .hero-email-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .hero-email-sub {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.3);
+      letter-spacing: 0.02em;
     }
 
     .hero-scroll-hint {
@@ -460,32 +516,76 @@
       color: #C8962E;
     }
 
-    .cta-btn-primary {
-      display: inline-block;
-      padding: 16px 48px;
-      background: #1A1A1A;
-      color: #ffffff;
+    .cta-email-form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .cta-email-wrap {
+      display: flex;
+      align-items: center;
+      background: #ffffff;
+      border: 1px solid rgba(0,0,0,0.12);
+      border-radius: 980px;
+      padding: 6px 6px 6px 24px;
+      gap: 8px;
+      width: 100%;
+      max-width: 480px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+      transition: box-shadow 0.2s;
+    }
+
+    .cta-email-wrap:focus-within {
+      box-shadow: 0 4px 32px rgba(200,150,46,0.2);
+      border-color: rgba(200,150,46,0.4);
+    }
+
+    .cta-email-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #1A1A1A;
       font-family: 'Plus Jakarta Sans', sans-serif;
       font-size: 0.9rem;
-      font-weight: 600;
-      border-radius: 980px;
-      text-decoration: none;
-      letter-spacing: 0.02em;
-      transition: background 0.2s, transform 0.2s;
-      margin-bottom: 20px;
-    }
-
-    .cta-btn-primary:hover {
-      background: #C8962E;
-      transform: translateY(-1px);
-    }
-
-    .cta-sub {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: 0.82rem;
       font-weight: 400;
-      color: #6B6B6B;
-      margin-top: 16px;
+      min-width: 0;
+    }
+
+    .cta-email-input::placeholder {
+      color: #9CA3AF;
+    }
+
+    .cta-email-btn {
+      padding: 11px 24px;
+      background: #1A1A1A;
+      border: none;
+      border-radius: 980px;
+      color: #ffffff;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      transition: background 0.2s;
+      flex-shrink: 0;
+    }
+
+    .cta-email-btn:hover { background: #C8962E; }
+
+    .cta-email-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .cta-email-msg {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.78rem;
+      color: #9CA3AF;
     }
 
     /* ── FOOTER ──────────────────────────────────────────────────── */
@@ -659,7 +759,23 @@
         Generate cinematic YouTube thumbnails in seconds.<br>
         Built for creators who refuse to be ignored.
       </p>
-      <a href="/login.html" class="hero-cta">Get Started Free</a>
+      <div class="hero-email-form">
+        <div class="hero-email-wrap">
+          <input
+            type="email"
+            id="heroEmailInput"
+            class="hero-email-input"
+            placeholder="Your favourite email?"
+            autocomplete="email"
+          />
+          <button class="hero-email-btn" id="heroEmailBtn">
+            Stay Notified
+          </button>
+        </div>
+        <p class="hero-email-sub" id="heroEmailMsg">
+          Invite-only. Be first to get access.
+        </p>
+      </div>
     </div>
 
     <div class="hero-scroll-hint">
@@ -687,27 +803,27 @@
 
       <div class="showcase-thumbs">
         <div class="thumb-float t1" data-speed="0.3">
-          <img src="/assets/example-clat.png" alt="CLAT thumbnail"
+          <img src="/assets/thumbai-2026-04-25-2211.png" alt="thumbnail"
             onerror="this.parentElement.style.display='none'" />
         </div>
         <div class="thumb-float t2" data-speed="0.5">
-          <img src="/assets/example-legal.png" alt="Legal thumbnail"
+          <img src="/assets/thumbai-1777034120348.png" alt="thumbnail"
             onerror="this.parentElement.style.display='none'" />
         </div>
         <div class="thumb-float t3" data-speed="0.2">
-          <img src="/assets/example-clat.png" alt="thumbnail"
+          <img src="/assets/thumbai-2026-04-25-2217.png" alt="thumbnail"
             onerror="this.parentElement.style.display='none'" />
         </div>
         <div class="thumb-float t4" data-speed="0.4">
-          <img src="/assets/example-legal.png" alt="thumbnail"
+          <img src="/assets/thumbai-1777039922751.png" alt="thumbnail"
             onerror="this.parentElement.style.display='none'" />
         </div>
         <div class="thumb-float t5" data-speed="0.6">
-          <img src="/assets/example-clat.png" alt="thumbnail"
+          <img src="/assets/thumbai-1777551335578.png" alt="thumbnail"
             onerror="this.parentElement.style.display='none'" />
         </div>
         <div class="thumb-float t6" data-speed="0.35">
-          <img src="/assets/example-legal.png" alt="thumbnail"
+          <img src="/assets/download%20(5).png" alt="thumbnail"
             onerror="this.parentElement.style.display='none'" />
         </div>
       </div>
@@ -762,12 +878,23 @@
         Stop blending in.<br>
         <em>Start stopping scrolls.</em>
       </h2>
-      <a href="/login.html" class="cta-btn-primary">
-        Get Started Free
-      </a>
-      <p class="cta-sub">
-        Invite-only. Request your access below.
-      </p>
+      <div class="cta-email-form">
+        <div class="cta-email-wrap">
+          <input
+            type="email"
+            id="ctaEmailInput"
+            class="cta-email-input"
+            placeholder="Your favourite email?"
+            autocomplete="email"
+          />
+          <button class="cta-email-btn" id="ctaEmailBtn">
+            Stay Notified
+          </button>
+        </div>
+        <p class="cta-email-msg" id="ctaEmailMsg">
+          Invite-only. Be first to get access.
+        </p>
+      </div>
     </div>
   </section>
 
@@ -794,12 +921,12 @@
     </div>
     <div class="footer-thumb-strip" id="footerStrip">
       <div class="footer-strip-inner">
-        <img src="/assets/example-clat.png"  alt="" onerror="this.style.display='none'" />
-        <img src="/assets/example-legal.png" alt="" onerror="this.style.display='none'" />
-        <img src="/assets/example-clat.png"  alt="" onerror="this.style.display='none'" />
-        <img src="/assets/example-legal.png" alt="" onerror="this.style.display='none'" />
-        <img src="/assets/example-clat.png"  alt="" onerror="this.style.display='none'" />
-        <img src="/assets/example-legal.png" alt="" onerror="this.style.display='none'" />
+        <img src="/assets/thumbai-2026-04-25-2211.png" alt="" onerror="this.style.display='none'" />
+        <img src="/assets/thumbai-1777034120348.png"   alt="" onerror="this.style.display='none'" />
+        <img src="/assets/thumbai-2026-04-25-2217.png" alt="" onerror="this.style.display='none'" />
+        <img src="/assets/thumbai-1777039922751.png"   alt="" onerror="this.style.display='none'" />
+        <img src="/assets/thumbai-1777551335578.png"   alt="" onerror="this.style.display='none'" />
+        <img src="/assets/download%20(5).png"          alt="" onerror="this.style.display='none'" />
       </div>
     </div>
   </footer>
@@ -845,6 +972,89 @@
     }, { threshold: 0.3 });
 
     if (footerStrip) footerObserver.observe(footerStrip);
+  </script>
+
+  <script>
+    'use strict';
+
+    /* ── Google Sheets email submission ──────────────────────────── */
+    const SHEETS_URL = 'https://script.google.com/macros/s/PASTE_YOUR_DEPLOYMENT_ID_HERE/exec';
+
+    async function submitEmail(email, source) {
+      if (!email || !email.includes('@')) return false;
+      try {
+        await fetch(SHEETS_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email,
+            source,
+            timestamp: new Date().toISOString()
+          })
+        });
+        return true;
+      } catch (e) {
+        console.error('Email submit error:', e);
+        return false;
+      }
+    }
+
+    /* ── Hero form ───────────────────────────────────────────────── */
+    const heroBtn   = document.getElementById('heroEmailBtn');
+    const heroInput = document.getElementById('heroEmailInput');
+    const heroMsg   = document.getElementById('heroEmailMsg');
+
+    if (heroBtn && heroInput) {
+      heroBtn.addEventListener('click', async () => {
+        const email = heroInput.value.trim();
+        if (!email || !email.includes('@')) {
+          heroMsg.textContent = 'Please enter a valid email.';
+          heroMsg.style.color = '#ff6b6b';
+          return;
+        }
+        heroBtn.disabled     = true;
+        heroBtn.textContent  = 'Saving...';
+        await submitEmail(email, 'hero');
+        heroInput.value      = '';
+        heroBtn.textContent  = 'Stay Notified';
+        heroBtn.disabled     = false;
+        heroMsg.textContent  = "You're on the list. We'll be in touch.";
+        heroMsg.style.color  = '#D4A84F';
+      });
+
+      heroInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') heroBtn.click();
+      });
+    }
+
+    /* ── CTA form ────────────────────────────────────────────────── */
+    const ctaBtn   = document.getElementById('ctaEmailBtn');
+    const ctaInput = document.getElementById('ctaEmailInput');
+    const ctaMsg   = document.getElementById('ctaEmailMsg');
+
+    if (ctaBtn && ctaInput) {
+      ctaBtn.addEventListener('click', async () => {
+        const email = ctaInput.value.trim();
+        if (!email || !email.includes('@')) {
+          ctaMsg.textContent = 'Please enter a valid email.';
+          ctaMsg.style.color = '#ff6b6b';
+          return;
+        }
+        ctaBtn.disabled    = true;
+        ctaBtn.textContent = 'SAVING...';
+        await submitEmail(email, 'cta');
+        ctaInput.value     = '';
+        ctaBtn.textContent = 'STAY NOTIFIED';
+        ctaBtn.disabled    = false;
+        ctaMsg.textContent = "You're on the list. We'll be in touch.";
+        ctaMsg.style.color = '#C8962E';
+      });
+
+      ctaInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') ctaBtn.click();
+      });
+    }
   </script>
 </body>
 </html>
