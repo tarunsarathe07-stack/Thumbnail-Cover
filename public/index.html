@@ -17,17 +17,17 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preload" as="style"
-    href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
     onload="this.onload=null;this.rel='stylesheet'">
   <noscript>
   <link rel="stylesheet"
-    href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap">
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap">
   </noscript>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --cream: #F5F4F0;
+      --cream: #F9F9F7;
       --cream-dark: #ECEAE3;
       --ink: #1A1A1A;
       --ink-muted: #6B6B6B;
@@ -58,6 +58,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
+      padding-top: 70px;
       background: var(--dark);
     }
 
@@ -147,21 +148,22 @@
 
     .hero-nav-signin:hover { color: #ffffff; }
 
-    .hero-content {
+     .hero-content {
       position: relative;
       z-index: 10;
-      text-align: center;
       padding: 0 24px;
       max-width: 860px;
+      width: 100%;
+      text-align: center;
     }
 
-    .hero-eyebrow {
+        .hero-eyebrow {
       display: inline-block;
       background: rgba(255,255,255,0.06);
       border: 1px solid rgba(255,255,255,0.12);
       border-radius: 100px;
       padding: 6px 16px;
-      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-family: 'IBM Plex Mono', monospace;
       font-size: 0.72rem;
       font-weight: 600;
       letter-spacing: 0.1em;
@@ -181,7 +183,7 @@
     }
 
     .hero-headline-em {
-      font-family: 'Playfair Display', serif;
+      font-family: 'Instrument Serif', serif;
       font-style: italic;
       font-weight: 700;
       font-size: clamp(2.4rem, 5vw, 4.5rem);
@@ -189,7 +191,7 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      display: block;
+      display: inline-block;
     }
 
     .hero-sub {
@@ -214,7 +216,7 @@
       align-items: center;
       background: rgba(255,255,255,0.08);
       border: 1px solid rgba(255,255,255,0.15);
-      border-radius: 980px;
+      border-radius: 12px;
       padding: 6px 6px 6px 20px;
       gap: 8px;
       backdrop-filter: blur(20px);
@@ -319,6 +321,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      padding-top: 70px;
     }
 
     .showcase-center {
@@ -329,7 +332,7 @@
     }
 
     .showcase-eyebrow {
-      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-family: 'IBM Plex Mono', monospace;
       font-size: 0.72rem;
       font-weight: 600;
       letter-spacing: 0.15em;
@@ -339,13 +342,13 @@
     }
 
     .showcase-headline {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(2.5rem, 5vw, 4.5rem);
-      font-weight: 400;
+      font-family: 'Instrument Serif', serif;
+      font-size: clamp(2.5rem, 5vw, 4.2rem);
+      font-weight: 700;
       color: #1A1A1A;
       line-height: 1.15;
       letter-spacing: -0.02em;
-      margin-bottom: 16px;
+      margin-bottom: 28px;
     }
 
     .showcase-sub {
@@ -369,7 +372,7 @@
       opacity: 0;
       transform: translateY(60px);
       transition: opacity 0.8s ease, transform 0.8s ease;
-      box-shadow: 0 8px 40px rgba(0,0,0,0.15);
+      box-shadow: none;
       border: none;
       pointer-events: auto;
     }
@@ -380,7 +383,7 @@
     }
 
     .thumb-float:hover {
-      box-shadow: 0 16px 60px rgba(0,0,0,0.25);
+      box-shadow: none;
       transform: translateY(-4px) !important;
       transition: box-shadow 0.3s ease, transform 0.3s ease !important;
     }
@@ -389,7 +392,7 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      display: block;
+      display: inline-block;
     }
 
     .thumb-float.t1 { width: 240px; height: 135px; top: 10%; left: 4%; }
@@ -414,7 +417,7 @@
     }
 
     .features-eyebrow-text {
-      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-family: 'IBM Plex Mono', monospace;
       font-size: 0.72rem;
       font-weight: 600;
       letter-spacing: 0.15em;
@@ -425,7 +428,7 @@
     }
 
     .features-title {
-      font-family: 'Playfair Display', serif;
+      font-family: 'Instrument Serif', serif;
       font-size: clamp(2rem, 4vw, 3.5rem);
       font-weight: 400;
       color: #1A1A1A;
@@ -446,12 +449,12 @@
       padding: 36px 28px;
       text-align: left;
       transition: box-shadow 0.2s, transform 0.2s;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+      box-shadow: none;
     }
 
     .feature-card:hover {
-      box-shadow: 0 8px 32px rgba(0,0,0,0.10);
-      transform: translateY(-2px);
+      box-shadow: none;
+      transform: translateY(-6px) scale(1.01);
     }
 
     .fc-icon {
@@ -461,10 +464,11 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      padding-top: 70px;
       font-size: 20px;
       margin-bottom: 20px;
-      background: #F5F4F0;
-      border: 1px solid rgba(0,0,0,0.08);
+      background: #ffffff;
+      border: 1px solid rgba(200,150,46,0.25);
       color: #C8962E;
     }
 
@@ -485,6 +489,22 @@
       line-height: 1.65;
     }
 
+    
+
+    .how-section {
+      background: #fff;
+      padding: 120px 40px;
+      border-top: 1px solid rgba(0,0,0,0.08);
+    }
+
+    .how-inner { max-width: 1100px; margin: 0 auto; }
+    .how-title { font-family: 'Instrument Serif', serif; font-size: clamp(2rem, 4vw, 3rem); margin-bottom: 44px; }
+    .how-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .how-card { border: 1px solid rgba(0,0,0,0.1); border-radius: 18px; padding: 28px; background: #fafafa; }
+    .how-step { font-size: 0.78rem; letter-spacing: .14em; color: #C8962E; font-weight: 700; margin-bottom: 14px; }
+    .how-head { font-size: 1.2rem; font-weight: 700; margin-bottom: 10px; }
+    .how-copy { color: #666; line-height: 1.6; }
+
     /* ── CTA SECTION ─────────────────────────────────────────────── */
 
     .cta-section {
@@ -500,7 +520,7 @@
     }
 
     .cta-eyebrow {
-      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-family: 'IBM Plex Mono', monospace;
       font-size: 0.72rem;
       font-weight: 600;
       letter-spacing: 0.15em;
@@ -510,7 +530,7 @@
     }
 
     .cta-headline {
-      font-family: 'Playfair Display', serif;
+      font-family: 'Instrument Serif', serif;
       font-size: clamp(2.5rem, 5vw, 4.5rem);
       font-weight: 400;
       color: #1A1A1A;
@@ -541,12 +561,12 @@
       gap: 8px;
       width: 100%;
       max-width: 480px;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+      box-shadow: none;
       transition: box-shadow 0.2s;
     }
 
     .cta-email-wrap:focus-within {
-      box-shadow: 0 4px 32px rgba(200,150,46,0.2);
+      box-shadow: none;
       border-color: rgba(200,150,46,0.4);
     }
 
@@ -619,6 +639,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      padding-top: 70px;
       gap: 4px;
     }
 
@@ -636,6 +657,7 @@
       display: flex;
       gap: 40px;
       justify-content: center;
+      padding-top: 70px;
       margin-bottom: 40px;
       flex-wrap: wrap;
     }
@@ -679,7 +701,7 @@
       flex: 1;
       height: 200px;
       object-fit: cover;
-      display: block;
+      display: inline-block;
       filter: brightness(0.5) saturate(0.8);
       transition: filter 0.4s ease;
     }
@@ -697,7 +719,8 @@
         font-size: clamp(2.2rem, 10vw, 3.5rem);
       }
 
-      .hero-content { padding: 0 20px; }
+      .hero-content { padding: 0 20px; text-align:center; }
+      .hero-email-form { align-items: center; }
 
       .hero-scroll-hint { bottom: 230px; }
 
@@ -717,6 +740,8 @@
       }
 
       .features-section { padding: 0 20px 100px; }
+      .how-section { padding: 80px 20px; }
+      .how-grid { grid-template-columns: 1fr; }
 
       .cta-section { padding: 100px 20px; }
 
@@ -758,32 +783,32 @@
     </nav>
 
     <div class="hero-content">
-      <div class="hero-eyebrow">✦ AI-Powered Creator Tool</div>
-      <h1 class="hero-headline">
-        Create Thumbnails<br>
-        <em class="hero-headline-em">That Stop The Scroll.</em>
-      </h1>
-      <p class="hero-sub">
-        Generate cinematic YouTube thumbnails in seconds.<br>
-        Built for creators who refuse to be ignored.
-      </p>
-      <div class="hero-email-form">
-        <div class="hero-email-wrap">
-          <input
-            type="email"
-            id="heroEmailInput"
-            class="hero-email-input"
-            placeholder="Your favourite email?"
-            autocomplete="email"
-          />
-          <button class="hero-email-btn" id="heroEmailBtn">
-            Stay Notified
-          </button>
-        </div>
-        <p class="hero-email-sub" id="heroEmailMsg">
-          Invite-only. Be first to get access.
+              <div class="hero-eyebrow">✦ AI-Powered Creator Tool</div>
+        <h1 class="hero-headline">
+          Create Thumbnails<br>
+          <em class="hero-headline-em">That Stop The Scroll.</em>
+        </h1>
+        <p class="hero-sub">
+          Generate cinematic YouTube thumbnails in seconds.<br>
+          Built for creators who refuse to be ignored.
         </p>
-      </div>
+        <div class="hero-email-form">
+          <div class="hero-email-wrap">
+            <input
+              type="email"
+              id="heroEmailInput"
+              class="hero-email-input"
+              placeholder="Your favourite email?"
+              autocomplete="email"
+            />
+            <button class="hero-email-btn" id="heroEmailBtn">
+              Stay Notified
+            </button>
+          </div>
+          <p class="hero-email-sub" id="heroEmailMsg">
+            Join 400+ creators on the waitlist.
+          </p>
+        </div>
     </div>
 
     <div class="hero-scroll-hint">
@@ -876,6 +901,32 @@
     </div>
   </section>
 
+  
+
+  <section class="how-section">
+    <div class="how-inner">
+      <h2 class="how-title">How ScrollStop Works</h2>
+      <div class="how-grid">
+        <article class="how-card">
+          <p class="how-step">STEP 1</p>
+          <h3 class="how-head">Describe</h3>
+          <p class="how-copy">Tell ScrollStop your video vibe, topic, and emotional hook.</p>
+        </article>
+        <article class="how-card">
+          <p class="how-step">STEP 2</p>
+          <h3 class="how-head">Personalize</h3>
+          <p class="how-copy">Upload your face photo (optional) and let AI blend it naturally into the scene.</p>
+        </article>
+        <article class="how-card">
+          <p class="how-step">STEP 3</p>
+          <h3 class="how-head">Launch</h3>
+          <p class="how-copy">Get 4 cinematic variations tuned for contrast, curiosity, and stronger click-throughs.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+
   <!-- ══════════════════════════════════════════════════
        CTA SECTION
   ══════════════════════════════════════════════════ -->
@@ -900,7 +951,7 @@
           </button>
         </div>
         <p class="cta-email-msg" id="ctaEmailMsg">
-          Invite-only. Be first to get access.
+          Join 400+ creators on the waitlist.
         </p>
       </div>
     </div>
@@ -919,9 +970,9 @@
       </p>
       <div class="footer-links">
         <a href="/login.html">Get Started</a>
-        <a href="#">Instagram</a>
-        <a href="#">YouTube</a>
-        <a href="#">Twitter</a>
+        <a href="https://instagram.com" target="_blank" rel="noopener noreferrer">Instagram</a>
+        <a href="https://youtube.com" target="_blank" rel="noopener noreferrer">YouTube</a>
+        <a href="https://x.com" target="_blank" rel="noopener noreferrer">Twitter</a>
       </div>
       <p class="footer-credit">
         Handcrafted with <span style="color:#C8962E;">♥</span> by Tarun
