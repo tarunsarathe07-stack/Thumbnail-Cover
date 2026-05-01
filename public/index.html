@@ -2,8 +2,684 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>ThumbAI</title>
-  <script>window.location.replace('/generator.html');</script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ScrollStop — Thumbnails That Stop The Scroll</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+  <meta name="description" content="Generate cinematic YouTube thumbnails in seconds. Built for creators who refuse to be ignored.">
+  <meta property="og:title" content="ScrollStop — Thumbnails That Stop The Scroll">
+  <meta property="og:description" content="Generate cinematic YouTube thumbnails in seconds. Built for creators who refuse to be ignored.">
+  <meta property="og:image" content="/assets/hero-poster.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="ScrollStop">
+  <meta name="twitter:description" content="Generate cinematic YouTube thumbnails in seconds.">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0A0A0B;
+      --surface: #111217;
+      --gold: #C8962E;
+      --gold-highlight: #D4A84F;
+      --glass: rgba(255,255,255,0.04);
+      --border: rgba(255,255,255,0.07);
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: var(--bg);
+      color: #ffffff;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* ── SECTION 1: HERO ─────────────────────────────────────────── */
+
+    .hero-section {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #0A0A0B;
+    }
+
+    .hero-video-wrap {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+    }
+
+    .hero-video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.6;
+    }
+
+    .hero-video-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to bottom,
+        rgba(10,10,11,0.3) 0%,
+        rgba(10,10,11,0.1) 40%,
+        rgba(10,10,11,0.5) 80%,
+        rgba(10,10,11,1) 100%
+      );
+    }
+
+    .hero-nav {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      padding: 28px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 10;
+    }
+
+    .hero-logo {
+      font-size: 1.1rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .logo-scroll {
+      color: #ffffff;
+    }
+
+    .logo-stop {
+      color: #C8962E;
+    }
+
+    .hero-nav-signin {
+      color: rgba(255,255,255,0.6);
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .hero-nav-signin:hover {
+      color: #ffffff;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      padding: 0 24px;
+      max-width: 800px;
+    }
+
+    .hero-eyebrow {
+      display: inline-block;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 100px;
+      padding: 6px 16px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: rgba(255,255,255,0.6);
+      margin-bottom: 24px;
+    }
+
+    .hero-headline {
+      font-size: clamp(2.5rem, 6vw, 5rem);
+      font-weight: 900;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      color: #ffffff;
+      margin-bottom: 20px;
+    }
+
+    .hero-headline-gold {
+      background: linear-gradient(135deg, #D4A84F, #C8962E);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-sub {
+      font-size: 1.1rem;
+      color: rgba(255,255,255,0.55);
+      line-height: 1.6;
+      margin-bottom: 36px;
+    }
+
+    .hero-cta {
+      display: inline-block;
+      padding: 16px 40px;
+      background: linear-gradient(135deg, #D4A84F, #C8962E);
+      color: #000000;
+      font-size: 1rem;
+      font-weight: 800;
+      border-radius: 980px;
+      text-decoration: none;
+      letter-spacing: 0.01em;
+      box-shadow: 0 0 30px rgba(200,150,46,0.4);
+      transition: all 0.2s ease;
+    }
+
+    .hero-cta:hover {
+      box-shadow: 0 0 50px rgba(200,150,46,0.6);
+      transform: translateY(-2px);
+    }
+
+    .hero-scroll-hint {
+      position: absolute;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      color: rgba(255,255,255,0.3);
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .scroll-line {
+      width: 1px;
+      height: 40px;
+      background: linear-gradient(to bottom,
+        rgba(255,255,255,0), rgba(255,255,255,0.3));
+      animation: scroll-pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes scroll-pulse {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 1; }
+    }
+
+    /* ── SECTION 2: SHOWCASE ─────────────────────────────────────── */
+
+    .showcase-section {
+      position: relative;
+      background: #0A0A0B;
+      min-height: 200vh;
+      overflow: hidden;
+    }
+
+    .showcase-canvas {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .showcase-center {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      padding: 0 24px;
+    }
+
+    .showcase-eyebrow {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      color: #C8962E;
+      margin-bottom: 16px;
+    }
+
+    .showcase-headline {
+      font-size: clamp(2rem, 5vw, 4rem);
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      color: #ffffff;
+      line-height: 1.1;
+      margin-bottom: 16px;
+    }
+
+    .showcase-sub {
+      font-size: 1rem;
+      color: rgba(255,255,255,0.4);
+    }
+
+    .showcase-thumbs {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .thumb-float {
+      position: absolute;
+      border-radius: 10px;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(60px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .thumb-float.visible {
+      opacity: 0.75;
+      transform: translateY(0);
+    }
+
+    .thumb-float img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .thumb-float.t1 { width: 220px; height: 124px; top: 12%; left: 5%; }
+    .thumb-float.t2 { width: 160px; height: 284px; top: 8%;  right: 8%; }
+    .thumb-float.t3 { width: 180px; height: 101px; bottom: 20%; left: 12%; }
+    .thumb-float.t4 { width: 200px; height: 355px; bottom: 10%; right: 5%; }
+    .thumb-float.t5 { width: 140px; height: 79px;  top: 45%; left: 2%; }
+    .thumb-float.t6 { width: 170px; height: 96px;  top: 40%; right: 3%; }
+
+    @media (max-width: 768px) {
+      .thumb-float.t2,
+      .thumb-float.t4 { display: none; }
+      .thumb-float.t1 { width: 140px; height: 79px;  top: 8%;  left: 2%; }
+      .thumb-float.t3 { width: 130px; height: 73px;  bottom: 25%; left: 4%; }
+      .thumb-float.t5 { width: 120px; height: 68px;  top: 40%; left: 2%; }
+      .thumb-float.t6 { width: 130px; height: 73px;  top: 35%; right: 2%; }
+    }
+
+    /* ── SECTION 3: FEATURES ─────────────────────────────────────── */
+
+    .features-section {
+      background: #0A0A0B;
+      padding: 120px 40px;
+    }
+
+    .features-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .features-eyebrow-text {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      color: #C8962E;
+      margin-bottom: 16px;
+    }
+
+    .features-title {
+      font-size: clamp(2rem, 4vw, 3.5rem);
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      color: #ffffff;
+      margin-bottom: 60px;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .feature-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 20px;
+      padding: 32px 24px;
+      text-align: left;
+      position: relative;
+      overflow: hidden;
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    .feature-card:hover {
+      background: rgba(255,255,255,0.05);
+    }
+
+    .fc-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      margin-bottom: 20px;
+      color: #C8962E;
+    }
+
+    .fc-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 10px;
+    }
+
+    .fc-desc {
+      font-size: 0.875rem;
+      color: rgba(255,255,255,0.45);
+      line-height: 1.6;
+    }
+
+    @media (max-width: 768px) {
+      .feature-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .features-section {
+        padding: 80px 20px;
+      }
+    }
+
+    /* ── SECTION 4: FOOTER ───────────────────────────────────────── */
+
+    .site-footer {
+      background: #0A0A0B;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      overflow: hidden;
+    }
+
+    .footer-top {
+      padding: 80px 40px 60px;
+      text-align: center;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .footer-logo {
+      font-size: 1.8rem;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      margin-bottom: 16px;
+    }
+
+    .footer-tagline {
+      color: rgba(255,255,255,0.4);
+      font-size: 0.9rem;
+      margin-bottom: 32px;
+      line-height: 1.6;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 32px;
+      justify-content: center;
+      margin-bottom: 32px;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      color: rgba(255,255,255,0.4);
+      text-decoration: none;
+      font-size: 0.875rem;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover {
+      color: #ffffff;
+    }
+
+    .footer-credit {
+      color: rgba(255,255,255,0.2);
+      font-size: 0.8rem;
+    }
+
+    .footer-thumb-strip {
+      width: 100%;
+      overflow: hidden;
+      transform: translateY(100%);
+      transition: transform 0.8s cubic-bezier(0.16,1,0.3,1);
+    }
+
+    .footer-thumb-strip.revealed {
+      transform: translateY(0);
+    }
+
+    .footer-strip-inner {
+      display: flex;
+      gap: 0;
+      width: 100%;
+    }
+
+    .footer-strip-inner img {
+      flex: 1;
+      height: 180px;
+      object-fit: cover;
+      display: block;
+      filter: brightness(0.6);
+      transition: filter 0.3s;
+    }
+
+    .footer-strip-inner img:hover {
+      filter: brightness(1);
+    }
+
+    @media (max-width: 768px) {
+      .hero-nav { padding: 20px 20px; }
+      .hero-headline { font-size: clamp(2rem, 8vw, 3rem); }
+      .hero-sub { font-size: 0.95rem; }
+      .footer-strip-inner img { height: 100px; }
+      .footer-top { padding: 60px 20px 40px; }
+    }
+  </style>
 </head>
-<body></body>
+<body>
+
+  <!-- ══════════════════════════════════════════════════
+       SECTION 1: HERO
+  ══════════════════════════════════════════════════ -->
+  <section class="hero-section">
+    <div class="hero-video-wrap">
+      <video
+        autoplay
+        muted
+        loop
+        playsinline
+        class="hero-video"
+        poster="/assets/hero-poster.jpg">
+        <source src="/assets/hero.mp4" type="video/mp4">
+      </video>
+      <div class="hero-video-overlay"></div>
+    </div>
+
+    <nav class="hero-nav">
+      <div class="hero-logo">
+        <span class="logo-scroll">Scroll</span><span class="logo-stop">Stop</span>
+      </div>
+      <a href="/login.html" class="hero-nav-signin">Sign in</a>
+    </nav>
+
+    <div class="hero-content">
+      <div class="hero-eyebrow">✦ AI-POWERED CREATOR TOOL</div>
+      <h1 class="hero-headline">
+        Create Thumbnails<br>
+        <span class="hero-headline-gold">That Stop The Scroll.</span>
+      </h1>
+      <p class="hero-sub">
+        Generate cinematic YouTube thumbnails in seconds.<br>
+        Built for creators who refuse to be ignored.
+      </p>
+      <a href="/login.html" class="hero-cta">Get Started Free</a>
+    </div>
+
+    <div class="hero-scroll-hint">
+      <div class="scroll-line"></div>
+      <span>Scroll</span>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════
+       SECTION 2: THUMBNAIL SHOWCASE
+  ══════════════════════════════════════════════════ -->
+  <section class="showcase-section" id="showcase">
+    <div class="showcase-canvas">
+      <div class="showcase-center">
+        <p class="showcase-eyebrow">RESULTS SPEAK</p>
+        <h2 class="showcase-headline">
+          Thumbnails proven<br>to stop the scroll
+        </h2>
+        <p class="showcase-sub">
+          Generated by ScrollStop. Zero design skills needed.
+        </p>
+      </div>
+
+      <div class="showcase-thumbs">
+        <div class="thumb-float t1" data-speed="0.3">
+          <img src="/assets/example-clat.png" alt="CLAT thumbnail"
+            onerror="this.parentElement.style.display='none'" />
+        </div>
+        <div class="thumb-float t2" data-speed="0.5">
+          <img src="/assets/example-legal.png" alt="Legal thumbnail"
+            onerror="this.parentElement.style.display='none'" />
+        </div>
+        <div class="thumb-float t3" data-speed="0.2">
+          <img src="/assets/example-clat.png" alt="thumbnail"
+            onerror="this.parentElement.style.display='none'" />
+        </div>
+        <div class="thumb-float t4" data-speed="0.4">
+          <img src="/assets/example-legal.png" alt="thumbnail"
+            onerror="this.parentElement.style.display='none'" />
+        </div>
+        <div class="thumb-float t5" data-speed="0.6">
+          <img src="/assets/example-clat.png" alt="thumbnail"
+            onerror="this.parentElement.style.display='none'" />
+        </div>
+        <div class="thumb-float t6" data-speed="0.35">
+          <img src="/assets/example-legal.png" alt="thumbnail"
+            onerror="this.parentElement.style.display='none'" />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════
+       SECTION 3: FEATURE CARDS
+  ══════════════════════════════════════════════════ -->
+  <section class="features-section">
+    <div class="features-inner">
+      <p class="features-eyebrow-text">EVERYTHING YOU NEED</p>
+      <h2 class="features-title">Master Your CTR</h2>
+      <div class="feature-grid">
+
+        <div class="feature-card fc-gold">
+          <div class="fc-icon" style="background:rgba(200,150,46,0.1);border:1px solid rgba(200,150,46,0.2);">⚡</div>
+          <div class="fc-title">AI Generation</div>
+          <div class="fc-desc">Generate professional thumbnails from any text description in under 2 minutes.</div>
+        </div>
+
+        <div class="feature-card fc-blue">
+          <div class="fc-icon" style="background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2);color:#60a5fa;">◉</div>
+          <div class="fc-title">Presenter Upload</div>
+          <div class="fc-desc">Upload your face photo. AI integrates your likeness into any thumbnail automatically.</div>
+        </div>
+
+        <div class="feature-card fc-purple">
+          <div class="fc-icon" style="background:rgba(168,85,247,0.1);border:1px solid rgba(168,85,247,0.2);color:#c084fc;">▭</div>
+          <div class="fc-title">Two Formats</div>
+          <div class="fc-desc">16:9 YouTube thumbnails and 9:16 vertical for Shorts and Instagram Reels.</div>
+        </div>
+
+        <div class="feature-card fc-emerald">
+          <div class="fc-icon" style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);color:#34d399;">✦</div>
+          <div class="fc-title">CTR Optimised</div>
+          <div class="fc-desc">AI enhances your prompt using proven CTR psychology — face dominance, contrast, curiosity gap.</div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════
+       SECTION 4: FOOTER
+  ══════════════════════════════════════════════════ -->
+  <footer class="site-footer">
+    <div class="footer-top">
+      <div class="footer-logo">
+        <span class="logo-scroll">Scroll</span><span class="logo-stop">Stop</span>
+      </div>
+      <p class="footer-tagline">
+        Thumbnails that stop the scroll. Built for creators.
+      </p>
+      <div class="footer-links">
+        <a href="/login.html">Get Started</a>
+        <a href="#">Instagram</a>
+        <a href="#">YouTube</a>
+        <a href="#">Twitter</a>
+      </div>
+      <p class="footer-credit">
+        Handcrafted with <span style="color:#C8962E;">♥</span> by Tarun
+      </p>
+    </div>
+    <div class="footer-thumb-strip" id="footerStrip">
+      <div class="footer-strip-inner">
+        <img src="/assets/example-clat.png" alt=""
+          onerror="this.style.display='none'" />
+        <img src="/assets/example-legal.png" alt=""
+          onerror="this.style.display='none'" />
+        <img src="/assets/example-clat.png" alt=""
+          onerror="this.style.display='none'" />
+        <img src="/assets/example-legal.png" alt=""
+          onerror="this.style.display='none'" />
+        <img src="/assets/example-clat.png" alt=""
+          onerror="this.style.display='none'" />
+        <img src="/assets/example-legal.png" alt=""
+          onerror="this.style.display='none'" />
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    'use strict';
+
+    /* ── Showcase scatter reveal ─────────────────────────────────── */
+    const thumbFloats = document.querySelectorAll('.thumb-float');
+    const showcaseSection = document.getElementById('showcase');
+
+    function handleShowcaseScroll() {
+      if (!showcaseSection) return;
+      const rect = showcaseSection.getBoundingClientRect();
+      const progress = Math.max(0,
+        Math.min(1, -rect.top / (rect.height - window.innerHeight)));
+
+      thumbFloats.forEach((thumb, i) => {
+        const speed = parseFloat(thumb.dataset.speed) || 0.3;
+        const threshold = i * 0.08;
+        if (progress > threshold) {
+          thumb.classList.add('visible');
+          const parallax = (progress - threshold) * speed * 100;
+          thumb.style.transform = `translateY(${-parallax}px)`;
+        } else {
+          thumb.classList.remove('visible');
+          thumb.style.transform = 'translateY(60px)';
+        }
+      });
+    }
+
+    window.addEventListener('scroll', handleShowcaseScroll, { passive: true });
+    handleShowcaseScroll();
+
+    /* ── Footer strip reveal ─────────────────────────────────────── */
+    const footerStrip = document.getElementById('footerStrip');
+
+    const footerObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          footerStrip.classList.add('revealed');
+        }
+      });
+    }, { threshold: 0.3 });
+
+    if (footerStrip) footerObserver.observe(footerStrip);
+  </script>
+</body>
 </html>
