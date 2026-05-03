@@ -74,8 +74,16 @@ app.use(express.urlencoded({ extended: false }));
 
 // ─── Session ───────────────────────────────────────────────────────────────────
 if (!process.env.SESSION_SECRET) {
-  console.error('FATAL: SESSION_SECRET is not set — refusing to start with an insecure default.');
-  process.exit(1);
+  console.error('FATAL: SESSION_SECRET is not set.');
+  // process.exit(1) kills the Vercel serverless process on every cold start,
+  // causing FUNCTION_INVOCATION_FAILED before any response can be sent.
+  // Register a catch-all 500 handler and halt further initialisation via return
+  // (safe in CommonJS — Node wraps modules in a function).
+  // Local `node server.js` still exits non-zero via the guard below.
+  app.use((_req, res) => res.status(500).json({ error: 'Server misconfiguration: SESSION_SECRET is not set.' }));
+  module.exports = app;
+  if (require.main === module) process.exit(1);
+  return; // stop initialising — prevents insecure handlers from being registered
 }
 const isProduction = process.env.NODE_ENV === 'production';
 if (isProduction) app.set('trust proxy', 1);
@@ -270,29 +278,66 @@ app.post('/api/v1/enhance', promptLimiter, async (req, res) => {
       messages: [
         {
           role: 'system',
-          content: `Convert the user's topic into a YouTube thumbnail image prompt.
-Return comma-separated visual phrases only. Format:
-[subject], [emotion], [environment], [lighting], [camera], [composition].
-Maximum 80 words. No sentences. No markdown. No explanation.
+          content: `You are a YouTube thumbnail strategist. Convert the user's topic into a visual image prompt engineered for maximum click-through rate.
 
-Based on the topic, append ONE typography style to the end of your prompt:
-- News/politics/current affairs → append: 'distressed grunge bold typography, breaking news headline style'
-- Education/exam/study → append: 'clean bold sans-serif typography, academic poster style'
-- Legal/court/justice → append: 'newspaper front page headline typography, official document bold text'
-- Conflict/war/drama → append: 'movie poster epic title lettering, metallic embossed text effect'
-- Religion/culture/tradition → append: 'ornate decorative typography, temple inscription style lettering'
-- Default/general → append: 'bold high contrast modern typography'
+RULE 1 — TOPIC PRESERVATION (most important):
+Never replace, rename, or substitute the user's topic.
+Use the exact subject, named entities, and event from the input.
+"Supreme Court strikes down reservation" → output must feature the Supreme Court and reservation policy — not a generic judge or activist.
+"UAE leaves OPEC" → output must reference UAE and OPEC visually.
+"CLAT 2026 last 30 days" → output must feature a CLAT student, not a generic student.
+Build the visual around the actual topic. Never invent a substitute narrative.
 
-Always append exactly one of these. Never skip it.
+RULE 2 — FACE DOMINANCE:
+Include a human face showing extreme emotion matching the topic sentiment.
+Shock, disbelief, fear, excitement — pick the one that fits.
+Close-up framing, face fills 50%+ of the left side of the frame.
 
-IMPORTANT: Never include bullet points, checklists, strategy lists, or multiple text items in the prompt. Single strong visual concept only.`
+RULE 3 — CONTRAST & POP:
+Vivid complementary colours. Subject pops against background.
+High contrast. No muddy or flat tones.
+
+RULE 4 — CURIOSITY GAP:
+One unexpected or unresolved visual element that makes the viewer ask "what happened?"
+
+RULE 5 — TEXT PLACEMENT ZONE:
+For ALL aspect ratios, use bold text integrated at the top or bottom of the frame.
+Never push text to the side or reserve a side column.
+For 16:9: bold title text bottom, full width, high contrast.
+For 9:16: bold title text top or bottom, full width, cinematic.
+Always end with: 'bold title text bottom full width'.
+
+RULE 6 — DEPTH & DRAMA:
+Cinematic depth-of-field, rim lighting, or volumetric light rays.
+Never flat lighting.
+
+RULE 7 — SIMPLICITY:
+One hero subject. One background. Maximum two supporting elements.
+
+OUTPUT FORMAT:
+Comma-separated visual phrases only. No sentences. No markdown. No explanation.
+Structure: [hero subject + emotion tied to actual topic], [environment matching topic],
+[lighting], [camera angle], [colour palette], [text placement — always 'bold title text bottom full width'], [typography style]
+Maximum 90 words.
+
+TYPOGRAPHY — append exactly one:
+- News/politics/current affairs → 'distressed grunge bold typography, breaking news style'
+- Education/exam/CLAT/study → 'clean bold sans-serif, academic poster style'
+- Legal/court/justice/Supreme Court → 'newspaper headline bold, official document style'
+- Conflict/war/drama → 'movie poster epic lettering, metallic embossed'
+- Finance/business/economy/OPEC → 'sleek modern sans-serif, Forbes magazine style'
+- Default → 'bold high-contrast modern typography'
+
+NEVER include: bullet points, lists, watermarks, YouTube UI elements, play buttons.
+One powerful visual concept only.`
         },
         { role: 'user', content: userInput }
       ],
       max_tokens: 120
     });
 
-    const prompt = completion.choices[0].message.content?.trim();
+    const rawPrompt = completion.choices[0].message.content?.trim();
+    const prompt = `Title: ${userInput}\n\n${rawPrompt}`;
     if (!prompt) {
       return res.status(500).json({ error: 'No prompt returned. Try a different topic.' });
     }
@@ -335,19 +380,25 @@ app.post('/api/v1/process', imageLimiter, async (req, res) => {
     }
 
     // MOVE 2 — Aspect ratio validation
-    const validRatios = ['16:9', '9:16', '1:1'];
+    const validRatios = ['16:9', '9:16'];
     if (!validRatios.includes(aspectRatio)) {
       return res.status(400).json({ error: 'Invalid aspect ratio.' });
     }
 
-    // MOVE 3 — Quality validation
-    const validQualities = ['low', 'medium', 'high'];
-    if (!validQualities.includes(quality)) quality = 'medium';
+    // Quality tier mapping
+    const qualityMap = {
+      'low':      'low',
+      'instant':  'low',
+      'standard': 'medium',
+      'medium':   'medium',
+      'premium':  'high',
+      'high':     'high'
+    };
+    const imageQuality = qualityMap[quality?.toLowerCase()] || 'medium';
 
     let size;
-    if (aspectRatio === '9:16')      size = '1024x1792';
-    else if (aspectRatio === '16:9') size = '1792x1024';
-    else                             size = '1024x1024';
+    if (aspectRatio === '9:16') size = '1024x1792';
+    else                        size = '1792x1024';
 
     const finalPrompt = `${sanitized},
 cinematic composition, dramatic lighting,
@@ -357,13 +408,27 @@ ultra realistic, high contrast,
 no watermarks, no bullet points,
 no checklists, no text lists`;
 
-    const result = await openaiClient.images.generate({
-      model:   'gpt-image-2',
-      prompt:  finalPrompt,
-      n:       1,
-      size,
-      quality
-    });
+    let result;
+    if (req.body.presenterImage) {
+      const base64Data  = req.body.presenterImage.replace(/^data:image\/[^;]+;base64,/, '');
+      const imageBuffer = Buffer.from(base64Data, 'base64');
+      const imageFile   = await toFile(imageBuffer, 'presenter.png', { type: 'image/png' });
+      result = await openaiClient.images.edit({
+        model:  'gpt-image-2',
+        image:  imageFile,
+        prompt: finalPrompt,
+        size,
+        n:      1
+      });
+    } else {
+      result = await openaiClient.images.generate({
+        model:   'gpt-image-2',
+        prompt:  finalPrompt,
+        n:       1,
+        size,
+        quality: imageQuality
+      });
+    }
 
     const imageData = result.data?.[0]?.b64_json;
     if (!imageData) {
@@ -371,7 +436,7 @@ no checklists, no text lists`;
     }
 
     // MOVE 1 — Deduct credits after success
-    const cost = quality === 'high' ? 2 : 1;
+    const cost = imageQuality === 'high' ? 2 : 1;
     req.session.credits = Math.max(0, currentCredits - cost);
 
     activityLog(req.session.user, 'generate', { ratio: aspectRatio, quality, creditsLeft: req.session.credits });

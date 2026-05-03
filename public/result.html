@@ -188,15 +188,18 @@
         const frame       = document.getElementById('imgFrame');
         const placeholder = document.getElementById('imgPlaceholder');
         const dlBtn       = document.getElementById('downloadBtn');
+        const ratio       = result.aspectRatio === '9:16' ? '9:16' : '16:9';
 
         // Show image
         imgEl.src                  = src;
         imgEl.style.display        = 'block';
         placeholder.style.display  = 'none';
+        frame.dataset.ratio        = ratio;
 
         // Portrait frame
-        if (result.aspectRatio === '9:16') {
+        if (ratio === '9:16') {
           frame.classList.add('portrait');
+          document.getElementById('variationsRow').classList.add('portrait');
         }
 
         // Variation thumbnails

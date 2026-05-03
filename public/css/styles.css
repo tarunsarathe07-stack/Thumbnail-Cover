@@ -18,6 +18,14 @@
   --shadow: 0 4px 24px rgba(0,0,0,.07);
   --shadow-md: 0 8px 40px rgba(0,0,0,.12);
   --t: .2s ease;
+  --dark-bg: #0A0A0B;
+  --dark-surface: #111217;
+  --dark-glass: rgba(255,255,255,0.04);
+  --dark-border: rgba(255,255,255,0.07);
+  --dark-border-hover: rgba(255,255,255,0.15);
+  --gold-glow: rgba(200,150,46,0.35);
+  --gold-gradient: linear-gradient(135deg, #D4A84F, #C8962E);
+  --noise-opacity: 0.04;
 }
 
 /* ── Base ──────────────────────────────────────────────────── */
@@ -237,13 +245,8 @@ a   { color: inherit; text-decoration: none; }
 .hero-bg {
   position: absolute;
   inset: 0;
-  background:
-    linear-gradient(to right,
-      rgba(0,0,0,.78) 0%,
-      rgba(0,0,0,.70) 45%,
-      rgba(0,0,0,.42) 100%),
-    url('/assets/theatre.jpeg') center/cover no-repeat fixed;
-  /* Fallback when image missing */
+  background: url('/assets/theatre.jpeg') center/cover no-repeat;
+  opacity: 0.3;
   background-color: #0d0d14;
 }
 
@@ -631,9 +634,17 @@ a   { color: inherit; text-decoration: none; }
   box-shadow: var(--shadow-md);
   aspect-ratio: 16/9;
   display: flex; align-items: center; justify-content: center;
+  padding: 10px;
 }
-.img-frame.portrait { aspect-ratio: 9/16; max-width: 340px; margin-left: auto; margin-right: auto; }
-.img-frame img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.img-frame.portrait { aspect-ratio: 9/16; max-width: 380px; margin-left: auto; margin-right: auto; }
+.img-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  border-radius: calc(var(--r-lg) - 10px);
+  background: #050506;
+}
 .img-placeholder { font-size: .85rem; color: var(--muted); text-align: center; }
 
 /* Thumbnail variations */
@@ -651,9 +662,16 @@ a   { color: inherit; text-decoration: none; }
   transition: var(--t);
   opacity: .55;
 }
+.variations.portrait {
+  justify-content: center;
+}
+.variations.portrait .variation {
+  flex: 0 1 76px;
+  aspect-ratio: 9/16;
+}
 .variation:first-child { border-color: var(--text); opacity: 1; }
 .variation:hover { opacity: .82; }
-.variation img { width: 100%; height: 100%; object-fit: cover; }
+.variation img { width: 100%; height: 100%; object-fit: contain; background: #050506; }
 
 /* Actions row */
 .result-actions {

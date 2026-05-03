@@ -59,204 +59,1362 @@
       margin-top: 10px;
     }
   </style>
+
+  <!-- ── Dark split-workspace styles ─────────────────────────── -->
+  <style>
+    body.page-body {
+      background: #0A0A0B;
+      color: #ffffff;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* WORKSPACE LAYOUT */
+    .workspace {
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* LEFT CONTROL PANEL */
+    .control-panel {
+      width: 420px;
+      min-width: 420px;
+      height: 100vh;
+      background: #111217;
+      border-right: 1px solid rgba(255,255,255,0.07);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+    .panel-header {
+      padding: 24px 24px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      flex-shrink: 0;
+    }
+
+    .panel-logo {
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: #C8962E;
+      text-transform: uppercase;
+    }
+
+    .credits-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(200,150,46,0.1);
+      border: 1px solid rgba(200,150,46,0.2);
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 0.78rem;
+      color: #C8962E;
+      font-weight: 600;
+    }
+
+    .sign-out-btn {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      color: rgba(255,255,255,0.5);
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 6px 12px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+    .sign-out-btn:hover {
+      background: rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.8);
+    }
+
+    .panel-body {
+      flex: 1;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      overflow-y: auto;
+    }
+
+    /* TAB SWITCHER */
+    .tab-switcher {
+      display: flex;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 12px;
+      padding: 4px;
+      gap: 4px;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      background: transparent;
+      color: rgba(255,255,255,0.4);
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+    .tab-btn.active {
+      background: rgba(255,255,255,0.08);
+      color: #ffffff;
+    }
+    .tab-btn:hover:not(.active) { color: rgba(255,255,255,0.7); }
+
+    /* SECTION LABELS */
+    .section-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+      margin-bottom: 8px;
+    }
+
+    /* PROMPT TEXTAREA — dark override */
+    .control-panel .prompt-textarea {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: #ffffff;
+    }
+    .control-panel .prompt-textarea::placeholder { color: rgba(255,255,255,0.25); }
+    .control-panel .prompt-textarea:focus {
+      border-color: #C8962E;
+      box-shadow: 0 0 0 3px rgba(200,150,46,0.15);
+    }
+
+    /* ENHANCE BUTTON */
+    .enhance-btn {
+      margin-top: 8px;
+      padding: 9px 16px;
+      background: rgba(212,168,79,0.08);
+      border: 1px solid rgba(212,168,79,0.25);
+      border-radius: 8px;
+      color: #D4A84F;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+      align-self: flex-start;
+      letter-spacing: 0.01em;
+      font-family: inherit;
+    }
+    .enhance-btn:hover {
+      background: rgba(212,168,79,0.15);
+      border-color: rgba(212,168,79,0.4);
+      color: #D4A84F;
+      box-shadow: 0 0 12px rgba(212,168,79,0.15);
+    }
+    .enhance-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* RATIO CARDS — dark override */
+    .control-panel .ratio-card {
+      border: 1px solid rgba(255,255,255,0.07);
+      background: rgba(255,255,255,0.04);
+      color: rgba(255,255,255,0.5);
+      border-radius: 10px;
+      padding: 14px 12px;
+    }
+    .control-panel .ratio-card:hover { border-color: rgba(255,255,255,0.15); }
+    .control-panel .ratio-card.selected {
+      border-color: rgba(200,150,46,0.4);
+      background: rgba(200,150,46,0.08);
+      color: #C8962E;
+    }
+    .control-panel .ratio-check { display: none !important; }
+    .control-panel .ratio-name { color: inherit; }
+    .control-panel .ratio-desc { color: rgba(255,255,255,0.3); }
+    .control-panel .ratio-card.selected .ratio-desc { color: rgba(200,150,46,0.6); }
+
+    /* QUALITY LABELS — dark override */
+    .control-panel label[id^="quality"] {
+      color: rgba(255,255,255,0.5);
+    }
+    .control-panel .quality-dots { color: inherit; }
+
+    /* COST LINE */
+    .cost-line {
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.3);
+      text-align: center;
+    }
+    .cost-line span { color: #C8962E; font-weight: 600; }
+
+    /* UPLOAD ZONES — dark override */
+    .control-panel .upload-zone {
+      border-color: rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.02);
+    }
+    .control-panel .upload-zone:hover { border-color: rgba(255,255,255,0.2); }
+    .control-panel .upload-zone-label { color: rgba(255,255,255,0.6); }
+    .control-panel .upload-zone-sub   { color: rgba(255,255,255,0.3); }
+    .control-panel .upload-zone-icon  { color: rgba(255,255,255,0.3); }
+    .control-panel .upload-zone.has-file { border-color: #22c55e; }
+
+    /* FACE SWAP BUTTON — dark */
+    .control-panel .btn-swap {
+      background: linear-gradient(135deg, #D4A84F, #C8962E) !important;
+      color: #000 !important;
+      border-radius: 14px !important;
+      box-shadow: 0 0 20px rgba(200,150,46,0.3);
+    }
+
+    /* PANEL FOOTER */
+    .panel-footer {
+      padding: 20px 24px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      background: #111217;
+      position: sticky;
+      bottom: 0;
+      flex-shrink: 0;
+    }
+
+    /* GENERATE BUTTON */
+    .generate-btn {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #D4A84F, #C8962E);
+      border: none;
+      border-radius: 14px;
+      color: #000000;
+      font-size: 1rem;
+      font-weight: 800;
+      cursor: pointer;
+      letter-spacing: 0.02em;
+      box-shadow: 0 0 20px rgba(200,150,46,0.3);
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-family: inherit;
+    }
+    .generate-btn:hover:not(:disabled) {
+      box-shadow: 0 0 40px rgba(200,150,46,0.5);
+      transform: translateY(-1px);
+    }
+    .generate-btn:active:not(:disabled) { transform: translateY(0); }
+    .generate-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* SWAP FOOTER BUTTON */
+    .swap-footer-btn {
+      width: 100%;
+      padding: 16px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 14px;
+      color: #ffffff;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+    .swap-footer-btn:hover:not(:disabled) { background: rgba(255,255,255,0.12); }
+    .swap-footer-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* RIGHT CANVAS PANEL */
+    .canvas-panel {
+      flex: 1;
+      height: 100vh;
+      background: #0A0A0B;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Subtle grid background */
+    .canvas-panel::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+    }
+
+    /* EMPTY STATE */
+    .canvas-empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 32px 24px 24px;
+      height: 100%;
+      gap: 24px;
+      position: relative;
+      z-index: 1;
+    }
+    .canvas-empty-top {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      text-align: center;
+    }
+    .canvas-empty-icon  { font-size: 3rem; opacity: 0.2; }
+    .canvas-empty-title { font-size: 1.1rem; font-weight: 700; color: rgba(255,255,255,0.25); }
+    .canvas-empty-sub   { font-size: 0.85rem; color: rgba(255,255,255,0.15); }
+    .canvas-examples {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .canvas-examples-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.15);
+      text-align: center;
+    }
+    .canvas-examples-grid {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+    .example-thumb {
+      flex: 1;
+      max-width: 180px;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.05);
+      opacity: 0.5;
+      transition: opacity 0.2s, border-color 0.2s;
+      aspect-ratio: 9/16;
+      background: rgba(255,255,255,0.02);
+    }
+    .example-thumb:hover {
+      opacity: 0.8;
+      border-color: rgba(212,168,79,0.2);
+    }
+    .example-thumb img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+    }
+
+    /* RESULT STATE */
+    .canvas-result {
+      display: none;
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      padding: 48px 48px 96px;
+      z-index: 1;
+      overflow-y: auto;
+    }
+    .canvas-result.visible { display: flex; }
+
+    .preview-card {
+      width: min(100%, 980px);
+      max-height: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      padding: 16px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.035));
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 18px;
+      box-shadow:
+        0 24px 80px rgba(0,0,0,0.48),
+        inset 0 1px 0 rgba(255,255,255,0.08);
+      position: relative;
+      z-index: 1;
+    }
+
+    .preview-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      color: rgba(255,255,255,0.48);
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      line-height: 1.3;
+      text-transform: uppercase;
+      min-height: 22px;
+    }
+
+    .preview-ratio-badge {
+      flex-shrink: 0;
+      color: #D4A84F;
+      background: rgba(212,168,79,0.1);
+      border: 1px solid rgba(212,168,79,0.22);
+      border-radius: 999px;
+      padding: 3px 9px;
+      letter-spacing: 0.06em;
+    }
+
+    .result-image-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      min-height: 0;
+      overflow: hidden;
+      border-radius: 14px;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(212,168,79,0.08), transparent 32%),
+        rgba(255,255,255,0.025);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .preview-card.ratio-9x16 {
+      width: min(100%, 460px);
+    }
+    .preview-card.ratio-9x16 .result-image-wrap { aspect-ratio: 9 / 16; }
+    .preview-card.ratio-16x9 .result-image-wrap { aspect-ratio: 16 / 9; }
+    .result-image-wrap img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background: #050506;
+    }
+
+    .canvas-result-actions { display: flex; gap: 12px; flex-shrink: 0; }
+
+    .result-download-btn {
+      padding: 12px 28px;
+      background: linear-gradient(135deg, #D4A84F, #C8962E);
+      border: none;
+      border-radius: 10px;
+      color: #000;
+      font-size: 0.9rem;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 0 20px rgba(200,150,46,0.3);
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    .result-download-btn:hover {
+      box-shadow: 0 0 40px rgba(200,150,46,0.5);
+      transform: translateY(-1px);
+    }
+
+    .result-new-btn {
+      padding: 12px 28px;
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 10px;
+      color: rgba(255,255,255,0.7);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    .result-new-btn:hover { border-color: rgba(255,255,255,0.3); color: #ffffff; }
+
+    /* LOADING OVERLAY — WebGL noise loader */
+    .loading-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(10,10,11,0.97);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      padding: 48px;
+    }
+    .loading-overlay.active { display: flex; }
+
+    .loading-preview-card {
+      width: min(100%, 620px);
+    }
+
+    .loading-preview-card.ratio-9x16 {
+      width: min(100%, 360px);
+    }
+
+    .loading-preview-frame {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.025);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .loading-preview-card.ratio-9x16 .loading-preview-frame {
+      width: auto;
+      height: min(58vh, 560px);
+      aspect-ratio: 9 / 16;
+      align-self: center;
+    }
+
+    /* old spinner loader removed — replaced by WebGL canvas */
+    .loader-status {
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.4);
+      letter-spacing: 0.05em;
+      text-align: center;
+      min-height: 20px;
+    }
+    .neural-progress-wrap {
+      width: 200px;
+      height: 2px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .neural-progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #C8962E, #D4A84F);
+      border-radius: 2px;
+      transition: width 0.5s ease;
+      box-shadow: 0 0 8px rgba(212,168,79,0.5);
+    }
+
+    /* VISUAL FRAME RATIO SELECTOR */
+    .ratio-selector-v2 {
+      display: flex;
+      gap: 8px;
+    }
+
+    .ratio-selector-v2 .ratio-card {
+      flex: 1;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 14px;
+      padding: 14px 10px 12px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+
+    .ratio-selector-v2 .ratio-card:hover {
+      border-color: rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.05);
+    }
+
+    .ratio-selector-v2 .ratio-card.active {
+      border-color: #D4A84F;
+      background: rgba(212,168,79,0.07);
+      box-shadow: 0 0 0 1px rgba(212,168,79,0.2),
+                  0 0 20px rgba(212,168,79,0.15);
+    }
+
+    .ratio-frame-wrap {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 44px;
+    }
+
+    .ratio-frame {
+      border: 2px solid rgba(255,255,255,0.2);
+      border-radius: 3px;
+      transition: border-color 0.2s ease;
+    }
+
+    .ratio-selector-v2 .ratio-card.active .ratio-frame {
+      border-color: #D4A84F;
+      box-shadow: 0 0 8px rgba(212,168,79,0.4);
+    }
+
+    .ratio-frame-169 { width: 44px; height: 26px; }
+    .ratio-frame-916 { width: 22px; height: 38px; }
+    .ratio-frame-11  { width: 32px; height: 32px; }
+
+    .ratio-card-label {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: rgba(255,255,255,0.5);
+    }
+
+    .ratio-selector-v2 .ratio-card.active .ratio-card-label { color: #D4A84F; }
+
+    .ratio-card-sub {
+      font-size: 0.65rem;
+      color: rgba(255,255,255,0.25);
+      text-align: center;
+      line-height: 1.3;
+    }
+
+    .ratio-badge-pill {
+      font-size: 0.58rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      padding: 2px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+    .ratio-badge-pill.yt    { background: #ff0000; color: #ffffff; }
+    .ratio-badge-pill.reels { background: linear-gradient(135deg, #833ab4, #fd1d1d); color: #ffffff; }
+    .ratio-badge-pill.post  { background: rgba(212,168,79,0.2); color: #D4A84F; border: 1px solid rgba(212,168,79,0.3); }
+
+    /* FIXED ACTION BUTTONS */
+    .result-actions-fixed {
+      display: flex;
+      gap: 10px;
+      flex-shrink: 0;
+      padding: 2px 0 0;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+    }
+    .result-btn-download {
+      background: linear-gradient(135deg, #D4A84F, #C8962E);
+      border: none;
+      border-radius: 24px;
+      color: #000;
+      font-size: 0.85rem;
+      font-weight: 700;
+      padding: 10px 24px;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.15s;
+      font-family: inherit;
+      box-shadow: 0 4px 16px rgba(212,168,79,0.35);
+    }
+    .result-btn-download:hover { opacity: 0.9; transform: translateY(-1px); }
+    .result-btn-download:disabled,
+    .result-btn-regen:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .result-btn-regen {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 24px;
+      color: rgba(255,255,255,0.75);
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 10px 24px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    .result-btn-regen:hover { background: rgba(255,255,255,0.12); color: #ffffff; }
+
+    /* PRESENTER UPLOAD */
+    .presenter-upload-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 4px;
+    }
+    .presenter-upload-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,255,255,0.04);
+      border: 1px dashed rgba(255,255,255,0.15);
+      border-radius: 8px;
+      padding: 8px 14px;
+      cursor: pointer;
+      flex: 1;
+      transition: all 0.2s;
+    }
+    .presenter-upload-label:hover {
+      border-color: rgba(212,168,79,0.4);
+      background: rgba(212,168,79,0.05);
+    }
+    .presenter-icon { font-size: 0.9rem; }
+    .presenter-text {
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.4);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .presenter-clear-btn {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 6px;
+      color: rgba(255,255,255,0.5);
+      font-size: 0.75rem;
+      padding: 6px 10px;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    .presenter-clear-btn:hover {
+      background: rgba(255,50,50,0.1);
+      border-color: rgba(255,50,50,0.3);
+      color: #ff6b6b;
+    }
+    .presenter-preview {
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+    }
+    .presenter-preview img {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid rgba(212,168,79,0.4);
+      box-shadow: 0 0 12px rgba(212,168,79,0.2);
+    }
+
+    /* HISTORY FILMSTRIP */
+    .history-strip {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(10,10,11,0.85);
+      backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 5;
+    }
+    .history-strip-label {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.25);
+      flex-shrink: 0;
+    }
+    .history-strip-scroll {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      flex: 1;
+    }
+    .history-strip-scroll::-webkit-scrollbar { display: none; }
+    .history-thumb {
+      width: 80px;
+      height: 45px;
+      border-radius: 6px;
+      object-fit: contain;
+      background: rgba(255,255,255,0.035);
+      border: 1px solid rgba(255,255,255,0.08);
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: all 0.2s;
+      opacity: 0.6;
+    }
+    .history-thumb.ratio-9x16 {
+      width: 36px;
+      height: 64px;
+    }
+    .history-thumb:hover {
+      opacity: 1;
+      border-color: rgba(212,168,79,0.5);
+      box-shadow: 0 0 12px rgba(212,168,79,0.2);
+    }
+
+    /* ERROR TOAST */
+    .error-toast {
+      background: rgba(255, 60, 60, 0.1);
+      border: 1px solid rgba(255, 60, 60, 0.3);
+      border-radius: 10px;
+      color: #ff6b6b;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 10px 14px;
+      display: none;
+      margin-top: 4px;
+      line-height: 1.4;
+    }
+    .error-toast.visible {
+      display: block;
+    }
+
+    /* WEBGL NOISE LOADER */
+    .webgl-loader-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 28px;
+      width: 100%;
+    }
+
+    .noise-canvas {
+      width: 100%;
+      height: 100%;
+      border-radius: 0;
+      display: block;
+    }
+
+    .webgl-loader-text {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+    }
+
+    /* MOBILE */
+    @media (max-width: 768px) {
+      body.page-body { overflow: auto; height: auto; }
+      .workspace { flex-direction: column; height: auto; }
+      .control-panel { width: 100%; min-width: unset; height: auto; overflow: visible; }
+      .canvas-panel { height: auto; min-height: 60vh; padding: 28px 16px 118px; }
+      .panel-footer { position: static; }
+      .loading-overlay { padding: 28px 16px 118px; }
+      .preview-card { padding: 12px; border-radius: 16px; }
+      .preview-card-top { font-size: 0.65rem; }
+      .result-actions-fixed {
+        display: flex;
+        padding: 0;
+        justify-content: stretch;
+        gap: 12px;
+      }
+      .result-btn-download,
+      .result-btn-regen { flex: 1; padding-left: 12px; padding-right: 12px; }
+      #historyStrip {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 99;
+        background: rgba(10,10,11,0.95);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-top: 1px solid rgba(255,255,255,0.06);
+      }
+      .canvas-result {
+        position: relative;
+        inset: auto;
+        padding: 0;
+        min-height: 52vh;
+      }
+    }
+  </style>
 </head>
 <body class="page-body">
 
-  <!-- Loading overlay -->
-  <div id="loadingOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:9999;flex-direction:column;align-items:center;justify-content:center;padding:40px;">
+  <div class="workspace">
 
-    <div style="display:flex;gap:8px;margin-bottom:40px;">
-      <div class="dot" style="animation-delay:0s"></div>
-      <div class="dot" style="animation-delay:0.2s"></div>
-      <div class="dot" style="animation-delay:0.4s"></div>
-    </div>
+    <!-- ══════════════════════════════════════
+         LEFT — CONTROL PANEL
+    ══════════════════════════════════════ -->
+    <div class="control-panel">
 
-    <div style="color:white;font-size:20px;font-weight:600;text-align:center;margin-bottom:8px;">
-      Creating your thumbnail
-    </div>
-
-    <div id="loadingMessage" style="color:#C8962E;font-size:14px;text-align:center;margin-bottom:40px;min-height:44px;max-width:260px;line-height:1.6;transition:opacity 0.4s ease;"></div>
-
-    <div style="width:200px;height:2px;background:rgba(255,255,255,0.08);border-radius:999px;overflow:hidden;">
-      <div id="loadingProgress" style="height:100%;width:0%;background:#C8962E;border-radius:999px;transition:width 1s linear;"></div>
-    </div>
-
-    <div id="loadingTimer" style="color:#555;font-size:12px;margin-top:16px;text-align:center;"></div>
-
-  </div>
-
-  <!-- Navbar -->
-  <nav class="nav">
-    <span class="nav-logo">ThumbAI</span>
-    <div class="nav-right">
-      <span class="nav-credits" id="navCredits">⚡ — Credits</span>
-      <button class="nav-btn" id="logoutBtn">Sign out</button>
-    </div>
-  </nav>
-
-  <main class="page-inner">
-
-    <!-- Header -->
-    <div class="animate-in">
-      <div class="page-heading">Create Thumbnail</div>
-      <div class="page-sub">Describe your vision and our AI will bring it to life.</div>
-    </div>
-
-    <!-- Tab switcher -->
-    <div class="gen-tabs animate-in" style="animation-delay:.08s">
-      <button class="gen-tab active" id="tabGenerate">⚡ AI Generate</button>
-      <button class="gen-tab"        id="tabFaceSwap">◉ Face Swap</button>
-    </div>
-
-    <!-- ════════════════════════════════════
-         AI GENERATE PANEL
-    ════════════════════════════════════ -->
-    <div id="panelGenerate">
-      <form id="genForm" novalidate>
-
-        <!-- Section heading -->
-        <div class="gen-section-heading animate-in" style="animation-delay:.12s;font-size:1.1rem;font-weight:700;color:#121212;margin-bottom:16px;">
-          Describe Your Thumbnail
+      <!-- Panel header: logo + credits + sign out -->
+      <div class="panel-header">
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div class="panel-logo">ThumbAI</div>
+          <button class="sign-out-btn" id="logoutBtn" type="button">Sign out</button>
         </div>
-
-        <!-- Prompt card -->
-        <div class="gen-card animate-in" style="animation-delay:.16s">
-          <div class="prompt-row">
-            <div class="gen-card-label">Your Prompt</div>
-            <button type="button" class="btn-suggest" id="suggestBtn" title="AI will improve your prompt for better results">
-              ✦ Enhance My Prompt
-            </button>
-          </div>
-          <textarea
-            class="prompt-textarea"
-            id="prompt"
-            placeholder="Example: shocked face, explosive background, bold text 'I QUIT!', cinematic lighting, dramatic colours"
-            maxlength="1000"
-            rows="4"
-          ></textarea>
-          <div class="prompt-foot">
-            <span class="char-counter"><span id="charCount">0</span> / 1000</span>
-            <span style="font-size:.75rem;color:var(--muted,#888);">Ctrl+Enter to generate</span>
-          </div>
-        </div>
-
-        <!-- Aspect ratio -->
-        <div class="gen-card animate-in" style="animation-delay:.22s">
-          <div class="gen-card-label">Aspect Ratio</div>
-          <div class="ratio-grid">
-            <div class="ratio-card selected" data-ratio="16:9">
-              <div class="ratio-check">✓</div>
-              <span class="ratio-badge-yt">YT</span>
-              <div class="ratio-name">16 : 9</div>
-              <div class="ratio-desc">YouTube Thumbnail</div>
-            </div>
-            <div class="ratio-card" data-ratio="9:16">
-              <div class="ratio-check">✓</div>
-              <span class="ratio-badge-reels">Reels</span>
-              <div class="ratio-name">9 : 16</div>
-              <div class="ratio-desc">Shorts / Reels</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Quality selector -->
-        <div class="gen-card animate-in" style="animation-delay:.26s">
-          <div class="gen-card-label">Quality</div>
-          <div style="display:flex;flex-direction:column;gap:8px;margin-top:12px;">
-
-            <label style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-radius:12px;border:1.5px solid #e5e5e5;cursor:pointer;background:white;" id="qualityDraftLabel">
-              <div>
-                <div style="font-weight:600;font-size:14px;"><span class="quality-dots">●○○</span> Draft</div>
-                <div style="font-size:12px;color:#888;margin-top:2px;">Fast preview · 20–30 seconds · 1 credit</div>
-              </div>
-              <input type="radio" name="quality" value="low">
-            </label>
-
-            <label style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-radius:12px;border:1.5px solid #C8962E;cursor:pointer;background:#fffbf5;" id="qualityStandardLabel">
-              <div>
-                <div style="font-weight:600;font-size:14px;"><span class="quality-dots">●●○</span> Standard</div>
-                <div style="font-size:12px;color:#888;margin-top:2px;">Good quality · ~1 minute · 1 credit</div>
-              </div>
-              <input type="radio" name="quality" value="medium" checked>
-            </label>
-
-            <label style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-radius:12px;border:1.5px solid #e5e5e5;cursor:pointer;background:white;" id="qualityPremiumLabel">
-              <div>
-                <div style="font-weight:600;font-size:14px;"><span class="quality-dots">●●●</span> Premium</div>
-                <div style="font-size:12px;color:#888;margin-top:2px;">Best quality · ~2 minutes · 2 credits</div>
-              </div>
-              <input type="radio" name="quality" value="high">
-            </label>
-
-          </div>
-        </div>
-
-        <div class="msg msg-error" id="genError" style="margin-bottom:12px"></div>
-
-        <div class="gen-footer animate-in" style="animation-delay:.28s">
-          <div class="gen-cost">Estimated cost: <strong id="costDisplay">1 credit</strong></div>
-          <button type="submit" class="btn btn-primary btn-lg" id="generateBtn">
-            <span id="genBtnText">⚡ Generate Thumbnail</span>
-            <span class="spinner" id="genSpinner" style="display:none"></span>
-          </button>
-        </div>
-
-      </form>
-    </div>
-
-    <!-- ════════════════════════════════════
-         FACE SWAP PANEL
-    ════════════════════════════════════ -->
-    <div id="panelFaceSwap" style="display:none">
-
-      <!-- Section 1: Upload Generated Thumbnail -->
-      <div class="gen-card animate-in fs-upload-section">
-        <div class="gen-card-label">Upload Generated Thumbnail</div>
-        <div class="upload-zone" id="thumbUploadZone">
-          <input type="file" id="thumbImageInput" accept="image/jpeg,image/png,image/webp" style="display:none">
-          <div id="thumbUploadDefault">
-            <div class="upload-zone-icon">▭</div>
-            <div class="upload-zone-label">Click to upload thumbnail</div>
-            <div class="upload-zone-sub">JPEG, PNG or WebP · max 10 MB</div>
-          </div>
-          <img id="thumbPreview" class="upload-preview" src="" alt="Thumbnail preview" style="display:none">
+        <div style="margin-top:12px;">
+          <span class="credits-badge" id="navCredits">⚡ — Credits</span>
         </div>
       </div>
 
-      <!-- Section 2: Upload Face Photo -->
-      <div class="gen-card animate-in fs-upload-section" style="animation-delay:.08s">
-        <div class="gen-card-label">Upload Face Photo</div>
-        <div class="upload-zone" id="faceUploadZone">
-          <input type="file" id="faceImageInput" accept="image/jpeg,image/png,image/webp" style="display:none">
-          <div id="faceUploadDefault">
-            <div class="upload-zone-icon">👤</div>
-            <div class="upload-zone-label">Click to upload face photo</div>
-            <div class="upload-zone-sub">JPEG, PNG or WebP · max 10 MB</div>
+      <!-- Panel body: scrollable controls -->
+      <div class="panel-body">
+
+        <!-- Tab switcher -->
+        <div class="tab-switcher">
+          <button class="tab-btn active" id="tabGenerate" type="button">⚡ AI Generate</button>
+          <button class="tab-btn"        id="tabFaceSwap" type="button">◉ Face Swap</button>
+        </div>
+
+        <!-- ════════════════════════════════
+             AI GENERATE PANEL
+        ════════════════════════════════ -->
+        <div id="panelGenerate">
+          <form id="genForm" novalidate>
+
+            <!-- Prompt -->
+            <div style="margin-bottom:20px;">
+              <div class="section-label">Your Prompt</div>
+              <textarea
+                class="prompt-textarea"
+                id="prompt"
+                placeholder="Paste your video title here.&#10;Example: CLAT 2027 Last 30 Days Strategy&#10;Then hit ✦ Enhance My Prompt for best results."
+                maxlength="1000"
+                rows="5"
+              ></textarea>
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;">
+                <span style="font-size:.72rem;color:rgba(255,255,255,0.25);"><span id="charCount">0</span> / 1000</span>
+                <span style="font-size:.72rem;color:rgba(255,255,255,0.2);">Ctrl+Enter to generate</span>
+              </div>
+              <button type="button" class="enhance-btn" id="suggestBtn" title="AI will improve your prompt for better results">
+                ✦ Enhance My Prompt
+              </button>
+              <div class="presenter-upload-wrap">
+                <label class="presenter-upload-label" for="presenterImageInput">
+                  <span class="presenter-icon">📎</span>
+                  <span class="presenter-text" id="presenterText">Add presenter photo (optional)</span>
+                  <input type="file" id="presenterImageInput" accept="image/*" style="display:none" />
+                </label>
+                <button class="presenter-clear-btn" id="presenterClearBtn" type="button" style="display:none">✕</button>
+              </div>
+              <div id="presenterPreview" class="presenter-preview" style="display:none">
+                <img id="presenterPreviewImg" src="" alt="Presenter" />
+              </div>
+            </div>
+
+            <!-- Aspect ratio -->
+            <div style="margin-bottom:20px;">
+              <div class="section-label">Aspect Ratio</div>
+              <div class="ratio-selector-v2" id="ratioSelector">
+
+                <div class="ratio-card active" data-ratio="16:9" data-width="1536" data-height="1024">
+                  <div class="ratio-frame-wrap">
+                    <div class="ratio-frame ratio-frame-169"></div>
+                  </div>
+                  <div class="ratio-card-label">
+                    16 : 9
+                  </div>
+                  <div class="ratio-card-sub">YouTube Thumbnail</div>
+                </div>
+
+                <div class="ratio-card" data-ratio="9:16" data-width="1024" data-height="1536">
+                  <div class="ratio-frame-wrap">
+                    <div class="ratio-frame ratio-frame-916"></div>
+                  </div>
+                  <div class="ratio-card-label">
+                    9 : 16
+                  </div>
+                  <div class="ratio-card-sub">Shorts / Reels</div>
+                </div>
+
+
+              </div>
+            </div>
+
+            <!-- Quality selector -->
+            <div style="margin-bottom:20px;">
+              <div class="section-label">Quality</div>
+              <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px;">
+
+                <label id="qualityDraftLabel" style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.04);cursor:pointer;color:rgba(255,255,255,0.5);">
+                  <div>
+                    <div style="font-weight:600;font-size:13px;"><span class="quality-dots">●○○</span> Instant</div>
+                    <div style="font-size:11px;margin-top:2px;opacity:0.6;">Fast preview · 20–30 seconds · 1 credit</div>
+                  </div>
+                  <input type="radio" name="quality" value="low">
+                </label>
+
+                <label id="qualityStandardLabel" style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-radius:10px;border:1px solid rgba(200,150,46,0.4);background:rgba(200,150,46,0.08);cursor:pointer;color:#C8962E;">
+                  <div>
+                    <div style="font-weight:600;font-size:13px;"><span class="quality-dots">●●○</span> Standard</div>
+                    <div style="font-size:11px;margin-top:2px;opacity:0.6;">Good quality · ~1 minute · 1 credit</div>
+                  </div>
+                  <input type="radio" name="quality" value="medium" checked>
+                </label>
+
+                <label id="qualityPremiumLabel" style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.04);cursor:pointer;color:rgba(255,255,255,0.5);">
+                  <div>
+                    <div style="font-weight:600;font-size:13px;"><span class="quality-dots">●●●</span> Premium</div>
+                    <div style="font-size:11px;margin-top:2px;opacity:0.6;">Best quality · ~2 minutes · 2 credits</div>
+                  </div>
+                  <input type="radio" name="quality" value="high">
+                </label>
+
+              </div>
+            </div>
+
+            <div class="cost-line">Estimated cost: <span id="costDisplay">1 credit</span></div>
+
+          </form>
+        </div><!-- /panelGenerate -->
+
+        <!-- ════════════════════════════════
+             FACE SWAP PANEL
+        ════════════════════════════════ -->
+        <div id="panelFaceSwap" style="display:none">
+
+          <!-- Upload Generated Thumbnail -->
+          <div class="fs-upload-section">
+            <div class="section-label">Upload Generated Thumbnail</div>
+            <div class="upload-zone" id="thumbUploadZone">
+              <input type="file" id="thumbImageInput" accept="image/jpeg,image/png,image/webp" style="display:none">
+              <div id="thumbUploadDefault">
+                <div class="upload-zone-icon">▭</div>
+                <div class="upload-zone-label">Click to upload thumbnail</div>
+                <div class="upload-zone-sub">JPEG, PNG or WebP · max 10 MB</div>
+              </div>
+              <img id="thumbPreview" class="upload-preview" src="" alt="Thumbnail preview" style="display:none">
+            </div>
           </div>
-          <img id="facePreview" class="upload-preview" src="" alt="Face preview" style="display:none">
-        </div>
-        <div style="margin-top:10px;font-size:.78rem;color:var(--muted)">
-          Clear front-facing photo works best
-        </div>
-      </div>
 
-      <div class="msg msg-error" id="faceswapError" style="margin-bottom:12px"></div>
+          <!-- Upload Face Photo -->
+          <div class="fs-upload-section">
+            <div class="section-label">Upload Face Photo</div>
+            <div class="upload-zone" id="faceUploadZone">
+              <input type="file" id="faceImageInput" accept="image/jpeg,image/png,image/webp" style="display:none">
+              <div id="faceUploadDefault">
+                <div class="upload-zone-icon">👤</div>
+                <div class="upload-zone-label">Click to upload face photo</div>
+                <div class="upload-zone-sub">JPEG, PNG or WebP · max 10 MB</div>
+              </div>
+              <img id="facePreview" class="upload-preview" src="" alt="Face preview" style="display:none">
+            </div>
+            <div style="margin-top:8px;font-size:.78rem;color:rgba(255,255,255,0.3);">
+              Clear front-facing photo works best
+            </div>
+          </div>
 
-      <div class="fs-submit-wrap animate-in" style="animation-delay:.12s">
-        <button type="button" class="btn-swap" id="faceswapBtn">
+          <div class="msg msg-error" id="faceswapError" style="margin-bottom:12px"></div>
+          <div class="fs-processing-note">Processing takes 30–60 seconds</div>
+
+        </div><!-- /panelFaceSwap -->
+
+        <!-- Error toast — visible above footer -->
+        <div class="error-toast" id="genError"></div>
+
+      </div><!-- /panel-body -->
+
+      <!-- Panel footer: sticky generate / swap buttons -->
+      <div class="panel-footer">
+        <!-- AI Generate submit button (linked to genForm via form attr) -->
+        <button type="submit" form="genForm" class="generate-btn" id="generateBtn">
+          <span id="genBtnText">⚡ Generate Thumbnail</span>
+          <span class="spinner" id="genSpinner" style="display:none"></span>
+        </button>
+        <!-- Face Swap button (shown when face swap tab active) -->
+        <button type="button" class="swap-footer-btn" id="faceswapBtn" style="display:none">
           <span id="faceswapBtnText">Swap Face →</span>
           <span class="spinner" id="faceswapSpinner" style="display:none"></span>
         </button>
-        <div class="fs-processing-note">Processing takes 30–60 seconds</div>
       </div>
 
-    </div>
+    </div><!-- /control-panel -->
 
-  </main>
+    <!-- ══════════════════════════════════════
+         RIGHT — CANVAS PANEL
+    ══════════════════════════════════════ -->
+    <div class="canvas-panel">
 
-  <footer style="text-align:center;font-size:12px;color:#888888;padding:24px 0;">
-    Handcrafted with <span style="color:#C8962E;">♥</span> by Tarun
-  </footer>
+      <!-- Loading overlay -->
+      <div class="loading-overlay" id="loadingOverlay">
+        <div class="preview-card loading-preview-card ratio-16x9" id="loadingPreviewCard" data-ratio="16:9">
+          <div class="preview-card-top">
+            <span>Generating preview</span>
+            <span class="preview-ratio-badge" id="loadingRatioBadge">16:9</span>
+          </div>
+          <div class="loading-preview-frame">
+            <canvas id="noiseCanvas" class="noise-canvas"></canvas>
+          </div>
+          <div class="webgl-loader-text">
+            <div class="loader-status" id="neuralStatus">
+              Initialising generation...
+            </div>
+            <div class="neural-progress-wrap">
+              <div class="neural-progress-bar" id="neuralProgressBar"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty state -->
+      <div class="canvas-empty" id="canvasEmpty">
+        <div class="canvas-empty-top">
+          <div class="canvas-empty-icon">⚡</div>
+          <div class="canvas-empty-title">Your thumbnail will appear here</div>
+          <div class="canvas-empty-sub">Paste your video title → Enhance → Generate</div>
+        </div>
+        <div class="canvas-examples">
+          <div class="canvas-examples-label">Made with ScrollStop</div>
+          <div class="canvas-examples-grid">
+            <div class="example-thumb">
+              <img src="/assets/example-clat.png"
+                alt="CLAT thumbnail example"
+                onerror="this.parentElement.style.display='none'" />
+            </div>
+            <div class="example-thumb">
+              <img src="/assets/example-legal.png"
+                alt="Legal thumbnail example"
+                onerror="this.parentElement.style.display='none'" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Result state -->
+      <div class="canvas-result" id="canvasResult">
+        <div class="preview-card result-preview-card ratio-16x9" id="previewCard" data-ratio="16:9">
+          <div class="preview-card-top">
+            <span>Thumbnail preview</span>
+            <span class="preview-ratio-badge" id="resultRatioBadge">16:9</span>
+          </div>
+          <div class="result-image-wrap">
+            <img id="resultImage" src="" alt="Generated thumbnail" />
+          </div>
+          <div class="result-actions-fixed">
+          <button class="result-btn-download" id="hoverDownloadBtn">↓ Download</button>
+          <button class="result-btn-regen" id="hoverRegenBtn">↺ New Generation</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- History filmstrip -->
+      <div class="history-strip" id="historyStrip" style="display:none">
+        <div class="history-strip-label">Recent</div>
+        <div class="history-strip-scroll" id="historyScroll"></div>
+      </div>
+
+    </div><!-- /canvas-panel -->
+
+  </div><!-- /workspace -->
+
+  <script id="webgl-loader-script">
+  (function () {
+    'use strict';
+
+    // ── Vertex Shader ────────────────────────────────────────────
+    const VERT = `
+attribute vec4 a_position;
+void main() {
+  gl_Position = a_position;
+}
+`;
+
+    // ── Fragment Shader ──────────────────────────────────────────
+    const FRAG = `
+precision highp float;
+
+uniform float u_time;
+uniform vec2  u_resolution;
+uniform vec3  u_color1;
+uniform vec3  u_color2;
+uniform vec3  u_color3;
+
+vec2 hash2(vec2 p) {
+  p = vec2(
+    dot(p, vec2(127.1, 311.7)),
+    dot(p, vec2(269.5, 183.3))
+  );
+  return -1.0 + 2.0 * fract(sin(p) * 43758.5453123);
+}
+
+float gnoise(vec2 p) {
+  vec2 i = floor(p);
+  vec2 f = fract(p);
+  vec2 u = f * f * (3.0 - 2.0 * f);
+  return mix(
+    mix(dot(hash2(i + vec2(0,0)), f - vec2(0,0)),
+        dot(hash2(i + vec2(1,0)), f - vec2(1,0)), u.x),
+    mix(dot(hash2(i + vec2(0,1)), f - vec2(0,1)),
+        dot(hash2(i + vec2(1,1)), f - vec2(1,1)), u.x),
+    u.y);
+}
+
+float fbm(vec2 p) {
+  float v    = 0.0;
+  float amp  = 0.5;
+  float freq = 1.0;
+  mat2  rot  = mat2(cos(0.5), sin(0.5), -sin(0.5), cos(0.5));
+  for (int i = 0; i < 6; i++) {
+    v    += amp * gnoise(p * freq);
+    p     = rot * p;
+    freq *= 2.0;
+    amp  *= 0.5;
+  }
+  return v;
+}
+
+float warpedFbm(vec2 p, float t) {
+  vec2 q = vec2(
+    fbm(p + vec2(0.0, 0.0) + 0.15 * t),
+    fbm(p + vec2(5.2, 1.3) + 0.15 * t)
+  );
+  vec2 r = vec2(
+    fbm(p + 3.5 * q + vec2(1.7, 9.2) + 0.12 * t),
+    fbm(p + 3.5 * q + vec2(8.3, 2.8) + 0.12 * t)
+  );
+  return fbm(p + 3.5 * r + 0.1 * t);
+}
+
+float grain(vec2 uv, float t) {
+  vec2 gp = uv * u_resolution * 0.5;
+  return fract(
+    sin(dot(gp + fract(t * 0.1), vec2(127.1, 311.7))) * 43758.5453
+  );
+}
+
+void main() {
+  vec2 uv = gl_FragCoord.xy / u_resolution;
+  vec2 p  = (uv - 0.5) * vec2(u_resolution.x / u_resolution.y, 1.0);
+  p *= 2.8;
+
+  float t = u_time * 0.18;
+  float n = warpedFbm(p, t);
+  float v = n * 0.5 + 0.5;
+
+  float vig = 1.0 - smoothstep(0.4, 1.2,
+    length((uv - 0.5) * vec2(1.6, 1.0)));
+  v *= vig;
+
+  float g = grain(uv, u_time);
+  v = mix(v, v + (g - 0.5) * 0.18, 0.65);
+  v = clamp(v, 0.0, 1.0);
+
+  vec3 col;
+  if (v < 0.45) {
+    col = mix(u_color1, u_color2, smoothstep(0.0, 0.45, v));
+  } else {
+    col = mix(u_color2, u_color3, smoothstep(0.45, 1.0, v));
+  }
+
+  gl_FragColor = vec4(col, 1.0);
+}
+`;
+
+    // ── WebGL state ──────────────────────────────────────────────
+    let gl, program, rafId;
+    let startTime = null;
+    let isRunning = false;
+
+    const C1 = [0.04, 0.07, 0.09];   // midnight blue
+    const C2 = [0.12, 0.22, 0.28];   // slate teal
+    const C3 = [0.83, 0.66, 0.31];   // gold
+
+    function compileShader(gl, src, type) {
+      const s = gl.createShader(type);
+      gl.shaderSource(s, src);
+      gl.compileShader(s);
+      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+        console.error('Shader compile error:', gl.getShaderInfoLog(s));
+        gl.deleteShader(s);
+        return null;
+      }
+      return s;
+    }
+
+    function initWebGL(canvas) {
+      const opts = {
+        alpha: false, antialias: false, depth: false,
+        stencil: false, preserveDrawingBuffer: false
+      };
+      gl = canvas.getContext('webgl', opts)
+        || canvas.getContext('experimental-webgl', opts);
+      if (!gl) { console.warn('WebGL not available'); return false; }
+
+      const vert = compileShader(gl, VERT, gl.VERTEX_SHADER);
+      const frag = compileShader(gl, FRAG, gl.FRAGMENT_SHADER);
+      if (!vert || !frag) return false;
+
+      program = gl.createProgram();
+      gl.attachShader(program, vert);
+      gl.attachShader(program, frag);
+      gl.linkProgram(program);
+      if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+        console.error('Program link error:', gl.getProgramInfoLog(program));
+        return false;
+      }
+
+      const buf = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+        -1,-1,  1,-1, -1, 1,
+        -1, 1,  1,-1,  1, 1
+      ]), gl.STATIC_DRAW);
+
+      const loc = gl.getAttribLocation(program, 'a_position');
+      gl.enableVertexAttribArray(loc);
+      gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+
+      return true;
+    }
+
+    function resizeCanvas(canvas) {
+      const dpr  = Math.min(window.devicePixelRatio || 1, 2);
+      const rect = canvas.getBoundingClientRect();
+      const w    = Math.round(rect.width  * dpr);
+      const h    = Math.round(rect.height * dpr);
+      if (canvas.width !== w || canvas.height !== h) {
+        canvas.width  = w;
+        canvas.height = h;
+      }
+    }
+
+    function render(ts) {
+      if (!isRunning) return;
+      rafId = requestAnimationFrame(render);
+
+      const canvas = document.getElementById('noiseCanvas');
+      if (!canvas || !gl) return;
+
+      resizeCanvas(canvas);
+      gl.viewport(0, 0, canvas.width, canvas.height);
+      gl.useProgram(program);
+
+      if (startTime === null) startTime = ts;
+      const t = (ts - startTime) * 0.001;
+
+      const ul  = (n)       => gl.getUniformLocation(program, n);
+      const setF  = (n, v)       => gl.uniform1f(ul(n), v);
+      const set2f = (n, x, y)   => gl.uniform2f(ul(n), x, y);
+      const set3f = (n, r, g, b) => gl.uniform3f(ul(n), r, g, b);
+
+      setF ('u_time',       t);
+      set2f('u_resolution', canvas.width, canvas.height);
+      set3f('u_color1',     ...C1);
+      set3f('u_color2',     ...C2);
+      set3f('u_color3',     ...C3);
+
+      gl.drawArrays(gl.TRIANGLES, 0, 6);
+    }
+
+    // ── Public API ───────────────────────────────────────────────
+    window.NoiseLoader = {
+      start() {
+        const canvas = document.getElementById('noiseCanvas');
+        if (!canvas) return;
+        if (!gl && !initWebGL(canvas)) return;
+        startTime = null;
+        isRunning = true;
+        resizeCanvas(canvas);
+        rafId = requestAnimationFrame(render);
+      },
+      stop() {
+        isRunning = false;
+        if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+      }
+    };
+
+  })();
+  </script>
 
   <script src="/js/app.js"></script>
   <script>
@@ -293,12 +1451,16 @@
       tabFaceSwap.classList.remove('active');
       panelGen.style.display = '';
       panelFs.style.display  = 'none';
+      document.getElementById('generateBtn').style.display = '';
+      document.getElementById('faceswapBtn').style.display = 'none';
     });
     tabFaceSwap.addEventListener('click', () => {
       tabFaceSwap.classList.add('active');
       tabGenerate.classList.remove('active');
       panelFs.style.display  = '';
       panelGen.style.display = 'none';
+      document.getElementById('faceswapBtn').style.display = '';
+      document.getElementById('generateBtn').style.display = 'none';
     });
 
     // ── Textarea auto-resize ───────────────────────────────────────
@@ -328,11 +1490,15 @@
 
     suggestBtn.addEventListener('click', async () => {
       const topic = promptEl.value.trim();
+      if (!topic) {
+        promptEl.focus();
+        return;
+      }
       suggestBtn.disabled    = true;
       suggestBtn.textContent = '✦ Thinking…';
 
       try {
-        const ratio = document.querySelector('#panelGenerate .ratio-card.selected')?.dataset.ratio || '16:9';
+        const ratio = document.querySelector('.ratio-card.active')?.dataset.ratio || '16:9';
         const r = await fetch('/api/v1/enhance', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -343,87 +1509,135 @@
         if (d.prompt) {
           promptEl.value = d.prompt;
           autoResize(promptEl);
-          charCountEl.textContent = d.prompt.length;
+          if (charCountEl) charCountEl.textContent = d.prompt.length;
+          suggestBtn.textContent       = '✦ Enhanced — Edit freely';
+          suggestBtn.style.color       = '#D4A84F';
+          suggestBtn.style.borderColor = 'rgba(212,168,79,0.5)';
+          setTimeout(() => {
+            suggestBtn.textContent       = '✦ Enhance My Prompt';
+            suggestBtn.style.color       = '';
+            suggestBtn.style.borderColor = '';
+          }, 3000);
         }
       } catch { /* silent */ }
       finally {
-        suggestBtn.disabled    = false;
-        suggestBtn.textContent = '✦ Prompt Assistant';
+        suggestBtn.disabled = false;
+        if (suggestBtn.textContent === '✦ Thinking…') {
+          suggestBtn.textContent = '✦ Enhance My Prompt';
+        }
       }
     });
 
     // ── Ratio card selection ───────────────────────────────────────
-    document.querySelectorAll('#panelGenerate .ratio-card').forEach(card => {
+    const ratioCards = document.querySelectorAll('.ratio-card');
+    let selectedWidth  = 1536;
+    let selectedHeight = 1024;
+    let currentPreviewRatio = '16:9';
+
+    function normalizeAspectRatio(ratio) {
+      return ratio === '9:16' ? '9:16' : '16:9';
+    }
+
+    function applyPreviewRatio(ratio) {
+      currentPreviewRatio = normalizeAspectRatio(ratio);
+      const ratioClass = currentPreviewRatio === '9:16' ? 'ratio-9x16' : 'ratio-16x9';
+      ['previewCard', 'loadingPreviewCard'].forEach(id => {
+        const card = document.getElementById(id);
+        if (!card) return;
+        card.dataset.ratio = currentPreviewRatio;
+        card.classList.remove('ratio-16x9', 'ratio-9x16');
+        card.classList.add(ratioClass);
+      });
+      ['resultRatioBadge', 'loadingRatioBadge'].forEach(id => {
+        const badge = document.getElementById(id);
+        if (badge) badge.textContent = currentPreviewRatio;
+      });
+    }
+
+    function renderCanvasResult(src, aspectRatio) {
+      applyPreviewRatio(aspectRatio);
+      document.getElementById('canvasEmpty').style.display = 'none';
+      document.getElementById('canvasResult').classList.add('visible');
+      document.getElementById('resultImage').src = src;
+    }
+
+    function restoreCanvasEmpty() {
+      document.getElementById('canvasResult').classList.remove('visible');
+      document.getElementById('canvasEmpty').style.display = 'flex';
+      const img = document.getElementById('resultImage');
+      if (img) img.removeAttribute('src');
+    }
+
+    ratioCards.forEach(card => {
       card.addEventListener('click', () => {
-        document.querySelectorAll('#panelGenerate .ratio-card').forEach(c => c.classList.remove('selected'));
-        card.classList.add('selected');
+        ratioCards.forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+        selectedWidth  = parseInt(card.dataset.width);
+        selectedHeight = parseInt(card.dataset.height);
+        applyPreviewRatio(card.dataset.ratio);
       });
     });
+    applyPreviewRatio(document.querySelector('.ratio-card.active')?.dataset.ratio || '16:9');
 
-    // ── Loading overlay ────────────────────────────────────────────
-    const loadingMessages = [
-      'Studying the best YouTube thumbnails ever made...',
-      'Adding the perfect amount of drama 🎬',
-      'Making sure the text is absolutely unignorable...',
-      'Consulting the algorithm gods...',
-      'Applying cinematic lighting to every pixel...',
-      'This will stop the scroll. Promise.',
-      'Currently outperforming your last designer...',
-      'Adding that NewsChannel energy ⚡',
-      'Making your competition nervous...',
-      'Almost there. Good things take time.',
-      'The AI is being extra careful with this one...',
-      'Rendering at movie-poster quality...',
-      'Your next viral thumbnail is loading...',
+    // ── Neural scanner loading overlay ────────────────────────────
+    const neuralMessages = [
+      'Initialising neural composition...',
+      'Analysing topic context...',
+      'Calculating CTR composition...',
+      'Placing subject in frame...',
+      'Applying cinematic lighting...',
+      'Rendering high-contrast palette...',
+      'Finalising thumbnail...'
     ];
 
-    let messageInterval;
-    let progressInterval;
-    let messageIndex  = 0;
-    let progressValue = 0;
-    let progressMax   = 70;
+    let neuralInterval = null;
+    let neuralProgress = 0;
+
+    function startNeuralScanner() {
+      const statusEl   = document.getElementById('neuralStatus');
+      const progressEl = document.getElementById('neuralProgressBar');
+      let msgIndex = 0;
+
+      if (statusEl)   statusEl.textContent = neuralMessages[0];
+      if (progressEl) progressEl.style.width = '0%';
+
+      // Start WebGL noise animation
+      if (window.NoiseLoader) window.NoiseLoader.start();
+
+      neuralProgress = 0;
+      neuralInterval = setInterval(() => {
+        msgIndex = (msgIndex + 1) % neuralMessages.length;
+        neuralProgress = Math.min(
+          neuralProgress + (100 / neuralMessages.length), 92
+        );
+        if (statusEl)   statusEl.textContent = neuralMessages[msgIndex];
+        if (progressEl) progressEl.style.width = neuralProgress + '%';
+      }, 2000);
+    }
+
+    function stopNeuralScanner() {
+      if (neuralInterval) clearInterval(neuralInterval);
+
+      const progressEl = document.getElementById('neuralProgressBar');
+      if (progressEl) progressEl.style.width = '100%';
+
+      // Stop WebGL animation after 600ms (gives progress bar time to fill)
+      setTimeout(() => {
+        if (window.NoiseLoader) window.NoiseLoader.stop();
+      }, 600);
+    }
 
     function showLoadingOverlay(quality) {
-      progressMax = quality === 'low' ? 35 : quality === 'high' ? 110 : 70;
-
-      const overlay = document.getElementById('loadingOverlay');
-      overlay.style.display = 'flex';
-
-      const msgEl = document.getElementById('loadingMessage');
-      msgEl.textContent   = loadingMessages[0];
-      msgEl.style.opacity = '1';
-
-      messageInterval = setInterval(() => {
-        messageIndex = (messageIndex + 1) % loadingMessages.length;
-        msgEl.style.opacity = '0';
-        setTimeout(() => {
-          msgEl.textContent   = loadingMessages[messageIndex];
-          msgEl.style.opacity = '1';
-        }, 300);
-      }, 4000);
-
-      progressValue = 0;
-      const progressEl = document.getElementById('loadingProgress');
-      progressEl.style.width = '0%';
-      progressInterval = setInterval(() => {
-        progressValue = Math.min(progressValue + 1, progressMax - 5);
-        progressEl.style.width = Math.round((progressValue / progressMax) * 95) + '%';
-        const remaining = Math.max(0, progressMax - progressValue);
-        document.getElementById('loadingTimer').textContent =
-          remaining > 5
-            ? `About ${remaining} seconds remaining...`
-            : 'Almost done...';
-      }, 1000);
+      applyPreviewRatio(currentPreviewRatio);
+      document.getElementById('loadingOverlay').classList.add('active');
+      startNeuralScanner();
     }
 
     function hideLoadingOverlay() {
-      clearInterval(messageInterval);
-      clearInterval(progressInterval);
-      document.getElementById('loadingProgress').style.width = '100%';
+      stopNeuralScanner();
       setTimeout(() => {
-        document.getElementById('loadingOverlay').style.display = 'none';
-        progressValue = 0;
-        messageIndex  = 0;
+        document.getElementById('loadingOverlay').classList.remove('active');
+        neuralProgress = 0;
       }, 500);
     }
 
@@ -431,11 +1645,13 @@
     document.querySelectorAll('input[name="quality"]').forEach(radio => {
       radio.addEventListener('change', function () {
         document.querySelectorAll('label[id^="quality"]').forEach(l => {
-          l.style.border     = '1.5px solid #e5e5e5';
-          l.style.background = 'white';
+          l.style.border     = '1px solid rgba(255,255,255,0.07)';
+          l.style.background = 'rgba(255,255,255,0.04)';
+          l.style.color      = 'rgba(255,255,255,0.5)';
         });
-        this.parentElement.style.border     = '1.5px solid #C8962E';
-        this.parentElement.style.background = '#fffbf5';
+        this.parentElement.style.border     = '1px solid rgba(200,150,46,0.4)';
+        this.parentElement.style.background = 'rgba(200,150,46,0.08)';
+        this.parentElement.style.color      = '#C8962E';
         document.getElementById('costDisplay').textContent =
           this.value === 'high' ? '2 credits' : '1 credit';
       });
@@ -452,36 +1668,44 @@
       genBtn.disabled       = on;
       genText.textContent   = on ? 'Generating…' : '⚡ Generate Thumbnail';
       genSpin.style.display = on ? 'inline-block' : 'none';
+      if (hoverDownloadBtn) hoverDownloadBtn.disabled = on;
+      if (hoverRegenBtn) hoverRegenBtn.disabled = on;
       if (on) showLoadingOverlay(quality); else hideLoadingOverlay();
     }
 
     genForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      genError.className = 'msg msg-error';
+      genError.classList.remove('visible');
 
-      const prompt = promptEl.value.trim();
-      if (!prompt) {
+      const promptToSend = promptEl.value.trim();
+      if (!promptToSend) {
         genError.textContent = 'Please describe what you want in your thumbnail.';
-        genError.className   = 'msg msg-error visible';
+        genError.classList.add('visible');
+        setTimeout(() => genError.classList.remove('visible'), 4000);
         return;
       }
 
-      const aspectRatio = document.querySelector('#panelGenerate .ratio-card.selected')?.dataset.ratio || '16:9';
+      const aspectRatio = normalizeAspectRatio(document.querySelector('.ratio-card.active')?.dataset.ratio || '16:9');
       const quality     = document.querySelector('input[name="quality"]:checked')?.value || 'medium';
 
+      applyPreviewRatio(aspectRatio);
+      document.getElementById('canvasResult').classList.remove('visible');
+      document.getElementById('canvasEmpty').style.display = 'none';
       setGenerating(true, quality);
       try {
         const res  = await fetch('/api/v1/process', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
-          body: JSON.stringify({ prompt, aspectRatio, quality })
+          body: JSON.stringify({ prompt: promptToSend, aspectRatio, quality, presenterImage: presenterImageBase64 || null })
         });
         const data = await res.json();
 
         if (!res.ok || !data.success) {
           genError.textContent = data.error || 'Generation failed. Please try again.';
-          genError.className   = 'msg msg-error visible';
+          genError.classList.add('visible');
+          setTimeout(() => genError.classList.remove('visible'), 4000);
+          restoreCanvasEmpty();
           setGenerating(false);
           return;
         }
@@ -493,16 +1717,167 @@
           imageData:   data.imageData,
           mimeType:    data.mimeType || 'image/png',
           aspectRatio: data.aspectRatio || aspectRatio,
-          prompt,
+          prompt:      promptToSend,
           timestamp:   new Date().toISOString()
         }));
-        window.location.href = '/result.html';
+
+        try {
+          // Show result in canvas
+          const mimeType = data.mimeType || 'image/png';
+          const src      = `data:${mimeType};base64,${data.imageData}`;
+          const returnedRatio = normalizeAspectRatio(data.aspectRatio || aspectRatio);
+          renderCanvasResult(src, returnedRatio);
+          saveToHistory(src, returnedRatio);
+          renderHistory();
+        } catch (successErr) {
+          console.error('Result render error:', successErr);
+        }
+
+        setGenerating(false);
       } catch {
         genError.textContent = 'Network error. Please check your connection and try again.';
-        genError.className   = 'msg msg-error visible';
+        genError.classList.add('visible');
+        setTimeout(() => genError.classList.remove('visible'), 4000);
+        restoreCanvasEmpty();
         setGenerating(false);
       }
     });
+
+    // ── Action buttons ────────────────────────────────────────
+    const hoverDownloadBtn = document.getElementById('hoverDownloadBtn');
+    const hoverRegenBtn    = document.getElementById('hoverRegenBtn');
+
+    if (hoverDownloadBtn) {
+      hoverDownloadBtn.addEventListener('click', async () => {
+        const img = document.getElementById('resultImage');
+        if (!img || !img.src) return;
+        try {
+          const response = await fetch(img.src);
+          const blob = await response.blob();
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'thumbai-' + Date.now() + '.png';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        } catch (e) {
+          window.open(img.src, '_blank');
+        }
+      });
+    }
+
+    if (hoverRegenBtn) {
+      hoverRegenBtn.addEventListener('click', () => {
+        restoreCanvasEmpty();
+      });
+    }
+
+    // ── Presenter photo upload ─────────────────────────────────────
+    const presenterImageInput  = document.getElementById('presenterImageInput');
+    const presenterText        = document.getElementById('presenterText');
+    const presenterClearBtn    = document.getElementById('presenterClearBtn');
+    const presenterPreview     = document.getElementById('presenterPreview');
+    const presenterPreviewImg  = document.getElementById('presenterPreviewImg');
+    let   presenterImageFile   = null;
+    let   presenterImageBase64 = null;
+
+    presenterImageInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      presenterImageFile = file;
+      presenterText.textContent = file.name;
+      presenterClearBtn.style.display = 'block';
+      presenterPreview.style.display  = 'flex';
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        presenterImageBase64    = ev.target.result;
+        presenterPreviewImg.src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    presenterClearBtn.addEventListener('click', () => {
+      presenterImageFile         = null;
+      presenterImageBase64       = null;
+      presenterImageInput.value  = '';
+      presenterText.textContent  = 'Add presenter photo (optional)';
+      presenterClearBtn.style.display = 'none';
+      presenterPreview.style.display  = 'none';
+    });
+
+    // ── Generation history filmstrip ───────────────────────────────
+    const HISTORY_KEY = 'thumbai_v2_history';
+    const MAX_HISTORY = 10;
+
+    function loadHistory() {
+      try {
+        const raw = localStorage.getItem(HISTORY_KEY);
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        if (!Array.isArray(parsed)) {
+          console.warn('[ThumbAI] History corrupted — resetting');
+          return [];
+        }
+        return parsed;
+      } catch (e) {
+        console.error('[ThumbAI] loadHistory parse error:', e);
+        return [];
+      }
+    }
+
+    function saveToHistory(imageUrl, aspectRatio = currentPreviewRatio) {
+      if (!imageUrl || imageUrl.length < 10) {
+        console.warn('[ThumbAI] saveToHistory: invalid URL, skipping');
+        return;
+      }
+      console.log('[ThumbAI] saveToHistory called, url length:', imageUrl.length);
+      const history = loadHistory();
+      const newEntry = {
+        url: imageUrl,
+        ts: Date.now(),
+        aspectRatio: normalizeAspectRatio(aspectRatio)
+      };
+      const updated = [newEntry, ...history].slice(0, MAX_HISTORY);
+      try {
+        localStorage.setItem(HISTORY_KEY, JSON.stringify(updated));
+        console.log('[ThumbAI] History saved, entries:', updated.length);
+      } catch (e) {
+        console.error('[ThumbAI] localStorage write failed:', e);
+      }
+      renderHistory();
+    }
+
+    function renderHistory() {
+      const history = loadHistory();
+      console.log('[ThumbAI] renderHistory, entries:', history.length);
+      const strip  = document.getElementById('historyStrip');
+      const scroll = document.getElementById('historyScroll');
+      if (!strip || !scroll) { console.warn('[ThumbAI] historyStrip/Scroll not found'); return; }
+      if (!history.length) { strip.style.display = 'none'; return; }
+      strip.style.display = 'flex';
+      scroll.innerHTML = '';
+      history.forEach((item, idx) => {
+        const img     = document.createElement('img');
+        const itemRatio = normalizeAspectRatio(item.aspectRatio || '16:9');
+        img.className = 'history-thumb ' + (itemRatio === '9:16' ? 'ratio-9x16' : 'ratio-16x9');
+        img.dataset.ratio = itemRatio;
+        img.src       = item.url;
+        img.loading   = 'lazy';
+        img.title     = new Date(item.ts).toLocaleTimeString();
+        img.onerror   = () => {
+          console.warn('[ThumbAI] History thumb failed to load, idx:', idx);
+          img.parentElement && img.parentElement.remove();
+        };
+        img.addEventListener('click', () => {
+          renderCanvasResult(item.url, itemRatio);
+        });
+        scroll.appendChild(img);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', renderHistory);
 
     // ── Thumbnail upload (face swap) ───────────────────────────────
     const thumbZone    = document.getElementById('thumbUploadZone');
@@ -560,6 +1935,9 @@
       fsBtn.disabled       = on;
       fsText.textContent   = on ? 'Processing…' : 'Swap Face →';
       fsSpin.style.display = on ? 'inline-block' : 'none';
+      genBtn.disabled      = on;
+      if (hoverDownloadBtn) hoverDownloadBtn.disabled = on;
+      if (hoverRegenBtn) hoverRegenBtn.disabled = on;
       if (on) showLoadingOverlay(); else hideLoadingOverlay();
     }
 
@@ -574,6 +1952,9 @@
 
       const targetDescription = 'YouTube thumbnail with this person\'s face, cinematic lighting, dramatic composition';
 
+      applyPreviewRatio('16:9');
+      document.getElementById('canvasResult').classList.remove('visible');
+      document.getElementById('canvasEmpty').style.display = 'none';
       setSwapping(true);
       try {
         const res  = await fetch('/api/v1/transform', {
@@ -591,6 +1972,7 @@
         if (!res.ok || !data.success) {
           fsError.textContent = data.error || 'Face swap failed. Please try again.';
           fsError.className   = 'msg msg-error visible';
+          restoreCanvasEmpty();
           setSwapping(false);
           return;
         }
@@ -602,10 +1984,23 @@
           prompt:      targetDescription,
           timestamp:   new Date().toISOString()
         }));
-        window.location.href = '/result.html';
+
+        try {
+          // Show result in canvas
+          const mimeType = data.mimeType || 'image/png';
+          const src      = `data:${mimeType};base64,${data.imageData}`;
+          renderCanvasResult(src, '16:9');
+          saveToHistory(src, '16:9');
+          renderHistory();
+        } catch (successErr) {
+          console.error('Result render error:', successErr);
+        }
+
+        setSwapping(false);
       } catch {
         fsError.textContent = 'Network error. Please check your connection and try again.';
         fsError.className   = 'msg msg-error visible';
+        restoreCanvasEmpty();
         setSwapping(false);
       }
     });
