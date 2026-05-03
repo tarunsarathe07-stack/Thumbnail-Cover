@@ -140,22 +140,6 @@ const promptLimiter = rateLimit({
   }
 });
 
-// ─── Session-based generation rate limiter (in-memory) ────────────────────────
-const sessionGenCounts = new Map(); // key: username → { count, resetAt }
-const SESSION_GEN_LIMIT  = 10;
-const SESSION_GEN_WINDOW = 60 * 60 * 1000; // 1 hour
-
-function checkSessionRateLimit(username) {
-  const now    = Date.now();
-  const record = sessionGenCounts.get(username);
-  if (!record || now > record.resetAt) {
-    sessionGenCounts.set(username, { count: 1, resetAt: now + SESSION_GEN_WINDOW });
-    return true;
-  }
-  if (record.count >= SESSION_GEN_LIMIT) return false;
-  record.count++;
-  return true;
-}
 
 // ─── Auth middleware ───────────────────────────────────────────────────────────
 function requireAuth(req, res, next) {
@@ -195,7 +179,6 @@ app.post('/api/v1/auth', loginLimiter, (req, res) => {
   if (username === validUser && password === validPass) {
     req.session.loggedIn = true;
     req.session.user     = username;
-    req.session.credits  = req.session.credits ?? 120;
     activityLog(username, 'login', { ip: req.ip });
     return res.json({ success: true });
   }
@@ -230,10 +213,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // ─── Current user ──────────────────────────────────────────────────────────────
 app.get('/api/v1/session', (req, res) => {
-  res.json({
-    user:    req.session.user || 'User',
-    credits: req.session.credits ?? 120
-  });
+  res.json({ user: req.session.user || 'User' });
 });
 
 // ─── Preset faces ──────────────────────────────────────────────────────────────
@@ -359,17 +339,6 @@ app.post('/api/v1/process', imageLimiter, async (req, res) => {
       return res.status(500).json({ error: 'OpenAI API key not configured. Please set OPENAI_API_KEY in your .env file.' });
     }
 
-    // MOVE 5 — Session-level rate limit
-    if (!checkSessionRateLimit(req.session.user)) {
-      return res.status(429).json({ error: 'Too many requests. Please wait before generating again.' });
-    }
-
-    // MOVE 1 — Credit check
-    const currentCredits = req.session.credits ?? 120;
-    if (currentCredits <= 0) {
-      return res.status(402).json({ error: 'No credits remaining.' });
-    }
-
     let { prompt, aspectRatio, quality } = req.body;
 
     // MOVE 4 — Prompt sanitization
@@ -437,17 +406,12 @@ no checklists, no text lists`;
       return res.status(500).json({ error: 'No image returned by OpenAI. Try a different prompt.' });
     }
 
-    // MOVE 1 — Deduct credits after success
-    const cost = imageQuality === 'high' ? 2 : 1;
-    req.session.credits = Math.max(0, currentCredits - cost);
-
-    activityLog(req.session.user, 'generate', { ratio: aspectRatio, quality, creditsLeft: req.session.credits });
+    activityLog(req.session.user, 'generate', { ratio: aspectRatio, quality });
     return res.json({
-      success:         true,
+      success:     true,
       imageData,
-      mimeType:        'image/png',
-      aspectRatio,
-      creditsRemaining: req.session.credits
+      mimeType:    'image/png',
+      aspectRatio
     });
   } catch (err) {
     console.error('Generate error:', err);
