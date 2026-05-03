@@ -74,8 +74,16 @@ app.use(express.urlencoded({ extended: false }));
 
 // ─── Session ───────────────────────────────────────────────────────────────────
 if (!process.env.SESSION_SECRET) {
-  console.error('FATAL: SESSION_SECRET is not set — refusing to start with an insecure default.');
-  process.exit(1);
+  console.error('FATAL: SESSION_SECRET is not set.');
+  // process.exit(1) kills the Vercel serverless process on every cold start,
+  // causing FUNCTION_INVOCATION_FAILED before any response can be sent.
+  // Register a catch-all 500 handler and halt further initialisation via return
+  // (safe in CommonJS — Node wraps modules in a function).
+  // Local `node server.js` still exits non-zero via the guard below.
+  app.use((_req, res) => res.status(500).json({ error: 'Server misconfiguration: SESSION_SECRET is not set.' }));
+  module.exports = app;
+  if (require.main === module) process.exit(1);
+  return; // stop initialising — prevents insecure handlers from being registered
 }
 const isProduction = process.env.NODE_ENV === 'production';
 if (isProduction) app.set('trust proxy', 1);
