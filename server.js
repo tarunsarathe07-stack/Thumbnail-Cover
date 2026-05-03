@@ -371,9 +371,7 @@ app.post('/api/v1/process', imageLimiter, async (req, res) => {
     if (aspectRatio === '9:16') size = '1024x1792';
     else                        size = '1792x1024';
 
-    const finalPrompt = `${BRAND_KB}
-
-${sanitized},
+    const finalPrompt = `${sanitized},
 cinematic composition, dramatic lighting,
 bold integrated title text,
 professional YouTube thumbnail,
