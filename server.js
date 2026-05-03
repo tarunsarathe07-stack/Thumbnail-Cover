@@ -7,7 +7,9 @@ const fs       = require('fs');
 const OpenAI   = require('openai');
 const { toFile } = require('openai');
 const session  = require('cookie-session');
-const { rateLimit, ipKeyGenerator } = require('express-rate-limit');
+const { rateLimit } = require('express-rate-limit');
+// express-rate-limit does not export ipKeyGenerator; strip IPv6-mapped IPv4 inline
+const ipKeyGenerator = (ip) => (ip ?? 'unknown').replace(/^::ffff:/, '');
 const { log: activityLog }          = require('./activity-logger');
 
 // ─── Required environment variables ───────────────────────────────────────────
