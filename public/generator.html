@@ -432,30 +432,80 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
+      gap: 18px;
+      padding: 48px 48px 96px;
       z-index: 1;
+      overflow-y: auto;
     }
     .canvas-result.visible { display: flex; }
+
+    .preview-card {
+      width: min(100%, 980px);
+      max-height: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      padding: 16px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.035));
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 18px;
+      box-shadow:
+        0 24px 80px rgba(0,0,0,0.48),
+        inset 0 1px 0 rgba(255,255,255,0.08);
+      position: relative;
+      z-index: 1;
+    }
+
+    .preview-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      color: rgba(255,255,255,0.48);
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      line-height: 1.3;
+      text-transform: uppercase;
+      min-height: 22px;
+    }
+
+    .preview-ratio-badge {
+      flex-shrink: 0;
+      color: #D4A84F;
+      background: rgba(212,168,79,0.1);
+      border: 1px solid rgba(212,168,79,0.22);
+      border-radius: 999px;
+      padding: 3px 9px;
+      letter-spacing: 0.06em;
+    }
 
     .result-image-wrap {
       display: flex;
       align-items: center;
       justify-content: center;
       width: 100%;
-      height: 100%;
+      aspect-ratio: 16 / 9;
+      min-height: 0;
       overflow: hidden;
+      border-radius: 14px;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(212,168,79,0.08), transparent 32%),
+        rgba(255,255,255,0.025);
+      border: 1px solid rgba(255,255,255,0.08);
     }
+    .preview-card.ratio-9x16 {
+      width: min(100%, 460px);
+    }
+    .preview-card.ratio-9x16 .result-image-wrap { aspect-ratio: 9 / 16; }
+    .preview-card.ratio-16x9 .result-image-wrap { aspect-ratio: 16 / 9; }
     .result-image-wrap img {
       display: block;
-      max-width: 100%;
-      max-height: 100%;
-      width: auto;
-      height: auto;
+      width: 100%;
+      height: 100%;
       object-fit: contain;
-      border-radius: 12px;
-      box-shadow:
-        0 0 0 1px rgba(255,255,255,0.08),
-        0 20px 60px -10px rgba(0,0,0,0.9),
-        0 0 40px rgba(200,150,46,0.08);
+      background: #050506;
     }
 
     .canvas-result-actions { display: flex; gap: 12px; flex-shrink: 0; }
@@ -492,76 +542,45 @@
     }
     .result-new-btn:hover { border-color: rgba(255,255,255,0.3); color: #ffffff; }
 
-    /* LOADING OVERLAY — neural scanner */
+    /* LOADING OVERLAY — WebGL noise loader */
     .loading-overlay {
       position: absolute;
       inset: 0;
-      background: rgba(10,10,11,0.96);
+      background: rgba(10,10,11,0.97);
       display: none;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       z-index: 10;
-      flex-direction: column;
+      padding: 48px;
     }
     .loading-overlay.active { display: flex; }
 
-    .clean-loader {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 32px;
+    .loading-preview-card {
+      width: min(100%, 620px);
     }
-    .loader-rings {
-      position: relative;
-      width: 80px;
-      height: 80px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+
+    .loading-preview-card.ratio-9x16 {
+      width: min(100%, 360px);
     }
-    .loader-ring {
-      position: absolute;
-      border-radius: 50%;
-      border: 1.5px solid transparent;
-      animation: ring-spin linear infinite;
+
+    .loading-preview-frame {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.025);
+      border: 1px solid rgba(255,255,255,0.08);
     }
-    .ring-1 {
-      width: 80px;
-      height: 80px;
-      border-top-color: #D4A84F;
-      border-right-color: rgba(212,168,79,0.3);
-      animation-duration: 1.8s;
+
+    .loading-preview-card.ratio-9x16 .loading-preview-frame {
+      width: auto;
+      height: min(58vh, 560px);
+      aspect-ratio: 9 / 16;
+      align-self: center;
     }
-    .ring-2 {
-      width: 56px;
-      height: 56px;
-      border-top-color: rgba(212,168,79,0.6);
-      border-left-color: rgba(212,168,79,0.2);
-      animation-duration: 1.2s;
-      animation-direction: reverse;
-    }
-    .ring-3 {
-      width: 32px;
-      height: 32px;
-      border-top-color: rgba(212,168,79,0.9);
-      animation-duration: 0.8s;
-    }
-    .loader-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: #D4A84F;
-      box-shadow: 0 0 12px rgba(212,168,79,0.8);
-      animation: dot-pulse 1.8s ease-in-out infinite;
-    }
-    @keyframes ring-spin {
-      from { transform: rotate(0deg); }
-      to   { transform: rotate(360deg); }
-    }
-    @keyframes dot-pulse {
-      0%, 100% { opacity: 0.4; transform: scale(0.8); }
-      50%      { opacity: 1;   transform: scale(1.2); }
-    }
+
+    /* old spinner loader removed — replaced by WebGL canvas */
     .loader-status {
       font-size: 0.82rem;
       color: rgba(255,255,255,0.4);
@@ -675,7 +694,9 @@
       display: flex;
       gap: 10px;
       flex-shrink: 0;
-      padding: 12px 0 16px;
+      padding: 2px 0 0;
+      justify-content: flex-end;
+      flex-wrap: wrap;
     }
     .result-btn-download {
       background: linear-gradient(135deg, #D4A84F, #C8962E);
@@ -691,6 +712,12 @@
       box-shadow: 0 4px 16px rgba(212,168,79,0.35);
     }
     .result-btn-download:hover { opacity: 0.9; transform: translateY(-1px); }
+    .result-btn-download:disabled,
+    .result-btn-regen:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      transform: none;
+    }
     .result-btn-regen {
       background: rgba(255,255,255,0.07);
       border: 1px solid rgba(255,255,255,0.15);
@@ -802,12 +829,17 @@
       width: 80px;
       height: 45px;
       border-radius: 6px;
-      object-fit: cover;
+      object-fit: contain;
+      background: rgba(255,255,255,0.035);
       border: 1px solid rgba(255,255,255,0.08);
       cursor: pointer;
       flex-shrink: 0;
       transition: all 0.2s;
       opacity: 0.6;
+    }
+    .history-thumb.ratio-9x16 {
+      width: 36px;
+      height: 64px;
     }
     .history-thumb:hover {
       opacity: 1;
@@ -832,31 +864,52 @@
       display: block;
     }
 
+    /* WEBGL NOISE LOADER */
+    .webgl-loader-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 28px;
+      width: 100%;
+    }
+
+    .noise-canvas {
+      width: 100%;
+      height: 100%;
+      border-radius: 0;
+      display: block;
+    }
+
+    .webgl-loader-text {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+    }
+
     /* MOBILE */
     @media (max-width: 768px) {
       body.page-body { overflow: auto; height: auto; }
       .workspace { flex-direction: column; height: auto; }
       .control-panel { width: 100%; min-width: unset; height: auto; overflow: visible; }
-      .canvas-panel { height: auto; min-height: 60vh; padding-bottom: 180px; }
+      .canvas-panel { height: auto; min-height: 60vh; padding: 28px 16px 118px; }
       .panel-footer { position: static; }
+      .loading-overlay { padding: 28px 16px 118px; }
+      .preview-card { padding: 12px; border-radius: 16px; }
+      .preview-card-top { font-size: 0.65rem; }
       .result-actions-fixed {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
         display: flex;
-        background: rgba(10,10,11,0.95);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        padding: 12px 16px 24px;
-        border-top: 1px solid rgba(255,255,255,0.06);
-        justify-content: center;
-        z-index: 100;
+        padding: 0;
+        justify-content: stretch;
         gap: 12px;
       }
+      .result-btn-download,
+      .result-btn-regen { flex: 1; padding-left: 12px; padding-right: 12px; }
       #historyStrip {
         position: fixed;
-        bottom: 80px;
+        bottom: 0;
         left: 0;
         right: 0;
         z-index: 99;
@@ -866,8 +919,10 @@
         border-top: 1px solid rgba(255,255,255,0.06);
       }
       .canvas-result {
-        padding-bottom: 180px;
-        overflow-y: auto;
+        position: relative;
+        inset: auto;
+        padding: 0;
+        min-height: 52vh;
       }
     }
   </style>
@@ -1072,16 +1127,21 @@
 
       <!-- Loading overlay -->
       <div class="loading-overlay" id="loadingOverlay">
-        <div class="clean-loader">
-          <div class="loader-rings">
-            <div class="loader-ring ring-1"></div>
-            <div class="loader-ring ring-2"></div>
-            <div class="loader-ring ring-3"></div>
-            <div class="loader-dot"></div>
+        <div class="preview-card loading-preview-card ratio-16x9" id="loadingPreviewCard" data-ratio="16:9">
+          <div class="preview-card-top">
+            <span>Generating preview</span>
+            <span class="preview-ratio-badge" id="loadingRatioBadge">16:9</span>
           </div>
-          <div class="loader-status" id="neuralStatus">Initialising generation...</div>
-          <div class="neural-progress-wrap">
-            <div class="neural-progress-bar" id="neuralProgressBar"></div>
+          <div class="loading-preview-frame">
+            <canvas id="noiseCanvas" class="noise-canvas"></canvas>
+          </div>
+          <div class="webgl-loader-text">
+            <div class="loader-status" id="neuralStatus">
+              Initialising generation...
+            </div>
+            <div class="neural-progress-wrap">
+              <div class="neural-progress-bar" id="neuralProgressBar"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -1112,12 +1172,18 @@
 
       <!-- Result state -->
       <div class="canvas-result" id="canvasResult">
-        <div class="result-image-wrap">
-          <img id="resultImage" src="" alt="Generated thumbnail" />
-        </div>
-        <div class="result-actions-fixed">
+        <div class="preview-card result-preview-card ratio-16x9" id="previewCard" data-ratio="16:9">
+          <div class="preview-card-top">
+            <span>Thumbnail preview</span>
+            <span class="preview-ratio-badge" id="resultRatioBadge">16:9</span>
+          </div>
+          <div class="result-image-wrap">
+            <img id="resultImage" src="" alt="Generated thumbnail" />
+          </div>
+          <div class="result-actions-fixed">
           <button class="result-btn-download" id="hoverDownloadBtn">↓ Download</button>
           <button class="result-btn-regen" id="hoverRegenBtn">↺ New Generation</button>
+          </div>
         </div>
       </div>
 
@@ -1130,6 +1196,225 @@
     </div><!-- /canvas-panel -->
 
   </div><!-- /workspace -->
+
+  <script id="webgl-loader-script">
+  (function () {
+    'use strict';
+
+    // ── Vertex Shader ────────────────────────────────────────────
+    const VERT = `
+attribute vec4 a_position;
+void main() {
+  gl_Position = a_position;
+}
+`;
+
+    // ── Fragment Shader ──────────────────────────────────────────
+    const FRAG = `
+precision highp float;
+
+uniform float u_time;
+uniform vec2  u_resolution;
+uniform vec3  u_color1;
+uniform vec3  u_color2;
+uniform vec3  u_color3;
+
+vec2 hash2(vec2 p) {
+  p = vec2(
+    dot(p, vec2(127.1, 311.7)),
+    dot(p, vec2(269.5, 183.3))
+  );
+  return -1.0 + 2.0 * fract(sin(p) * 43758.5453123);
+}
+
+float gnoise(vec2 p) {
+  vec2 i = floor(p);
+  vec2 f = fract(p);
+  vec2 u = f * f * (3.0 - 2.0 * f);
+  return mix(
+    mix(dot(hash2(i + vec2(0,0)), f - vec2(0,0)),
+        dot(hash2(i + vec2(1,0)), f - vec2(1,0)), u.x),
+    mix(dot(hash2(i + vec2(0,1)), f - vec2(0,1)),
+        dot(hash2(i + vec2(1,1)), f - vec2(1,1)), u.x),
+    u.y);
+}
+
+float fbm(vec2 p) {
+  float v    = 0.0;
+  float amp  = 0.5;
+  float freq = 1.0;
+  mat2  rot  = mat2(cos(0.5), sin(0.5), -sin(0.5), cos(0.5));
+  for (int i = 0; i < 6; i++) {
+    v    += amp * gnoise(p * freq);
+    p     = rot * p;
+    freq *= 2.0;
+    amp  *= 0.5;
+  }
+  return v;
+}
+
+float warpedFbm(vec2 p, float t) {
+  vec2 q = vec2(
+    fbm(p + vec2(0.0, 0.0) + 0.15 * t),
+    fbm(p + vec2(5.2, 1.3) + 0.15 * t)
+  );
+  vec2 r = vec2(
+    fbm(p + 3.5 * q + vec2(1.7, 9.2) + 0.12 * t),
+    fbm(p + 3.5 * q + vec2(8.3, 2.8) + 0.12 * t)
+  );
+  return fbm(p + 3.5 * r + 0.1 * t);
+}
+
+float grain(vec2 uv, float t) {
+  vec2 gp = uv * u_resolution * 0.5;
+  return fract(
+    sin(dot(gp + fract(t * 0.1), vec2(127.1, 311.7))) * 43758.5453
+  );
+}
+
+void main() {
+  vec2 uv = gl_FragCoord.xy / u_resolution;
+  vec2 p  = (uv - 0.5) * vec2(u_resolution.x / u_resolution.y, 1.0);
+  p *= 2.8;
+
+  float t = u_time * 0.18;
+  float n = warpedFbm(p, t);
+  float v = n * 0.5 + 0.5;
+
+  float vig = 1.0 - smoothstep(0.4, 1.2,
+    length((uv - 0.5) * vec2(1.6, 1.0)));
+  v *= vig;
+
+  float g = grain(uv, u_time);
+  v = mix(v, v + (g - 0.5) * 0.18, 0.65);
+  v = clamp(v, 0.0, 1.0);
+
+  vec3 col;
+  if (v < 0.45) {
+    col = mix(u_color1, u_color2, smoothstep(0.0, 0.45, v));
+  } else {
+    col = mix(u_color2, u_color3, smoothstep(0.45, 1.0, v));
+  }
+
+  gl_FragColor = vec4(col, 1.0);
+}
+`;
+
+    // ── WebGL state ──────────────────────────────────────────────
+    let gl, program, rafId;
+    let startTime = null;
+    let isRunning = false;
+
+    const C1 = [0.04, 0.07, 0.09];   // midnight blue
+    const C2 = [0.12, 0.22, 0.28];   // slate teal
+    const C3 = [0.83, 0.66, 0.31];   // gold
+
+    function compileShader(gl, src, type) {
+      const s = gl.createShader(type);
+      gl.shaderSource(s, src);
+      gl.compileShader(s);
+      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+        console.error('Shader compile error:', gl.getShaderInfoLog(s));
+        gl.deleteShader(s);
+        return null;
+      }
+      return s;
+    }
+
+    function initWebGL(canvas) {
+      const opts = {
+        alpha: false, antialias: false, depth: false,
+        stencil: false, preserveDrawingBuffer: false
+      };
+      gl = canvas.getContext('webgl', opts)
+        || canvas.getContext('experimental-webgl', opts);
+      if (!gl) { console.warn('WebGL not available'); return false; }
+
+      const vert = compileShader(gl, VERT, gl.VERTEX_SHADER);
+      const frag = compileShader(gl, FRAG, gl.FRAGMENT_SHADER);
+      if (!vert || !frag) return false;
+
+      program = gl.createProgram();
+      gl.attachShader(program, vert);
+      gl.attachShader(program, frag);
+      gl.linkProgram(program);
+      if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+        console.error('Program link error:', gl.getProgramInfoLog(program));
+        return false;
+      }
+
+      const buf = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+        -1,-1,  1,-1, -1, 1,
+        -1, 1,  1,-1,  1, 1
+      ]), gl.STATIC_DRAW);
+
+      const loc = gl.getAttribLocation(program, 'a_position');
+      gl.enableVertexAttribArray(loc);
+      gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+
+      return true;
+    }
+
+    function resizeCanvas(canvas) {
+      const dpr  = Math.min(window.devicePixelRatio || 1, 2);
+      const rect = canvas.getBoundingClientRect();
+      const w    = Math.round(rect.width  * dpr);
+      const h    = Math.round(rect.height * dpr);
+      if (canvas.width !== w || canvas.height !== h) {
+        canvas.width  = w;
+        canvas.height = h;
+      }
+    }
+
+    function render(ts) {
+      if (!isRunning) return;
+      rafId = requestAnimationFrame(render);
+
+      const canvas = document.getElementById('noiseCanvas');
+      if (!canvas || !gl) return;
+
+      resizeCanvas(canvas);
+      gl.viewport(0, 0, canvas.width, canvas.height);
+      gl.useProgram(program);
+
+      if (startTime === null) startTime = ts;
+      const t = (ts - startTime) * 0.001;
+
+      const ul  = (n)       => gl.getUniformLocation(program, n);
+      const setF  = (n, v)       => gl.uniform1f(ul(n), v);
+      const set2f = (n, x, y)   => gl.uniform2f(ul(n), x, y);
+      const set3f = (n, r, g, b) => gl.uniform3f(ul(n), r, g, b);
+
+      setF ('u_time',       t);
+      set2f('u_resolution', canvas.width, canvas.height);
+      set3f('u_color1',     ...C1);
+      set3f('u_color2',     ...C2);
+      set3f('u_color3',     ...C3);
+
+      gl.drawArrays(gl.TRIANGLES, 0, 6);
+    }
+
+    // ── Public API ───────────────────────────────────────────────
+    window.NoiseLoader = {
+      start() {
+        const canvas = document.getElementById('noiseCanvas');
+        if (!canvas) return;
+        if (!gl && !initWebGL(canvas)) return;
+        startTime = null;
+        isRunning = true;
+        resizeCanvas(canvas);
+        rafId = requestAnimationFrame(render);
+      },
+      stop() {
+        isRunning = false;
+        if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+      }
+    };
+
+  })();
+  </script>
 
   <script src="/js/app.js"></script>
   <script>
@@ -1247,6 +1532,41 @@
     const ratioCards = document.querySelectorAll('.ratio-card');
     let selectedWidth  = 1536;
     let selectedHeight = 1024;
+    let currentPreviewRatio = '16:9';
+
+    function normalizeAspectRatio(ratio) {
+      return ratio === '9:16' ? '9:16' : '16:9';
+    }
+
+    function applyPreviewRatio(ratio) {
+      currentPreviewRatio = normalizeAspectRatio(ratio);
+      const ratioClass = currentPreviewRatio === '9:16' ? 'ratio-9x16' : 'ratio-16x9';
+      ['previewCard', 'loadingPreviewCard'].forEach(id => {
+        const card = document.getElementById(id);
+        if (!card) return;
+        card.dataset.ratio = currentPreviewRatio;
+        card.classList.remove('ratio-16x9', 'ratio-9x16');
+        card.classList.add(ratioClass);
+      });
+      ['resultRatioBadge', 'loadingRatioBadge'].forEach(id => {
+        const badge = document.getElementById(id);
+        if (badge) badge.textContent = currentPreviewRatio;
+      });
+    }
+
+    function renderCanvasResult(src, aspectRatio) {
+      applyPreviewRatio(aspectRatio);
+      document.getElementById('canvasEmpty').style.display = 'none';
+      document.getElementById('canvasResult').classList.add('visible');
+      document.getElementById('resultImage').src = src;
+    }
+
+    function restoreCanvasEmpty() {
+      document.getElementById('canvasResult').classList.remove('visible');
+      document.getElementById('canvasEmpty').style.display = 'flex';
+      const img = document.getElementById('resultImage');
+      if (img) img.removeAttribute('src');
+    }
 
     ratioCards.forEach(card => {
       card.addEventListener('click', () => {
@@ -1254,8 +1574,10 @@
         card.classList.add('active');
         selectedWidth  = parseInt(card.dataset.width);
         selectedHeight = parseInt(card.dataset.height);
+        applyPreviewRatio(card.dataset.ratio);
       });
     });
+    applyPreviewRatio(document.querySelector('.ratio-card.active')?.dataset.ratio || '16:9');
 
     // ── Neural scanner loading overlay ────────────────────────────
     const neuralMessages = [
@@ -1275,12 +1597,19 @@
       const statusEl   = document.getElementById('neuralStatus');
       const progressEl = document.getElementById('neuralProgressBar');
       let msgIndex = 0;
-      neuralProgress = 0;
+
       if (statusEl)   statusEl.textContent = neuralMessages[0];
       if (progressEl) progressEl.style.width = '0%';
+
+      // Start WebGL noise animation
+      if (window.NoiseLoader) window.NoiseLoader.start();
+
+      neuralProgress = 0;
       neuralInterval = setInterval(() => {
         msgIndex = (msgIndex + 1) % neuralMessages.length;
-        neuralProgress = Math.min(neuralProgress + (100 / neuralMessages.length), 92);
+        neuralProgress = Math.min(
+          neuralProgress + (100 / neuralMessages.length), 92
+        );
         if (statusEl)   statusEl.textContent = neuralMessages[msgIndex];
         if (progressEl) progressEl.style.width = neuralProgress + '%';
       }, 2000);
@@ -1288,11 +1617,18 @@
 
     function stopNeuralScanner() {
       if (neuralInterval) clearInterval(neuralInterval);
+
       const progressEl = document.getElementById('neuralProgressBar');
       if (progressEl) progressEl.style.width = '100%';
+
+      // Stop WebGL animation after 600ms (gives progress bar time to fill)
+      setTimeout(() => {
+        if (window.NoiseLoader) window.NoiseLoader.stop();
+      }, 600);
     }
 
     function showLoadingOverlay(quality) {
+      applyPreviewRatio(currentPreviewRatio);
       document.getElementById('loadingOverlay').classList.add('active');
       startNeuralScanner();
     }
@@ -1332,6 +1668,8 @@
       genBtn.disabled       = on;
       genText.textContent   = on ? 'Generating…' : '⚡ Generate Thumbnail';
       genSpin.style.display = on ? 'inline-block' : 'none';
+      if (hoverDownloadBtn) hoverDownloadBtn.disabled = on;
+      if (hoverRegenBtn) hoverRegenBtn.disabled = on;
       if (on) showLoadingOverlay(quality); else hideLoadingOverlay();
     }
 
@@ -1347,9 +1685,10 @@
         return;
       }
 
-      const aspectRatio = document.querySelector('.ratio-card.active')?.dataset.ratio || '16:9';
+      const aspectRatio = normalizeAspectRatio(document.querySelector('.ratio-card.active')?.dataset.ratio || '16:9');
       const quality     = document.querySelector('input[name="quality"]:checked')?.value || 'medium';
 
+      applyPreviewRatio(aspectRatio);
       document.getElementById('canvasResult').classList.remove('visible');
       document.getElementById('canvasEmpty').style.display = 'none';
       setGenerating(true, quality);
@@ -1366,6 +1705,7 @@
           genError.textContent = data.error || 'Generation failed. Please try again.';
           genError.classList.add('visible');
           setTimeout(() => genError.classList.remove('visible'), 4000);
+          restoreCanvasEmpty();
           setGenerating(false);
           return;
         }
@@ -1385,10 +1725,9 @@
           // Show result in canvas
           const mimeType = data.mimeType || 'image/png';
           const src      = `data:${mimeType};base64,${data.imageData}`;
-          document.getElementById('canvasEmpty').style.display = 'none';
-          document.getElementById('canvasResult').classList.add('visible');
-          document.getElementById('resultImage').src = src;
-          saveToHistory(src);
+          const returnedRatio = normalizeAspectRatio(data.aspectRatio || aspectRatio);
+          renderCanvasResult(src, returnedRatio);
+          saveToHistory(src, returnedRatio);
           renderHistory();
         } catch (successErr) {
           console.error('Result render error:', successErr);
@@ -1399,6 +1738,7 @@
         genError.textContent = 'Network error. Please check your connection and try again.';
         genError.classList.add('visible');
         setTimeout(() => genError.classList.remove('visible'), 4000);
+        restoreCanvasEmpty();
         setGenerating(false);
       }
     });
@@ -1430,10 +1770,7 @@
 
     if (hoverRegenBtn) {
       hoverRegenBtn.addEventListener('click', () => {
-        document.querySelector('.canvas-result').classList.remove('visible');
-        document.querySelector('.canvas-empty').style.display = 'flex';
-        const ri = document.getElementById('resultImage');
-        if (ri) ri.src = '';
+        restoreCanvasEmpty();
       });
     }
 
@@ -1490,14 +1827,18 @@
       }
     }
 
-    function saveToHistory(imageUrl) {
+    function saveToHistory(imageUrl, aspectRatio = currentPreviewRatio) {
       if (!imageUrl || imageUrl.length < 10) {
         console.warn('[ThumbAI] saveToHistory: invalid URL, skipping');
         return;
       }
       console.log('[ThumbAI] saveToHistory called, url length:', imageUrl.length);
       const history = loadHistory();
-      const newEntry = { url: imageUrl, ts: Date.now() };
+      const newEntry = {
+        url: imageUrl,
+        ts: Date.now(),
+        aspectRatio: normalizeAspectRatio(aspectRatio)
+      };
       const updated = [newEntry, ...history].slice(0, MAX_HISTORY);
       try {
         localStorage.setItem(HISTORY_KEY, JSON.stringify(updated));
@@ -1519,7 +1860,9 @@
       scroll.innerHTML = '';
       history.forEach((item, idx) => {
         const img     = document.createElement('img');
-        img.className = 'history-thumb';
+        const itemRatio = normalizeAspectRatio(item.aspectRatio || '16:9');
+        img.className = 'history-thumb ' + (itemRatio === '9:16' ? 'ratio-9x16' : 'ratio-16x9');
+        img.dataset.ratio = itemRatio;
         img.src       = item.url;
         img.loading   = 'lazy';
         img.title     = new Date(item.ts).toLocaleTimeString();
@@ -1528,12 +1871,7 @@
           img.parentElement && img.parentElement.remove();
         };
         img.addEventListener('click', () => {
-          const ri = document.getElementById('resultImage');
-          if (ri) ri.src = item.url;
-          const ce = document.getElementById('canvasEmpty');
-          const cr = document.getElementById('canvasResult');
-          if (ce) ce.style.display = 'none';
-          if (cr) cr.classList.add('visible');
+          renderCanvasResult(item.url, itemRatio);
         });
         scroll.appendChild(img);
       });
@@ -1597,6 +1935,9 @@
       fsBtn.disabled       = on;
       fsText.textContent   = on ? 'Processing…' : 'Swap Face →';
       fsSpin.style.display = on ? 'inline-block' : 'none';
+      genBtn.disabled      = on;
+      if (hoverDownloadBtn) hoverDownloadBtn.disabled = on;
+      if (hoverRegenBtn) hoverRegenBtn.disabled = on;
       if (on) showLoadingOverlay(); else hideLoadingOverlay();
     }
 
@@ -1611,6 +1952,7 @@
 
       const targetDescription = 'YouTube thumbnail with this person\'s face, cinematic lighting, dramatic composition';
 
+      applyPreviewRatio('16:9');
       document.getElementById('canvasResult').classList.remove('visible');
       document.getElementById('canvasEmpty').style.display = 'none';
       setSwapping(true);
@@ -1630,6 +1972,7 @@
         if (!res.ok || !data.success) {
           fsError.textContent = data.error || 'Face swap failed. Please try again.';
           fsError.className   = 'msg msg-error visible';
+          restoreCanvasEmpty();
           setSwapping(false);
           return;
         }
@@ -1646,10 +1989,8 @@
           // Show result in canvas
           const mimeType = data.mimeType || 'image/png';
           const src      = `data:${mimeType};base64,${data.imageData}`;
-          document.getElementById('canvasEmpty').style.display = 'none';
-          document.getElementById('canvasResult').classList.add('visible');
-          document.getElementById('resultImage').src = src;
-          saveToHistory(src);
+          renderCanvasResult(src, '16:9');
+          saveToHistory(src, '16:9');
           renderHistory();
         } catch (successErr) {
           console.error('Result render error:', successErr);
@@ -1659,6 +2000,7 @@
       } catch {
         fsError.textContent = 'Network error. Please check your connection and try again.';
         fsError.className   = 'msg msg-error visible';
+        restoreCanvasEmpty();
         setSwapping(false);
       }
     });
