@@ -1,0 +1,14 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#db2777"/>
+      <stop offset="100%" stop-color="#9d174d"/>
+    </linearGradient>
+  </defs>
+  <rect width="200" height="200" fill="url(#bg)"/>
+  <path d="M 10 200 Q 15 148 100 142 Q 185 148 190 200 Z" fill="rgba(255,255,255,0.88)"/>
+  <rect x="88" y="124" width="24" height="20" rx="8" fill="rgba(255,255,255,0.88)"/>
+  <circle cx="100" cy="96" r="44" fill="rgba(255,255,255,0.88)"/>
+  <text x="100" y="104" font-family="Arial,Helvetica,sans-serif" font-size="44" font-weight="700" fill="#db2777" text-anchor="middle" dominant-baseline="middle">P</text>
+  <text x="100" y="185" font-family="Arial,Helvetica,sans-serif" font-size="14" font-weight="600" fill="rgba(255,255,255,0.92)" text-anchor="middle">Priya</text>
+</svg>

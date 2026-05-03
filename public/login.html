@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ThumbAI — AI YouTube Thumbnail Generator</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+  <meta name="description" content="Create cinematic YouTube thumbnails with AI in seconds. No design skills needed.">
+  <meta property="og:title" content="ThumbAI — AI YouTube Thumbnail Generator">
+  <meta property="og:description" content="Create cinematic YouTube thumbnails with AI in seconds. No design skills needed.">
+  <meta property="og:image" content="/assets/theatre.jpeg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="ThumbAI">
+  <meta name="twitter:description" content="Create cinematic YouTube thumbnails with AI in seconds.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+  <style>
+    /* Dark cinematic overrides for landing page */
+
+    body {
+      background: #0A0A0B;
+      color: #ffffff;
+    }
+
+    /* Noise texture overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      opacity: 0.04;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Apple depth shadow */
+    .apple-depth {
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.05),
+                  0 10px 30px -10px rgba(0,0,0,0.8);
+    }
+
+    /* Gold glow button */
+    .btn-gold-glow {
+      background: linear-gradient(135deg, #D4A84F, #C8962E);
+      color: #000000;
+      box-shadow: 0 0 40px rgba(200,150,46,0.4);
+      border: none;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .btn-gold-glow:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 0 60px rgba(200,150,46,0.5);
+    }
+
+    /* Glassmorphism card */
+    .glass-card {
+      background: rgba(255,255,255,0.04);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 20px;
+    }
+
+    /* Dark feature cards */
+    .feature-card-dark {
+      background: rgba(255,255,255,0.04);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 20px;
+      padding: 32px;
+      position: relative;
+      overflow: hidden;
+      transition: background 0.2s ease;
+    }
+    .feature-card-dark:hover {
+      background: rgba(255,255,255,0.06);
+    }
+
+    /* Glow blob behind feature card icons */
+    .feature-card-dark::before {
+      content: '';
+      position: absolute;
+      top: -40px;
+      right: -40px;
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      filter: blur(40px);
+      opacity: 0.2;
+      transition: opacity 0.2s ease;
+    }
+    .feature-card-dark:hover::before {
+      opacity: 0.3;
+    }
+
+    /* Glow colors per card */
+    .glow-gold::before   { background: #C8962E; }
+    .glow-blue::before   { background: #3b82f6; }
+    .glow-purple::before { background: #a855f7; }
+    .glow-emerald::before{ background: #10b981; }
+
+    /* Feature icon container */
+    .feature-icon-box {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      margin-bottom: 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Navbar update */
+    nav.navbar {
+      background: rgba(18,18,18,0.8) !important;
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    /* Hero title update */
+    .hero-title {
+      color: #ffffff;
+    }
+    .hero-title .gold {
+      background: linear-gradient(135deg, #D4A84F, #C8962E);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* Hero subtitle */
+    .hero-sub {
+      color: rgba(255,255,255,0.6);
+    }
+
+    /* Hero eyebrow */
+    .hero-eyebrow {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.7);
+    }
+
+    /* Login card glass */
+    .login-card {
+      background: rgba(255,255,255,0.04) !important;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.07) !important;
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.05),
+                  0 10px 30px -10px rgba(0,0,0,0.8);
+    }
+
+    .login-card-title {
+      color: #ffffff;
+    }
+    .login-card-sub {
+      color: rgba(255,255,255,0.5);
+    }
+
+    /* Glass input fields */
+    .form-input-glass {
+      background: rgba(255,255,255,0.05) !important;
+      border: 1px solid rgba(255,255,255,0.1) !important;
+      color: #ffffff !important;
+    }
+    .form-input-glass::placeholder {
+      color: rgba(255,255,255,0.3);
+    }
+    .form-input-glass:focus {
+      border-color: #C8962E !important;
+      box-shadow: 0 0 0 3px rgba(200,150,46,0.2) !important;
+    }
+
+    /* Sign In button */
+    #loginBtn {
+      background: linear-gradient(135deg, #D4A84F, #C8962E) !important;
+      color: #000000 !important;
+      box-shadow: 0 0 20px rgba(200,150,46,0.3);
+    }
+    #loginBtn:hover {
+      box-shadow: 0 0 40px rgba(200,150,46,0.5);
+      transform: translateY(-1px);
+    }
+
+    /* Features section */
+    .features {
+      background: transparent;
+    }
+    .features-eyebrow {
+      color: #C8962E;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid rgba(255,255,255,0.06);
+      background: transparent;
+    }
+
+    /* Hero min-height */
+    .hero {
+      min-height: 100vh;
+    }
+    .hero-bg {
+      background-size: cover !important;
+      background-position: center top !important;
+      min-height: 100vh;
+    }
+
+    .hero-content {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      gap: 48px;
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 40px;
+    }
+
+    .hero-left {
+      flex: 1;
+      max-width: 580px;
+    }
+
+    .hero-right {
+      flex-shrink: 0;
+      width: 380px;
+    }
+
+    @media (max-width: 768px) {
+      .hero-content {
+        flex-direction: column;
+        padding: 0 20px;
+        gap: 32px;
+      }
+      .hero-right {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="nav">
+    <span class="nav-logo">ThumbAI</span>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+
+    <div class="hero-content">
+
+      <!-- Left — headline -->
+      <div class="hero-left animate-in">
+        <div class="hero-eyebrow">✦ AI-Powered Creator Tool</div>
+        <h1 class="hero-title">
+          Create<br>
+          <span class="gold">Thumbnails</span><br>
+          That Stop<br>The Scroll.
+        </h1>
+        <p class="hero-sub">
+          Generate stunning YouTube thumbnails and cover art in seconds.
+          Cinematic quality — zero design skills needed.
+        </p>
+        <div class="hero-actions">
+          <button
+            class="btn btn-primary"
+            style="background:#C8962E;color:#000;border-color:#C8962E;"
+            onclick="document.getElementById('loginSection').scrollIntoView({behavior:'smooth'})"
+          >
+            Get Started Free
+          </button>
+        </div>
+
+
+      </div>
+
+      <!-- Right — login card -->
+      <div class="hero-right animate-in" id="loginSection" style="animation-delay:.12s">
+        <div class="login-card">
+          <div class="login-card-title">Welcome Back</div>
+          <div class="login-card-sub">Sign in to start creating</div>
+
+          <form class="login-form" id="loginForm" novalidate>
+            <div class="form-group">
+              <input
+                class="form-input-glass"
+                type="text"
+                id="username"
+                placeholder="Username"
+                autocomplete="username"
+              >
+            </div>
+            <div class="form-group">
+              <input
+                class="form-input-glass"
+                type="password"
+                id="password"
+                placeholder="Password"
+                autocomplete="current-password"
+              >
+            </div>
+
+            <div class="msg msg-error" id="loginError"></div>
+
+            <button class="btn btn-primary btn-full" type="submit" id="loginBtn">
+              <span id="loginBtnText">Sign In</span>
+              <span class="spinner" id="loginSpinner" style="display:none"></span>
+            </button>
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Feature cards -->
+  <section class="features">
+    <div class="features-inner">
+      <p class="features-eyebrow">Everything you need</p>
+      <h3 style="color:#ffffff;font-size:2rem;font-weight:800;letter-spacing:-0.03em;text-align:center;margin-bottom:48px;">
+        Master Your CTR
+      </h3>
+      <div class="feature-grid">
+
+        <div class="feature-card-dark glow-gold fade-up">
+          <div class="feature-icon-box"
+            style="background:rgba(200,150,46,0.1);border:1px solid rgba(200,150,46,0.2);">
+            <span style="color:#C8962E;">⚡</span>
+          </div>
+          <div class="feature-title"
+            style="color:#ffffff;font-size:1.1rem;font-weight:700;margin-bottom:8px;">
+            AI Generation
+          </div>
+          <div class="feature-desc"
+            style="color:rgba(255,255,255,0.5);">
+            Generate professional thumbnails from any text description in under 2 minutes.
+          </div>
+        </div>
+
+        <div class="feature-card-dark glow-blue fade-up" style="transition-delay:.08s">
+          <div class="feature-icon-box"
+            style="background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2);">
+            <span style="color:#60a5fa;">◉</span>
+          </div>
+          <div class="feature-title"
+            style="color:#ffffff;font-size:1.1rem;font-weight:700;margin-bottom:8px;">
+            Face Swap
+          </div>
+          <div class="feature-desc"
+            style="color:rgba(255,255,255,0.5);">
+            Swap faces with AI precision. Use preset educators or upload your own face image.
+          </div>
+        </div>
+
+        <div class="feature-card-dark glow-purple fade-up" style="transition-delay:.16s">
+          <div class="feature-icon-box"
+            style="background:rgba(168,85,247,0.1);border:1px solid rgba(168,85,247,0.2);">
+            <span style="color:#c084fc;">▭</span>
+          </div>
+          <div class="feature-title"
+            style="color:#ffffff;font-size:1.1rem;font-weight:700;margin-bottom:8px;">
+            Two Formats
+          </div>
+          <div class="feature-desc"
+            style="color:rgba(255,255,255,0.5);">
+            Create 16:9 YouTube thumbnails and 9:16 vertical for Shorts and Instagram Reels.
+          </div>
+        </div>
+
+        <div class="feature-card-dark glow-emerald fade-up" style="transition-delay:.24s">
+          <div class="feature-icon-box"
+            style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);">
+            <span style="color:#34d399;">✦</span>
+          </div>
+          <div class="feature-title"
+            style="color:#ffffff;font-size:1.1rem;font-weight:700;margin-bottom:8px;">
+            Prompt Assistant
+          </div>
+          <div class="feature-desc"
+            style="color:rgba(255,255,255,0.5);">
+            AI suggests optimised prompts based on your topic so you get better results.
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <footer style="text-align:center;font-size:12px;color:#888888;padding:24px 0;">
+    Handcrafted with <span style="color:#C8962E;">♥</span> by Tarun
+  </footer>
+
+  <script src="/js/app.js"></script>
+  <script>
+    'use strict';
+
+    const form    = document.getElementById('loginForm');
+    const errorEl = document.getElementById('loginError');
+    const btn     = document.getElementById('loginBtn');
+    const btnText = document.getElementById('loginBtnText');
+    const spinner = document.getElementById('loginSpinner');
+
+    function setLoading(on) {
+      btn.disabled          = on;
+      btnText.textContent   = on ? 'Signing in…' : 'Sign In';
+      spinner.style.display = on ? 'inline-block' : 'none';
+    }
+    function showError(msg) {
+      errorEl.textContent = msg;
+      errorEl.className   = 'msg msg-error visible';
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errorEl.className = 'msg msg-error';
+
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+      if (!username || !password) { showError('Please enter your username and password.'); return; }
+
+      setLoading(true);
+      try {
+        const res  = await fetch('/api/v1/auth', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ username, password })
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          window.location.href = '/generator.html';
+        } else {
+          showError(data.error || 'Invalid credentials. Please try again.');
+          setLoading(false);
+        }
+      } catch {
+        showError('Network error. Please check your connection and try again.');
+        setLoading(false);
+      }
+    });
+  </script>
+</body>
+</html>
