@@ -256,7 +256,18 @@ app.post('/api/v1/enhance', promptLimiter, async (req, res) => {
     if (!openaiClient) {
       return res.status(500).json({ error: 'OpenAI API key not configured.' });
     }
-    const { topic, category } = req.body;
+    const { topic, category, aspectRatio } = req.body;
+    const directionMode = String(req.body.directionMode || 'auto').toLowerCase();
+    const directionGuides = {
+      auto: 'Auto Art Direction: choose the strongest premium thumbnail direction for the topic.',
+      poster: 'Poster: bias toward a symbolic premium poster system with iconic objects, dramatic scale, and memorable composition.',
+      news: 'News: bias toward urgent current-affairs drama, sharp stakes, alert energy, and instant headline clarity.',
+      academic: 'Academic: bias toward ed-tech and exam-prep visuals such as study war rooms, books, notes, clocks, whiteboards, discipline, and high-stakes learning.',
+      tech: 'Tech: bias toward AI, startup, business, and rivalry visuals with premium futuristic or documentary energy.',
+      face: 'Face: bias toward emotion-led thumbnails where a human expression carries the click, without forcing awkward framing.',
+      typography: 'Typography: bias toward big readable title-led design, poster typography, and minimal supporting visuals.'
+    };
+    const directionGuide = directionGuides[directionMode] || directionGuides.auto;
     const userInput = (topic || category || '').trim();
     if (!userInput) {
       return res.status(400).json({ error: 'Topic or category is required.' });
@@ -270,71 +281,39 @@ app.post('/api/v1/enhance', promptLimiter, async (req, res) => {
       messages: [
         {
           role: 'system',
-          content: `You are a YouTube thumbnail strategist. Convert the user's topic into a visual image prompt engineered for maximum click-through rate.
+          content: `You are ScrollStop's senior thumbnail art director. Convert the user's topic into a premium image-generation prompt for GPT Image.
 
-RULE 1 — TOPIC PRESERVATION (most important):
-Never replace, rename, or substitute the user's topic.
-Use the exact subject, named entities, and event from the input.
-"Supreme Court strikes down reservation" → output must feature the Supreme Court and reservation policy — not a generic judge or activist.
-"UAE leaves OPEC" → output must reference UAE and OPEC visually.
-"CLAT 2026 last 30 days" → output must feature a CLAT student, not a generic student.
-Build the visual around the actual topic. Never invent a substitute narrative.
+Your job is to add taste, not rigid instructions. Preserve the user's actual topic, named entities, and core event, but choose an iconic visual metaphor instead of a literal checklist.
 
-RULE 2 — FACE DOMINANCE:
-Include a human face showing extreme emotion matching the topic sentiment.
-Shock, disbelief, fear, excitement — pick the one that fits.
-Close-up framing, face fills 50%+ of the left side of the frame.
+Creative direction principles:
+- Let the image model choose the strongest composition, typography, lighting, and subject placement.
+- Prefer a bold poster-like thumbnail system: one clear idea, strong title typography, memorable symbol or scene, dramatic contrast.
+- Use faces only when they genuinely improve click appeal. Do not force a face into every topic.
+- For legal, politics, education, tech, finance, creator, or entertainment topics, choose the visual language that feels most premium and platform-native.
+- For 16:9, optimize for YouTube home/search readability. For 9:16, optimize for Shorts/Reels mobile cover readability.
+- Use the requested direction mode as taste guidance, not as a fixed template.
+- Avoid clutter, watermarks, app UI, tiny unreadable text, bullet lists, and generic stock-photo scenes.
 
-RULE 3 — CONTRAST & POP:
-Vivid complementary colours. Subject pops against background.
-High contrast. No muddy or flat tones.
-
-RULE 4 — CURIOSITY GAP:
-One unexpected or unresolved visual element that makes the viewer ask "what happened?"
-
-RULE 5 — TEXT PLACEMENT ZONE:
-For ALL aspect ratios, use bold text integrated at the top or bottom of the frame.
-Never push text to the side or reserve a side column.
-For 16:9: bold title text bottom, full width, high contrast.
-For 9:16: bold title text top or bottom, full width, cinematic.
-Always end with: 'bold title text bottom full width'.
-
-RULE 6 — DEPTH & DRAMA:
-Cinematic depth-of-field, rim lighting, or volumetric light rays.
-Never flat lighting.
-
-RULE 7 — SIMPLICITY:
-One hero subject. One background. Maximum two supporting elements.
-
-OUTPUT FORMAT:
-Comma-separated visual phrases only. No sentences. No markdown. No explanation.
-Structure: [hero subject + emotion tied to actual topic], [environment matching topic],
-[lighting], [camera angle], [colour palette], [text placement — always 'bold title text bottom full width'], [typography style]
-Maximum 90 words.
-
-TYPOGRAPHY — append exactly one:
-- News/politics/current affairs → 'distressed grunge bold typography, breaking news style'
-- Education/exam/CLAT/study → 'clean bold sans-serif, academic poster style'
-- Legal/court/justice/Supreme Court → 'newspaper headline bold, official document style'
-- Conflict/war/drama → 'movie poster epic lettering, metallic embossed'
-- Finance/business/economy/OPEC → 'sleek modern sans-serif, Forbes magazine style'
-- Default → 'bold high-contrast modern typography'
-
-NEVER include: bullet points, lists, watermarks, YouTube UI elements, play buttons.
-One powerful visual concept only.`
+Output only the final image prompt. No markdown, no explanation, no bullets. Keep it under 140 words.
+The prompt should start with: Create a premium [format] thumbnail/cover for: "[title]"`
         },
-        { role: 'user', content: userInput }
+        {
+          role: 'user',
+          content: `Title/topic: ${userInput}
+Aspect ratio: ${aspectRatio === '9:16' ? '9:16 vertical Shorts/Reels cover' : '16:9 YouTube thumbnail'}
+Direction mode: ${directionGuide}`
+        }
       ],
-      max_tokens: 120
+      max_tokens: 220
     });
 
     const rawPrompt = completion.choices[0].message.content?.trim();
-    const prompt = `Title: ${userInput}\n\n${rawPrompt}`;
+    const prompt = rawPrompt || `Create a premium ${aspectRatio === '9:16' ? '9:16 vertical Shorts/Reels cover' : '16:9 YouTube thumbnail'} for: "${userInput}". Act as an elite thumbnail art director. Choose the strongest cinematic composition, typography, lighting, subject placement, and visual metaphor for maximum click appeal. Use bold readable title text, dramatic contrast, and one clear story. Avoid clutter, watermarks, app UI, or tiny unreadable text.`;
     if (!prompt) {
       return res.status(500).json({ error: 'No prompt returned. Try a different topic.' });
     }
 
-    activityLog(req.session.user, 'suggest-prompt', { topic: userInput.slice(0, 80) });
+    activityLog(req.session.user, 'suggest-prompt', { topic: userInput.slice(0, 80), directionMode });
     res.json({ prompt });
   } catch (err) {
     console.error('Suggest prompt error:', err);
@@ -392,13 +371,13 @@ app.post('/api/v1/process', imageLimiter, async (req, res) => {
     if (aspectRatio === '9:16') size = '1024x1792';
     else                        size = '1792x1024';
 
-    const finalPrompt = `${sanitized},
-cinematic composition, dramatic lighting,
-bold integrated title text,
-professional YouTube thumbnail,
-ultra realistic, high contrast,
-no watermarks, no bullet points,
-no checklists, no text lists`;
+    const formatLabel = aspectRatio === '9:16'
+      ? 'vertical 9:16 Shorts / Instagram Reels cover'
+      : 'landscape 16:9 YouTube thumbnail';
+
+    const finalPrompt = `${sanitized}
+
+Render as a premium ${formatLabel}. Let the model choose the strongest composition, typography, lighting, and subject placement for click appeal. The result must have bold readable title text, one clear focal idea, cinematic contrast, and professional creator-thumbnail polish. Avoid watermarks, app UI, tiny unreadable text, bullet lists, checklists, and clutter.`;
 
     let result;
     if (req.body.presenterImage) {
