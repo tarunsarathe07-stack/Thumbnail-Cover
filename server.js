@@ -341,12 +341,13 @@ Direction mode matters. Use it to choose taste, props, composition, color, and t
 Output only the creative brief. Keep it under 950 characters so it fits in the app textarea.
 Use this exact compact format:
 Create a premium [format] for: "[exact title]"
-Title design: [exact words, size/hierarchy/color treatment]
-Concept: [one strong visual idea]
-Specific props: [topic-specific props/entities/places, not generic symbols]
-Depth: [foreground / midground / background]
-Color grade: [one cinematic palette]
-Avoid: [short anti-generic constraints]`
+TITLE: [exact words to render in the image]
+TYPOGRAPHY: [size, weight, color, treatment — e.g. "oversized gold distressed, top 45% of frame"]
+HERO: [main subject — specific, not generic]
+PROPS: [2-3 topic-specific objects/entities/places, not generic symbols]
+COLOR GRADE: [one cinematic palette — e.g. "warm amber shadows, dark charcoal background"]
+DEPTH: FG [foreground object] | MG [midground subject/action] | BG [background environment]
+AVOID: [short anti-generic constraints specific to this topic]`
         },
         {
           role: 'user',
@@ -360,12 +361,13 @@ Direction mode: ${directionGuide}`
 
     const rawPrompt = completion.choices[0].message.content?.trim();
     const prompt = rawPrompt || `Create a premium ${formatLabel} for: "${userInput}"
-Title design: exact title as bold designed hero typography with clear hierarchy and color contrast.
-Concept: one strong platform-native visual idea with premium poster energy.
-Specific props: topic-specific objects, entities, places, or symbols that prove the subject.
-Depth: foreground object / midground subject / background environment.
-Color grade: cinematic palette matched to the topic.
-Avoid: generic AI template, random warning icons, random clocks, stock faces, clutter, tiny text, UI, watermarks.`;
+TITLE: ${userInput}
+TYPOGRAPHY: oversized bold hero typography with strong color contrast, occupying 35-50% of frame
+HERO: compelling subject specific to the topic
+PROPS: topic-specific objects, entities, places, or symbols that prove the subject
+COLOR GRADE: cinematic palette matched to the topic
+DEPTH: FG topic-relevant object | MG main subject | BG environment
+AVOID: generic AI template, random warning icons, random clocks, stock faces, clutter, tiny text, UI, watermarks`;
     if (!prompt) {
       return res.status(500).json({ error: 'No prompt returned. Try a different topic.' });
     }
