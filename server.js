@@ -59,6 +59,74 @@ const BRAND_KB = `Brand Visual Style Guide for Professional Thumbnails:
 - Subjects and people must match the topic context and ethnicity where relevant
 - Hyper-realistic photographic quality, no cartoons or illustrations`;
 
+const REFERENCE_THUMBNAIL_RULES = `ScrollStop reference-quality rules:
+- Make title typography a designed hero, not pasted text. If title-led, it should own about 35-50% of the frame.
+- Use exact topic-specific props, institutions, people, books, symbols, places, or product cues instead of generic icons.
+- Build three visible depth planes: foreground object, mid subject/action, background environment.
+- Choose one cinematic color grade that fits the topic: amber study room, steel blue tech, sepia legal, red/grey crisis, gold/political, etc.
+- Keep one strong visual idea. Avoid clutter, checklist walls, UI mockups, random warning triangles, random clocks, generic stock faces, tiny text, and default AI-thumbnail templates.`;
+
+const DIRECTION_GUIDES = {
+  auto: `Choose the strongest reference-quality archetype for the topic. Decide whether it should be typography-led, symbolic poster, face-led, documentary/news, academic, or tech rivalry.`,
+  poster: `Symbolic premium poster. Use iconic objects at dramatic scale, strong title hierarchy, deep shadows, premium texture, and one memorable scene.`,
+  news: `Urgent current-affairs drama. Use real institutions, flags, city/place cues, political/legal props, crowd or conflict context, and headline-scale typography.`,
+  academic: `Ed-tech/exam quality. Use subject-specific books, notes, exam halls, study lamps, desks, admit cards, syllabus cues, Indian student context where relevant, and disciplined study-war-room lighting. Do not overuse clocks unless time pressure is central.`,
+  tech: `AI/startup/business rivalry. Use product/entity-specific visual cues, futuristic or documentary lighting, polished hardware/interface-adjacent symbolism, and premium steel-blue/gold contrast.`,
+  face: `Emotion-led thumbnail. Use a face only when expression carries the click; make it specific, intense, and context-aware rather than a generic stock reaction.`,
+  typography: `Title-led design. Make typography the main composition with minimal but specific supporting imagery, strong font contrast, banners/highlights, and excellent readability.`
+};
+
+function formatLabelForRatio(aspectRatio) {
+  return aspectRatio === '9:16'
+    ? 'vertical 9:16 Shorts / Instagram Reels cover'
+    : 'landscape 16:9 YouTube thumbnail';
+}
+
+function directionGuideFor(mode) {
+  return DIRECTION_GUIDES[mode] || DIRECTION_GUIDES.auto;
+}
+
+function buildReferenceSuffix(formatLabel) {
+  return `Render as a premium ${formatLabel}.
+
+Reference-quality requirements:
+- Integrate the exact title text as designed thumbnail typography, not as a plain caption.
+- If the thumbnail is title-led, let typography occupy roughly 35-50% of the frame with mixed weight/color hierarchy.
+- Include topic-specific props, entities, places, books, institutions, product symbols, or visual cues that prove the image understands the subject.
+- Create three depth planes: foreground object, midground subject/action, background environment.
+- Use one distinct cinematic color grade matched to the topic.
+- Keep one clear focal idea with premium YouTube/Shorts cover polish.
+
+Avoid default AI-thumbnail templates, random warning icons, random clocks unless central to the idea, generic stock faces, cluttered checklists, app UI, watermarks, tiny unreadable text, bullet lists, and side-panel layouts.`;
+}
+
+async function buildPremiumArtDirection(openaiClient, inputPrompt, aspectRatio) {
+  const formatLabel = formatLabelForRatio(aspectRatio);
+  const completion = await openaiClient.chat.completions.create({
+    model: 'gpt-4o-mini',
+    messages: [
+      {
+        role: 'system',
+        content: `You are ScrollStop's final art director for premium thumbnail generation.
+
+Rewrite the user's prompt into one decisive GPT Image prompt that matches these proven ScrollStop reference thumbnails:
+${REFERENCE_THUMBNAIL_RULES}
+
+Keep the user's title/topic and named entities exact. Do not invent unrelated people or false facts. Choose the strongest visual metaphor, typography system, props, color grade, and depth layout. The output must be image-generation prompt text only, under 180 words.`
+      },
+      {
+        role: 'user',
+        content: `Format: ${formatLabel}
+User prompt or creative brief:
+${inputPrompt}`
+      }
+    ],
+    max_tokens: 260
+  });
+
+  return completion.choices[0].message.content?.trim();
+}
+
 // ─── Multer config ─────────────────────────────────────────────────────────────
 const storage = multer.memoryStorage();
 const upload  = multer({
@@ -248,16 +316,7 @@ app.post('/api/v1/enhance', promptLimiter, async (req, res) => {
     }
     const { topic, category, aspectRatio } = req.body;
     const directionMode = String(req.body.directionMode || 'auto').toLowerCase();
-    const directionGuides = {
-      auto: 'Auto Art Direction: choose the strongest premium thumbnail direction for the topic.',
-      poster: 'Poster: bias toward a symbolic premium poster system with iconic objects, dramatic scale, and memorable composition.',
-      news: 'News: bias toward urgent current-affairs drama, sharp stakes, alert energy, and instant headline clarity.',
-      academic: 'Academic: bias toward ed-tech and exam-prep visuals such as study war rooms, books, notes, clocks, whiteboards, discipline, and high-stakes learning.',
-      tech: 'Tech: bias toward AI, startup, business, and rivalry visuals with premium futuristic or documentary energy.',
-      face: 'Face: bias toward emotion-led thumbnails where a human expression carries the click, without forcing awkward framing.',
-      typography: 'Typography: bias toward big readable title-led design, poster typography, and minimal supporting visuals.'
-    };
-    const directionGuide = directionGuides[directionMode] || directionGuides.auto;
+    const directionGuide = directionGuideFor(directionMode);
     const userInput = (topic || category || '').trim();
     if (!userInput) {
       return res.status(400).json({ error: 'Topic or category is required.' });
@@ -266,39 +325,49 @@ app.post('/api/v1/enhance', promptLimiter, async (req, res) => {
       return res.status(400).json({ error: 'Topic is too long.' });
     }
 
+    const formatLabel = formatLabelForRatio(aspectRatio);
     const completion = await openaiClient.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [
         {
           role: 'system',
-          content: `You are ScrollStop's senior thumbnail art director. Convert the user's topic into a premium image-generation prompt for GPT Image.
+          content: `You are ScrollStop's senior thumbnail art director. Convert the user's topic into a compact editable creative brief for GPT Image.
 
-Your job is to add taste, not rigid instructions. Preserve the user's actual topic, named entities, and core event, but choose an iconic visual metaphor instead of a literal checklist.
+Match the quality of premium ScrollStop reference thumbnails:
+${REFERENCE_THUMBNAIL_RULES}
 
-Creative direction principles:
-- Let the image model choose the strongest composition, typography, lighting, and subject placement.
-- Prefer a bold poster-like thumbnail system: one clear idea, strong title typography, memorable symbol or scene, dramatic contrast.
-- Use faces only when they genuinely improve click appeal. Do not force a face into every topic.
-- For legal, politics, education, tech, finance, creator, or entertainment topics, choose the visual language that feels most premium and platform-native.
-- For 16:9, optimize for YouTube home/search readability. For 9:16, optimize for Shorts/Reels mobile cover readability.
-- Use the requested direction mode as taste guidance, not as a fixed template.
-- Avoid clutter, watermarks, app UI, tiny unreadable text, bullet lists, and generic stock-photo scenes.
+Direction mode matters. Use it to choose taste, props, composition, color, and typography, but do not force a rigid template.
 
-Output only the final image prompt. No markdown, no explanation, no bullets. Keep it under 140 words.
-The prompt should start with: Create a premium [format] thumbnail/cover for: "[title]"`
+Output only the creative brief. Keep it under 950 characters so it fits in the app textarea.
+Use this exact compact format:
+Create a premium [format] for: "[exact title]"
+TITLE: [exact words to render in the image]
+TYPOGRAPHY: [size, weight, color, treatment — e.g. "oversized gold distressed, top 45% of frame"]
+HERO: [main subject — specific, not generic]
+PROPS: [2-3 topic-specific objects/entities/places, not generic symbols]
+COLOR GRADE: [one cinematic palette — e.g. "warm amber shadows, dark charcoal background"]
+DEPTH: FG [foreground object] | MG [midground subject/action] | BG [background environment]
+AVOID: [short anti-generic constraints specific to this topic]`
         },
         {
           role: 'user',
           content: `Title/topic: ${userInput}
-Aspect ratio: ${aspectRatio === '9:16' ? '9:16 vertical Shorts/Reels cover' : '16:9 YouTube thumbnail'}
+Format: ${formatLabel}
 Direction mode: ${directionGuide}`
         }
       ],
-      max_tokens: 220
+      max_tokens: 260
     });
 
     const rawPrompt = completion.choices[0].message.content?.trim();
-    const prompt = rawPrompt || `Create a premium ${aspectRatio === '9:16' ? '9:16 vertical Shorts/Reels cover' : '16:9 YouTube thumbnail'} for: "${userInput}". Act as an elite thumbnail art director. Choose the strongest cinematic composition, typography, lighting, subject placement, and visual metaphor for maximum click appeal. Use bold readable title text, dramatic contrast, and one clear story. Avoid clutter, watermarks, app UI, or tiny unreadable text.`;
+    const prompt = rawPrompt || `Create a premium ${formatLabel} for: "${userInput}"
+TITLE: ${userInput}
+TYPOGRAPHY: oversized bold hero typography with strong color contrast, occupying 35-50% of frame
+HERO: compelling subject specific to the topic
+PROPS: topic-specific objects, entities, places, or symbols that prove the subject
+COLOR GRADE: cinematic palette matched to the topic
+DEPTH: FG topic-relevant object | MG main subject | BG environment
+AVOID: generic AI template, random warning icons, random clocks, stock faces, clutter, tiny text, UI, watermarks`;
     if (!prompt) {
       return res.status(500).json({ error: 'No prompt returned. Try a different topic.' });
     }
@@ -350,13 +419,21 @@ app.post('/api/v1/process', imageLimiter, async (req, res) => {
     if (aspectRatio === '9:16') size = '1024x1792';
     else                        size = '1792x1024';
 
-    const formatLabel = aspectRatio === '9:16'
-      ? 'vertical 9:16 Shorts / Instagram Reels cover'
-      : 'landscape 16:9 YouTube thumbnail';
+    const formatLabel = formatLabelForRatio(aspectRatio);
+    let directedPrompt = sanitized;
 
-    const finalPrompt = `${sanitized}
+    if (imageQuality === 'high') {
+      try {
+        const premiumPrompt = await buildPremiumArtDirection(openaiClient, sanitized, aspectRatio);
+        if (premiumPrompt) directedPrompt = premiumPrompt.slice(0, 1600);
+      } catch (preflightErr) {
+        console.warn('Premium art direction preflight failed:', preflightErr.message);
+      }
+    }
 
-Render as a premium ${formatLabel}. Let the model choose the strongest composition, typography, lighting, and subject placement for click appeal. The result must have bold readable title text, one clear focal idea, cinematic contrast, and professional creator-thumbnail polish. Avoid watermarks, app UI, tiny unreadable text, bullet lists, checklists, and clutter.`;
+    const finalPrompt = `${directedPrompt}
+
+${buildReferenceSuffix(formatLabel)}`;
 
     let result;
     if (req.body.presenterImage) {
