@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Create Thumbnail — ThumbAI</title>
+  <title>Create Thumbnail - ScrollStop</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
   <meta name="description" content="Create cinematic YouTube thumbnails with AI in seconds. No design skills needed.">
-  <meta property="og:title" content="ThumbAI — AI YouTube Thumbnail Generator">
+  <meta property="og:title" content="ScrollStop - AI Thumbnail Studio">
   <meta property="og:description" content="Create cinematic YouTube thumbnails with AI in seconds. No design skills needed.">
   <meta property="og:image" content="/assets/theatre.jpeg">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="ThumbAI">
+  <meta name="twitter:title" content="ScrollStop">
   <meta name="twitter:description" content="Create cinematic YouTube thumbnails with AI in seconds.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -219,6 +219,53 @@
       box-shadow: 0 0 12px rgba(212,168,79,0.15);
     }
     .enhance-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .direction-selector {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .direction-chip {
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.04);
+      color: rgba(255,255,255,0.55);
+      border-radius: 10px;
+      padding: 10px 11px;
+      cursor: pointer;
+      font-family: inherit;
+      text-align: left;
+      transition: border-color 0.2s, background 0.2s, color 0.2s;
+    }
+
+    .direction-chip:hover {
+      border-color: rgba(255,255,255,0.16);
+      color: rgba(255,255,255,0.78);
+    }
+
+    .direction-chip.active {
+      border-color: rgba(200,150,46,0.48);
+      background: rgba(200,150,46,0.1);
+      color: #D4A84F;
+    }
+
+    .direction-chip span {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+
+    .direction-chip small {
+      display: block;
+      margin-top: 3px;
+      color: rgba(255,255,255,0.3);
+      font-size: 0.66rem;
+      line-height: 1.25;
+    }
+
+    .direction-chip.active small { color: rgba(212,168,79,0.62); }
 
     /* RATIO CARDS — dark override */
     .control-panel .ratio-card {
@@ -939,7 +986,7 @@
       <!-- Panel header: logo + credits + sign out -->
       <div class="panel-header">
         <div style="display:flex;align-items:center;justify-content:space-between;">
-          <div class="panel-logo">ThumbAI</div>
+          <div class="panel-logo">ScrollStop</div>
           <button class="sign-out-btn" id="logoutBtn" type="button">Sign out</button>
         </div>
         <div style="margin-top:12px;">
@@ -968,7 +1015,7 @@
               <textarea
                 class="prompt-textarea"
                 id="prompt"
-                placeholder="Paste your video title here.&#10;Example: CLAT 2027 Last 30 Days Strategy&#10;Then hit ✦ Enhance My Prompt for best results."
+                placeholder="Paste your video title here.&#10;Example: CLAT 2027 Last 30 Days Strategy&#10;Then hit Build Creative Direction for best results."
                 maxlength="1000"
                 rows="5"
               ></textarea>
@@ -976,8 +1023,8 @@
                 <span style="font-size:.72rem;color:rgba(255,255,255,0.25);"><span id="charCount">0</span> / 1000</span>
                 <span style="font-size:.72rem;color:rgba(255,255,255,0.2);">Ctrl+Enter to generate</span>
               </div>
-              <button type="button" class="enhance-btn" id="suggestBtn" title="AI will improve your prompt for better results">
-                ✦ Enhance My Prompt
+              <button type="button" class="enhance-btn" id="suggestBtn" title="ScrollStop will build a premium art direction prompt">
+                ✦ Build Creative Direction
               </button>
               <div class="presenter-upload-wrap">
                 <label class="presenter-upload-label" for="presenterImageInput">
@@ -989,6 +1036,41 @@
               </div>
               <div id="presenterPreview" class="presenter-preview" style="display:none">
                 <img id="presenterPreviewImg" src="" alt="Presenter" />
+              </div>
+            </div>
+
+            <!-- Creative direction -->
+            <div style="margin-bottom:20px;">
+              <div class="section-label">Direction</div>
+              <div class="direction-selector" id="directionSelector" aria-label="Creative direction mode">
+                <button class="direction-chip active" type="button" data-mode="auto">
+                  <span>Auto</span>
+                  <small>Best fit</small>
+                </button>
+                <button class="direction-chip" type="button" data-mode="poster">
+                  <span>Poster</span>
+                  <small>Symbolic</small>
+                </button>
+                <button class="direction-chip" type="button" data-mode="news">
+                  <span>News</span>
+                  <small>Urgent</small>
+                </button>
+                <button class="direction-chip" type="button" data-mode="academic">
+                  <span>Academic</span>
+                  <small>Ed-tech</small>
+                </button>
+                <button class="direction-chip" type="button" data-mode="tech">
+                  <span>Tech</span>
+                  <small>AI/startup</small>
+                </button>
+                <button class="direction-chip" type="button" data-mode="face">
+                  <span>Face</span>
+                  <small>Emotion</small>
+                </button>
+                <button class="direction-chip" type="button" data-mode="typography">
+                  <span>Typography</span>
+                  <small>Title-led</small>
+                </button>
               </div>
             </div>
 
@@ -1487,6 +1569,14 @@ void main() {
 
     // ── Prompt Assistant ───────────────────────────────────────────
     const suggestBtn = document.getElementById('suggestBtn');
+    const directionChips = document.querySelectorAll('.direction-chip');
+
+    directionChips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        directionChips.forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+      });
+    });
 
     suggestBtn.addEventListener('click', async () => {
       const topic = promptEl.value.trim();
@@ -1499,22 +1589,23 @@ void main() {
 
       try {
         const ratio = document.querySelector('.ratio-card.active')?.dataset.ratio || '16:9';
+        const directionMode = document.querySelector('.direction-chip.active')?.dataset.mode || 'auto';
         const r = await fetch('/api/v1/enhance', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
-          body: JSON.stringify({ topic, aspectRatio: ratio })
+          body: JSON.stringify({ topic, aspectRatio: ratio, directionMode })
         });
         const d = await r.json();
         if (d.prompt) {
           promptEl.value = d.prompt;
           autoResize(promptEl);
           if (charCountEl) charCountEl.textContent = d.prompt.length;
-          suggestBtn.textContent       = '✦ Enhanced — Edit freely';
+          suggestBtn.textContent       = '✦ Direction built - edit freely';
           suggestBtn.style.color       = '#D4A84F';
           suggestBtn.style.borderColor = 'rgba(212,168,79,0.5)';
           setTimeout(() => {
-            suggestBtn.textContent       = '✦ Enhance My Prompt';
+            suggestBtn.textContent       = '✦ Build Creative Direction';
             suggestBtn.style.color       = '';
             suggestBtn.style.borderColor = '';
           }, 3000);
@@ -1523,7 +1614,7 @@ void main() {
       finally {
         suggestBtn.disabled = false;
         if (suggestBtn.textContent === '✦ Thinking…') {
-          suggestBtn.textContent = '✦ Enhance My Prompt';
+          suggestBtn.textContent = '✦ Build Creative Direction';
         }
       }
     });
@@ -1817,22 +1908,22 @@ void main() {
         if (!raw) return [];
         const parsed = JSON.parse(raw);
         if (!Array.isArray(parsed)) {
-          console.warn('[ThumbAI] History corrupted — resetting');
+          console.warn('[ScrollStop] History corrupted — resetting');
           return [];
         }
         return parsed;
       } catch (e) {
-        console.error('[ThumbAI] loadHistory parse error:', e);
+        console.error('[ScrollStop] loadHistory parse error:', e);
         return [];
       }
     }
 
     function saveToHistory(imageUrl, aspectRatio = currentPreviewRatio) {
       if (!imageUrl || imageUrl.length < 10) {
-        console.warn('[ThumbAI] saveToHistory: invalid URL, skipping');
+        console.warn('[ScrollStop] saveToHistory: invalid URL, skipping');
         return;
       }
-      console.log('[ThumbAI] saveToHistory called, url length:', imageUrl.length);
+      console.log('[ScrollStop] saveToHistory called, url length:', imageUrl.length);
       const history = loadHistory();
       const newEntry = {
         url: imageUrl,
@@ -1842,19 +1933,19 @@ void main() {
       const updated = [newEntry, ...history].slice(0, MAX_HISTORY);
       try {
         localStorage.setItem(HISTORY_KEY, JSON.stringify(updated));
-        console.log('[ThumbAI] History saved, entries:', updated.length);
+        console.log('[ScrollStop] History saved, entries:', updated.length);
       } catch (e) {
-        console.error('[ThumbAI] localStorage write failed:', e);
+        console.error('[ScrollStop] localStorage write failed:', e);
       }
       renderHistory();
     }
 
     function renderHistory() {
       const history = loadHistory();
-      console.log('[ThumbAI] renderHistory, entries:', history.length);
+      console.log('[ScrollStop] renderHistory, entries:', history.length);
       const strip  = document.getElementById('historyStrip');
       const scroll = document.getElementById('historyScroll');
-      if (!strip || !scroll) { console.warn('[ThumbAI] historyStrip/Scroll not found'); return; }
+      if (!strip || !scroll) { console.warn('[ScrollStop] historyStrip/Scroll not found'); return; }
       if (!history.length) { strip.style.display = 'none'; return; }
       strip.style.display = 'flex';
       scroll.innerHTML = '';
@@ -1867,7 +1958,7 @@ void main() {
         img.loading   = 'lazy';
         img.title     = new Date(item.ts).toLocaleTimeString();
         img.onerror   = () => {
-          console.warn('[ThumbAI] History thumb failed to load, idx:', idx);
+          console.warn('[ScrollStop] History thumb failed to load, idx:', idx);
           img.parentElement && img.parentElement.remove();
         };
         img.addEventListener('click', () => {
